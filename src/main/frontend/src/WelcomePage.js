@@ -1,7 +1,10 @@
+import { useTranslation } from 'react-i18next';
+
 export default function WelcomePage() {
 
+    const {t} = useTranslation();
 
-    return(<button onClick = {LogIN}> Log In </button>)
+    return(<button onClick = {LogIN}> {t('log-in')} </button>)
 
 }
 function LogIN(){

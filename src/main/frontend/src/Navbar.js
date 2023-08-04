@@ -1,14 +1,18 @@
 import { Link, useMatch, useResolvedPath } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
+
+  const {t} = useTranslation();
+
   return (
     <nav className="nav">
       <Link to="/" className="site-title">
         Site Name
       </Link>
       <ul>
-        <CustomLink to="/profile">Profile</CustomLink>
-        <CustomLink to="/aboutproject">About Project</CustomLink>
+        <CustomLink to="/profile">{t('profile')}</CustomLink>
+        <CustomLink to="/aboutproject">{t('about-project')}</CustomLink>
       </ul>
     </nav>
   )

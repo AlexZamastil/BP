@@ -4,9 +4,12 @@ import Profile from "./Profile"
 import { Route, Routes } from "react-router-dom"
 import { useEffect, useState} from "react";
 import WelcomePage from "./WelcomePage"
+import { useTranslation } from 'react-i18next';
+
 
 function App() {
 
+  const {t} = useTranslation();
 
   return (
     <>
@@ -27,10 +30,13 @@ function App() {
 
 function RenderContent() {
 
+  const {t} = useTranslation();
+
     if (localStorage.getItem("user")== null){
       return(
         <div>
-            <p>welcomepage</p>
+            
+            <p>{t('welcome-page')}</p>
             <WelcomePage/>
         </div>
       
@@ -39,7 +45,7 @@ function RenderContent() {
       return(
         <div>
             <p>logged in</p>
-            <button on onClick={LogOut}> log out </button>
+            <button on onClick={LogOut}> {t('log-out')} </button>
         </div>
       
       )
@@ -50,6 +56,7 @@ function LogOut(){
   localStorage.clear("user")
   console.log(localStorage.getItem("user"))
   window.location.reload(false)
+  
 }
 
 
