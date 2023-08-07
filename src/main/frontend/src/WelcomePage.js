@@ -4,11 +4,30 @@ export default function WelcomePage() {
 
     const {t} = useTranslation();
 
-    return(<button onClick = {LogIN}> {t('log-in')} </button>)
+    return(
+    <ShowLogin/>
+    )
 
 }
-function LogIN(){
+
+
+  function LogIN(){
     localStorage.setItem("user", "honza")
     console.log(localStorage.getItem("user"))
     window.location.reload(false)
 }
+
+
+  function ShowLogin(){
+    const {t} = useTranslation();
+    if (localStorage.getItem("user")== null){
+    return(
+      <div>
+        <button on onClick={LogIN}> {t('log-in')} </button>
+          
+          <p>{t('welcome-page')}</p>
+          
+      </div>
+    
+    )
+  }} 

@@ -1,5 +1,7 @@
 import { Link, useMatch, useResolvedPath } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
+import styling from "./styling.css"
+import tempImage from "./sources/temp.png"
 
 export default function Navbar() {
 
@@ -7,12 +9,13 @@ export default function Navbar() {
 
   return (
     <nav className="nav">
-      <Link to="/" className="site-title">
-        Site Name
+      <Link to="/welcomePage" className="site-title">
+      <img src={tempImage} width={50} alt="temp" />
+
       </Link>
       <ul>
-        <CustomLink to="/profile">{t('profile')}</CustomLink>
-        <CustomLink to="/aboutproject">{t('about-project')}</CustomLink>
+        <CustomLink className="c-link" to="/profile"> <p>{t('profile')}</p> </CustomLink>
+        <CustomLink className="c-link" to="/aboutproject"> <p>{t('about-project')}</p> </CustomLink>
       </ul>
     </nav>
   )
