@@ -1,4 +1,4 @@
-package java.cz.uhk.fim.project.bakalarka.model;
+package cz.uhk.fim.project.bakalarka.model;
 
 import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
 import jakarta.persistence.*;
