@@ -5,7 +5,8 @@ import { Route, Routes } from "react-router-dom"
 import { useEffect, useState} from "react";
 import WelcomePage from "./WelcomePage"
 import { useTranslation } from 'react-i18next';
-
+import Login from "./Login"
+import Registration from "./Registration"
 
 function App() {
 
@@ -13,12 +14,15 @@ function App() {
 
   return (
     <>
-      <Navbar />
+    
+      {Navbar(localStorage.getItem("user"))}
       <div className="container">
         <Routes>
           <Route path="/aboutproject" element={<AboutProject/>} />
           <Route path="/profile" element={<Profile/>} />
           <Route path="/welcomePage" element={<WelcomePage/>} />
+          <Route path="/login" element={<Login/>} />
+          <Route path="/register" element={<Registration/>} />
         </Routes>
         
       </div>

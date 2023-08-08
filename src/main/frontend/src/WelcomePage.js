@@ -12,7 +12,7 @@ export default function WelcomePage() {
 
 
   function LogIN(){
-    localStorage.setItem("user", "honza")
+    localStorage.setItem("user", "TestUser0231")
     console.log(localStorage.getItem("user"))
     window.location.reload(false)
 }

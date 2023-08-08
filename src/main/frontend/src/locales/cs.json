@@ -2,5 +2,6 @@
     "site-name" : "Název stránky",
     "profile" : "Profil",
     "about-project" : "O Projektu",
-    "log-in" : "Přihlásit"
+    "log-in" : "Přihlásit",
+    "register" : "Registrace"
 }
