@@ -7,11 +7,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user", schema = "public")
 public class User {
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
-@Column(name = "pk_useriD")
+@Column(name = "pk_userid")
     private long id;
 
     @Column(name = "customindex")

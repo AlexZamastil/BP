@@ -7,10 +7,10 @@ export default function Login(){
   const handleClick =(e)=>{
     e.preventDefault();
 
-   fetch("http://localhost:8080/api/user/login",{
+   fetch("http://localhost:8080/api/basic/user/login",{
         method:"POST",
         headers:{
-          'Authorization': '',
+          'Authorization': 'No Auth',
             "Content-Type":"application/json"},
             body : JSON.stringify({
                 email : email,
@@ -18,19 +18,18 @@ export default function Login(){
             })
         }).then(async(response)=>{
           if (response.status === 200){
-            console.log('LOG IN SUCCESSFULL')
+            console.log('Logged in')
             return await response.json();
-            
+
           } else{
             throw await response.json();
-            
           }  
         }).then((response) => {
           localStorage.setItem('login', true);
           window.dispatchEvent(new Event('storage'));
          localStorage.setItem('token', response.message);
-        }).catch((err)=>{
-            console.log("error " + err.message)
+        }).catch((error)=>{
+            console.log("error " + error.message)
         })
             console.log(email, password)
   }

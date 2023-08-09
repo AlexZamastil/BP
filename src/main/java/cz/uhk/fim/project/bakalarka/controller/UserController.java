@@ -3,10 +3,7 @@ package cz.uhk.fim.project.bakalarka.controller;
 import cz.uhk.fim.project.bakalarka.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import cz.uhk.fim.project.bakalarka.service.UserService;
 
@@ -21,13 +18,19 @@ public class UserController {
         this.userService = userService;
     }
 
-
-
-    @PostMapping(value = "/user/login", consumes = {"application/json"})
-    public ResponseEntity<?> authenticateUser(@RequestBody User requestBody) {
-        return userService.authenticateUser(
+    @PostMapping(value = "basic/user/login", consumes = {"application/json"})
+    public ResponseEntity<?> loginUser(@RequestBody User requestBody) {
+        return userService.login(
                 requestBody.getEmail(),
                 requestBody.getPassword()
         );
+    }
+    @GetMapping(value = "test")
+    public String test(){
+        return "TEST";
+    }
+    @PostMapping("test-request")
+    public ResponseEntity<String> testPostRequest() {
+        return ResponseEntity.ok("POST request successful");
     }
 }

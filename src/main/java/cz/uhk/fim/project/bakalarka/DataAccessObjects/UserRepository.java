@@ -1,4 +1,4 @@
-package cz.uhk.fim.project.bakalarka.DAO;
+package cz.uhk.fim.project.bakalarka.DataAccessObjects;
 
 import cz.uhk.fim.project.bakalarka.model.User;
 import jakarta.transaction.Transactional;
@@ -23,6 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Modifying
     void newpassword(long id, String oldPassword, String newPassword);
+
 
 }
 

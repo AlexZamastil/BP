@@ -4,6 +4,7 @@ export default function WelcomePage() {
 
     const {t} = useTranslation();
 
+
     return(
     <ShowLogin/>
     )

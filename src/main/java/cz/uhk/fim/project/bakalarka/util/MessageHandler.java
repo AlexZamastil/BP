@@ -3,10 +3,10 @@ package cz.uhk.fim.project.bakalarka.util;
 import org.springframework.http.ResponseEntity;
 
 public class MessageHandler {
-    public ResponseEntity<Object> error(String errorText){
+    public static ResponseEntity<Object> error(String errorText){
         return ResponseEntity.badRequest().body(errorText);
     }
-    public ResponseEntity<Object> success(String text){
+    public static ResponseEntity<Object> success(String text){
         return ResponseEntity.ok(text);
     }
 
