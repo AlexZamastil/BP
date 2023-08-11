@@ -10,6 +10,7 @@ public class JWTUtils {
 
     private final String secret = "SECRET";
 
+
     public String generateJWToken(String userEmail) {
         JWTCreator.Builder jwtBuilder = JWT
                 .create()

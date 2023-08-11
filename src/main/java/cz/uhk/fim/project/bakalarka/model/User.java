@@ -37,7 +37,8 @@ public class User {
 
     @Column(name = "adminprivileges")
     private boolean adminPrivileges;
-
+    @Column(name = "token")
+    private String token;
     @OneToMany
     @JoinTable(name = "userbannedfood",
             joinColumns = {
@@ -51,7 +52,7 @@ public class User {
     }
 
 
-    public User(long id, float customIndex, LocalDate dateOfBirth, String email, double height, String nickname, String password, double weight, boolean adminPrivileges, Set<Food> bannedFood) {
+    public User(long id, float customIndex, LocalDate dateOfBirth, String email, double height, String nickname, String password, double weight, boolean adminPrivileges, Set<Food> bannedFood, String token) {
         this.id = id;
         this.customIndex = customIndex;
         this.dateOfBirth = dateOfBirth;
@@ -62,6 +63,7 @@ public class User {
         this.weight = weight;
         this.adminPrivileges = adminPrivileges;
         this.bannedFood = bannedFood;
+        this.token = token;
     }
 
     public long getId() {
@@ -134,5 +136,21 @@ public class User {
 
     public void setAdminPrivileges(boolean adminPrivileges) {
         this.adminPrivileges = adminPrivileges;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public Set<Food> getBannedFood() {
+        return bannedFood;
+    }
+
+    public void setBannedFood(Set<Food> bannedFood) {
+        this.bannedFood = bannedFood;
     }
 }

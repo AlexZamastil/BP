@@ -7,7 +7,7 @@ export default function Login(){
   const handleClick =(e)=>{
     e.preventDefault();
 
-   fetch("http://localhost:8080/api/basic/user/login",{
+   fetch("http://localhost:8080/api/nonauthorized/user/login",{
         method:"POST",
         headers:{
           'Authorization': 'No Auth',
@@ -19,10 +19,10 @@ export default function Login(){
         }).then(async(response)=>{
           if (response.status === 200){
             console.log('Logged in')
-            return await response.json();
+            return await response;
 
           } else{
-            throw await response.json();
+            throw await response;
           }  
         }).then((response) => {
           localStorage.setItem('login', true);

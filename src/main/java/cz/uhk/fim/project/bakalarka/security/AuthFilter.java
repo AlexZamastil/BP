@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
+
 @Component
 public class AuthFilter extends OncePerRequestFilter {
     JWTUtils jwtUtils;
@@ -25,21 +27,42 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-            boolean isRequestPrivileged = request.getServletPath().startsWith("api/privileged/");
+            boolean isPrivileged = request.getServletPath().startsWith("/api/privileged/");
+            boolean isAuthorized = request.getServletPath().startsWith("/api/authorized/");
+            boolean isNonauthorized = request.getServletPath().startsWith("/api/nonauthorized/");
 
-                    if(!isRequestPrivileged || request.getServletPath().startsWith("api/basic/")){
+                    if(isNonauthorized){
                         filterChain.doFilter(request,response);
                     }
                         else {
-                            String token =  request.getHeader("Authorization");
-                            String userEmail = jwtUtils.getEmail(token);
-                            User user = userRepository.findUserByEmail(userEmail);
-                            if (user.isAdminPrivileges()){
-                                filterChain.doFilter(request,response);
-                            }
-                            else {
+                        if (isAuthorized || isPrivileged) {
+                            try {
+                                String token = request.getHeader("Authorization").replace("Bearer ","");
+                                System.out.println(token);
+                                if(token.equals("")){
+                                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                }
+
+                                String userEmail = jwtUtils.getEmail(token);
+                                User user = userRepository.findUserByEmail(userEmail);
+
+                                if(Objects.equals(user.getToken(), token)){
+                                    if (isPrivileged) {
+                                        if (user.isAdminPrivileges()) {
+                                            filterChain.doFilter(request, response);
+                                        } else response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                    }
+                                }
+
+                                filterChain.doFilter(request, response);
+                            } catch (IOException | ServletException e) {
+                                e.printStackTrace();
                                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             }
+
+
+                        }
+                        else  response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     }
 
 

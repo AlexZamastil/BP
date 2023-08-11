@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserById(long Id);
 
+
     @Query(value = "CALL updateuserstats(?1,?2,?3,?4,?5,?6)",nativeQuery = true)
     @Transactional
     @Modifying

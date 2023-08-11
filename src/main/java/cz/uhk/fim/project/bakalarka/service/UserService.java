@@ -31,10 +31,13 @@ public class UserService {
             return MessageHandler.error("Wrong password");
         }
         String jwttoken = jwtUtils.generateJWToken(authUser.getEmail());
-        String jsonToken = "{ \"token\" : \""+jwttoken+"\"}";
+        authUser.setToken(jwttoken);
+        userRepository.save(authUser);
 
-        return MessageHandler.success(jsonToken);
+        return MessageHandler.success(jwttoken);
 
     }
+
+
 
 }

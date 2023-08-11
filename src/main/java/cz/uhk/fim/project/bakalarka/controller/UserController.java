@@ -18,7 +18,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "basic/user/login", consumes = {"application/json"})
+    @PostMapping(value = "nonauthorized/user/login", consumes = {"application/json"})
     public ResponseEntity<?> loginUser(@RequestBody User requestBody) {
         return userService.login(
                 requestBody.getEmail(),
@@ -29,7 +29,8 @@ public class UserController {
     public String test(){
         return "TEST";
     }
-    @PostMapping("test-request")
+
+    @PostMapping("authorized/test-request")
     public ResponseEntity<String> testPostRequest() {
         return ResponseEntity.ok("POST request successful");
     }
