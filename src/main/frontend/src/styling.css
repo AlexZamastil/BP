@@ -45,6 +45,12 @@
   margin-right: auto;
 }
 
+.error404 {
+  padding: 30px;
+  font-size:xx-large;
+  color:#61e248
+}
+
 @media (max-width: 768px) {
   .nav {
     flex-direction: column;

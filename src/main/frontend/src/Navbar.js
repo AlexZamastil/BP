@@ -21,8 +21,8 @@ export default function Navbar(props) {
           <CustomLink className="c-link" to="/aboutproject"> <p>{t('about-project')}</p> </CustomLink>
   
           {localStorage.getItem("user") == null ? (
-              <><CustomLink className="login-link" to="/login"> <p>{t('log-in')}</p> </CustomLink>
-                <CustomLink className="register-link" to="/register"> <p>{t('register')}</p> </CustomLink>
+              <><CustomLink className="c-link" to="/login"> <p>{t('log-in')}</p> </CustomLink>
+                <CustomLink className="c-link" to="/register"> <p>{t('register')}</p> </CustomLink>
               </>
               
         ) : (

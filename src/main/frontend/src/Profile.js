@@ -7,9 +7,6 @@ export default function Profile(){
 
     const {t} = useTranslation();
 
-    function LogOut(){
-      localStorage.clear("user");
-    }
     const handleLogout = ()=> {
       localStorage.clear("user");
       navigate("/WelcomePage");

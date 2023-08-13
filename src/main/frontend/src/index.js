@@ -8,7 +8,7 @@ import { I18nContext, I18nextProvider } from "react-i18next"
 const root = ReactDOM.createRoot(document.getElementById("root"))
 
 i18next.init({
-  interpolation: { escapeValue: false }, // For React components
+  interpolation: { escapeValue: false },
   lng: 'en', // Default language
   resources: {
     en: { translation: require('./locales/en.json') },

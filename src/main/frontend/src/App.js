@@ -7,6 +7,7 @@ import WelcomePage from "./WelcomePage"
 import { useTranslation } from 'react-i18next';
 import Login from "./Login"
 import Registration from "./Registration"
+import PageNotFound from "./PageNotFound";
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/welcomePage" element={<WelcomePage/>} />
           <Route path="/login" element={<Login/>} />
           <Route path="/register" element={<Registration/>} />
+          <Route path="*" element={<PageNotFound/>}/>
         </Routes>
         
       </div>
