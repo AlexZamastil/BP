@@ -30,7 +30,7 @@ public class UserService {
 
             return MessageHandler.error("Wrong password");
         }
-        String jwttoken = jwtUtils.generateJWToken(authUser.getEmail());
+        String jwttoken = jwtUtils.generateJWToken(authUser.getId());
         authUser.setToken(jwttoken);
         userRepository.save(authUser);
 

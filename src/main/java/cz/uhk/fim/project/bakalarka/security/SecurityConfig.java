@@ -47,9 +47,7 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .csrf().disable();
 
-
         http.cors();
-
 
         http.addFilterBefore(authFilter, BasicAuthenticationFilter.class);
 
@@ -77,7 +75,5 @@ public class SecurityConfig {
         return http.build();
     }
     */
-
-
 
 }

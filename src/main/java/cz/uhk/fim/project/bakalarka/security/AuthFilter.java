@@ -1,5 +1,6 @@
 package cz.uhk.fim.project.bakalarka.security;
 
+import com.auth0.jwt.interfaces.Claim;
 import cz.uhk.fim.project.bakalarka.DataAccessObjects.UserRepository;
 import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
@@ -43,8 +44,9 @@ public class AuthFilter extends OncePerRequestFilter {
                                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                 }
 
-                                String userEmail = jwtUtils.getEmail(token);
-                                User user = userRepository.findUserByEmail(userEmail);
+                                Claim userIDClaim = jwtUtils.getID(token);
+                                System.out.println(userIDClaim + "   CLAIM");
+                                User user = userRepository.findUserById(userIDClaim.asLong());
 
                                 if(Objects.equals(user.getToken(), token)){
                                     if (isPrivileged) {

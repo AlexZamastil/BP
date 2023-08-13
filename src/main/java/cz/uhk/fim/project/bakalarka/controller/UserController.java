@@ -25,7 +25,7 @@ public class UserController {
                 requestBody.getPassword()
         );
     }
-    @GetMapping(value = "test")
+    @GetMapping(value = "authorized/test")
     public String test(){
         return "TEST";
     }
