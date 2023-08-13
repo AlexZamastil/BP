@@ -1,6 +1,5 @@
 import { Link, useMatch, useResolvedPath } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
-import styling from "./styling.css"
 import logo_transparent from "./sources/logo_transparent.png"
 
 export default function Navbar(props) {

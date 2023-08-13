@@ -9,6 +9,8 @@ import Login from "./Login"
 import Registration from "./Registration"
 import PageNotFound from "./PageNotFound";
 
+
+
 function App() {
 
   const {t} = useTranslation();

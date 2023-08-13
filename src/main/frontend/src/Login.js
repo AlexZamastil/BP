@@ -7,7 +7,7 @@ export default function Login(){
 
   const navigate = useNavigate();
     
-  const handleClick =(e)=>{
+  const logInRequest =(e)=>{
     e.preventDefault();
 
    
@@ -30,6 +30,7 @@ export default function Login(){
           }  
         }).then(async(response) => {
          localStorage.setItem('token', response.message)
+         localStorage.setItem('user', email)
         return await response;
         }).then((response) => {
           if (response.status == 200){
@@ -59,7 +60,7 @@ export default function Login(){
        onChange={(e)=>setPassword(e.target.value)} />
       
       
-       <Button variant="contained" onClick={handleClick}> Submit </Button>
+       <Button variant="contained" onClick={logInRequest}> Submit </Button>
       </form>
       </Container>
     )

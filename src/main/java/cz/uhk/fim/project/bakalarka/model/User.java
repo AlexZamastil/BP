@@ -65,6 +65,12 @@ public class User {
         this.bannedFood = bannedFood;
         this.token = token;
     }
+    public User(String email, String nickname, String password, LocalDate dateOfBirth){
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.dateOfBirth = dateOfBirth;
+    }
 
     public long getId() {
         return id;
@@ -152,5 +158,22 @@ public class User {
 
     public void setBannedFood(Set<Food> bannedFood) {
         this.bannedFood = bannedFood;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", customIndex=" + customIndex +
+                ", dateOfBirth=" + dateOfBirth +
+                ", email='" + email + '\'' +
+                ", height=" + height +
+                ", nickname='" + nickname + '\'' +
+                ", password='" + password + '\'' +
+                ", weight=" + weight +
+                ", adminPrivileges=" + adminPrivileges +
+                ", token='" + token + '\'' +
+                ", bannedFood=" + bannedFood +
+                '}';
     }
 }

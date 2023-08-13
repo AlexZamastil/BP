@@ -1,6 +1,7 @@
 package cz.uhk.fim.project.bakalarka.controller;
 
 import cz.uhk.fim.project.bakalarka.model.User;
+import cz.uhk.fim.project.bakalarka.request.ChangePasswordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +20,34 @@ public class UserController {
     }
 
     @PostMapping(value = "nonauthorized/user/login", consumes = {"application/json"})
-    public ResponseEntity<?> loginUser(@RequestBody User requestBody) {
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
         return userService.login(
-                requestBody.getEmail(),
-                requestBody.getPassword()
+                user.getEmail(),
+                user.getPassword()
         );
     }
+
+    @PostMapping(value = "nonauthorized/user/register", consumes = {"application/json"})
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        System.out.println(user);
+        return userService.register(
+                user.getEmail(),
+                user.getNickname(),
+                user.getPassword(),
+                user.getDateOfBirth()
+        );
+    }
+    @PostMapping(value = "authorized/user/passwordreset", consumes = {"application/json"})
+    public ResponseEntity<?> newPassword(@RequestBody ChangePasswordRequest changePasswordRequest){
+        return userService.changePassword(
+                changePasswordRequest.getUserId(),
+                changePasswordRequest.getOldPassword(),
+                changePasswordRequest.getNewPassword()
+        );
+    }
+
+
+
     @GetMapping(value = "authorized/test")
     public String test(){
         return "TEST";
