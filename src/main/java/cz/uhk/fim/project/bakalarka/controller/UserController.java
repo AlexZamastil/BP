@@ -2,6 +2,8 @@ package cz.uhk.fim.project.bakalarka.controller;
 
 import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.request.ChangePasswordRequest;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,12 @@ public class UserController {
                 changePasswordRequest.getOldPassword(),
                 changePasswordRequest.getNewPassword()
         );
+    }
+
+    @GetMapping(value= "authorized/user/getuserdata")
+    public ResponseEntity<?> getUserData(HttpServletRequest request){
+        String header = request.getHeader("Authorization");
+        return userService.getUserData(header);
     }
 
 
