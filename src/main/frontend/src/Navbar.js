@@ -10,7 +10,7 @@ export default function Navbar(props) {
 
   return (
     
-    
+    <>
         <nav className="nav">
         <Link to="/welcomePage" className="logo">
         <img src={logo_transparent}  width={200} alt="temp" />
@@ -20,8 +20,8 @@ export default function Navbar(props) {
           <CustomLink className="c-link" to="/aboutproject"> <p>{t('about-project')}</p> </CustomLink>
   
           {localStorage.getItem("user") == null ? (
-              <><CustomLink className="c-link" to="/login"> <p>{t('log-in')}</p> </CustomLink>
-                <CustomLink className="c-link" to="/register"> <p>{t('register')}</p> </CustomLink>
+              <><CustomLink className="loginnav" to="/login"> <p>{t('log-in')}</p> </CustomLink>
+                <CustomLink className="registernav" to="/register"> <p>{t('register')}</p> </CustomLink>
               </>
               
         ) : (
@@ -30,9 +30,10 @@ export default function Navbar(props) {
         )
         }
         </ul>
-        
-        
+       
       </nav>
+       <hr className="hr-line"/>
+       </>
       )
 }
 

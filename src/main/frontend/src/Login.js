@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Container} from '@mui/system';
+import { Paper } from '@mui/material';
 import {TextField,Button} from '@mui/material';
-import {useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom";
 
 export default function Login(){
 
@@ -45,24 +46,28 @@ export default function Login(){
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     return (
-      <Container>
-
+      <div className='loginBG'>
+      <Container >
+        <Paper elevation={3} className='paper'>
       <form noValidate autoComplete="off">
       
-        <h1>Login</h1>
+        <h1>Login form</h1>
       
-      <TextField style={{margin:"10px auto"}} id="outlined-basic" label="Email" variant="outlined" fullWidth 
+      <TextField  style={{ margin: "10px auto", opacity: 1 }} id="outlined-basic" label="Email" variant="outlined" fullWidth 
         value={email}
         onChange={(e)=>setEmail(e.target.value)} />
       
-        <TextField type="password" style={{margin:"10px auto"}} id="outlined-basic" label="Password" variant="outlined" fullWidth 
+        <TextField   style={{ margin: "10px auto", opacity: 1 }} type="password"  id="outlined-basic" label="Password" variant="outlined" fullWidth 
        value={password}
        onChange={(e)=>setPassword(e.target.value)} />
       
       
        <Button variant="contained" onClick={logInRequest}> Submit </Button>
       </form>
+      </Paper>
       </Container>
+      </div>
+     
     )
 }
 

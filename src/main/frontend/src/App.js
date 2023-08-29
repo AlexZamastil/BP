@@ -31,6 +31,10 @@ function App() {
         
       </div>
       
+      <footer>
+      
+      {t("footertext1")}
+      </footer>
       
     </>
   )

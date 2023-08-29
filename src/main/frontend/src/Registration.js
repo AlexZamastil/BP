@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Container} from '@mui/system';
 import {TextField,Button} from '@mui/material';
+import { Paper } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import {useNavigate} from "react-router-dom"
-
-
-
 
 export default function Registration() {
   const navigate = useNavigate();
@@ -76,6 +74,7 @@ export default function Registration() {
 
   return (
     <Container>
+       <Paper elevation={3} className='paper'>
       <form noValidate autoComplete="off">
         <h1>Registration form</h1>
 
@@ -111,17 +110,16 @@ export default function Registration() {
         />
 
         <DatePicker 
+        className='datepicker'
          format="YYYY-MM-DD"
          maxDate={today.getDate}
          value={date}
          onChange={(newDate) => setBirthdate(newDate)}
          />
-        
 
-        <Button variant="contained" onClick={handleClick}>
-          Submit
-        </Button>
+        <Button variant="contained" onClick={handleClick}> Submit </Button>
       </form>
+      </Paper>
     </Container>
   );
 }

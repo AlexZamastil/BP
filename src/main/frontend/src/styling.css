@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
 
+
+:root {
+  --yellow-color: #d9ff00;
+  --greer-color: #61e248;
+}
+
+
 * {
   margin: 0;
   padding: 0;
@@ -9,12 +16,19 @@
   font-size: 16px;
   text-decoration: none;
 }
+html, body {
+  height: 100%;
+}
+.container {
+  min-height: 100%; 
+  position: relative; 
+}
 
 .nav {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background-color: #61e248;
+  background-color: var(--greer-color);
   color: rgb(0, 0, 0);
   padding: 10px 10%;
 }
@@ -24,21 +38,41 @@
   display: flex;
 }
 
-
 .nav li {
   padding: 0px 20px;
-
 }
 
 .nav ul .c-link {
   text-decoration: none;
   color: rgb(0, 0, 0);
   transition: all 0.3s ease 0s;
+  padding: 10px 15px;
 }
 
 .nav ul .c-link:hover {
   color: #ffffff;
 }
+.nav ul .loginnav {
+  text-decoration: none;
+  color: rgb(0, 0, 0);
+  transition: all 0.3s ease 0s;
+  padding: 10px 15px;
+}
+
+.nav ul .loginnav:hover {
+  color: #ffffff;
+}
+.nav ul .registernav {
+  text-decoration:none;
+  color: rgb(0, 0, 0);
+  transition: all 0.3s ease 0s;
+  padding: 10px 15px;
+}
+
+.nav ul .registernav:hover {
+  color: #ffffff;
+}
+
 
 .logo {
   display: block;
@@ -46,9 +80,90 @@
 }
 
 .error404 {
-  padding: 30px;
+  padding: 100px;
   font-size:xx-large;
-  color:#61e248
+  text-align: center;
+  color:var(--greer-color)
+}
+.error404 img {
+  padding: 10px
+}
+
+.welcomeDiv1 {
+  color:#ffffff;
+  text-align: left;
+  padding: 75px 200px;
+  background-image: url(/src/sources/img_runners.jpg);
+  background-image:
+  linear-gradient(45deg,
+    rgba(27, 90, 25, 0.836),
+    rgba(161, 63, 6, 0.57)), url(/src/sources/img_runners.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.welcomeDiv1 p {
+  padding : 10px;
+  font-size: 25px;
+}
+.welcomeDiv1 h1 {
+  font-size: 75px;
+  text-align: center;
+  color: var(--yellow-color);
+}
+.welcomeDiv2 {
+  background-image: url(/src/sources/racing_track.jpg);
+  background-image:
+  linear-gradient(45deg,
+    rgba(27, 90, 25, 0.836),
+    rgba(161, 63, 6, 0.57)), url(/src/sources/racing_track.jpg);
+  text-align: left;
+  padding: 75px 200px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.welcomeDiv2 h1 {
+  font-size: 75px;
+  text-align:justify;
+  color: var(--yellow-color);
+}
+.h11{
+  padding-left: 100px;
+}
+.h22{
+  padding-left: 150px;
+}
+.h33{
+  padding-left: 200px;
+}
+.h44{
+  padding-left: 250px;
+}
+.paper {
+  padding: 10px;
+  margin: 0px;
+  max-width: 300px;
+  opacity: 0.9;
+  
+}
+
+.loginBG{
+  padding: 150px;
+  background-image: url(/src/sources/img_legs.jpg);
+
+}
+.paper h1 {
+  font-size: 30px;
+}
+.hr-line {
+  border: none;
+  border-top: 1px solid rgb(0, 0, 0);
+  margin: 0; 
+}
+footer {
+  background-color: var(--greer-color); 
+  color: #fff;
+  padding: 30px 0px;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -69,4 +184,5 @@
   .site-title {
     margin: 10px 0; 
   }
+  
 }

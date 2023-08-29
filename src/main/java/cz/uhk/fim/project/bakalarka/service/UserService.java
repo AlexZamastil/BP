@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import cz.uhk.fim.project.bakalarka.model.User;
 
-import cz.uhk.fim.project.bakalarka.DataAccessObjects.UserRepository;
+import cz.uhk.fim.project.bakalarka.DataAccessObject.UserRepository;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 
 import java.time.LocalDate;
