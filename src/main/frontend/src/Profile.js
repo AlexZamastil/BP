@@ -1,4 +1,4 @@
-import { Paper } from '@mui/material';
+import { Paper, Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link} from "react-router-dom"
@@ -11,6 +11,10 @@ export default function Profile(){
     const handleLogout = ()=> {
       localStorage.clear("user");
       navigate("/WelcomePage");
+      window.location.reload(false);
+    }
+    const handleChange = ()=> {
+      navigate("/UpdateData");
       window.location.reload(false);
     }
 useEffect(()=>{
@@ -35,13 +39,18 @@ useEffect(()=>{
           Height <b>{userStats.user.height}</b><br/>
           Weight <b>{userStats.user.weight}</b><br/>
           Date of birth<b>{userStats.user.dateOfBirth}</b><br/>
-          BodyType<b>{userStats.userstats.bodytype}</b>
+          BodyType<b>{userStats.user.bodyType}</b><br/>
+          <br/>
+          <Button color='primary' variant='contained' onClick={handleChange}> {t('change_data')} </Button>
         </div>
       </Paper>
        ) : null}
+       <div className='Logout'>
         <Link to="/WelcomePage">
-        <button on onClick={handleLogout}> {t('log-out')} </button>
+        <Button color='secondary' variant='contained' onClick={handleLogout}> {t('log-out')} </Button>
         </Link>
+        </div>
+        
       </div>)
 }
 

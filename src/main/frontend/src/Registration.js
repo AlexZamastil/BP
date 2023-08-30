@@ -81,6 +81,7 @@ export default function Registration() {
 
         <TextField
           style={{ margin: '10px auto' }}
+          sx={{ m: 1, width: '25ch' }}
           id="outlined-basic"
           label="Nickname"
           variant="outlined"
@@ -91,6 +92,7 @@ export default function Registration() {
 
         <TextField
           style={{ margin: '10px auto' }}
+          sx={{ m: 1, width: '25ch' }}
           id="outlined-basic"
           label="Email"
           variant="outlined"
@@ -102,6 +104,7 @@ export default function Registration() {
         <TextField
           type="password"
           style={{ margin: '10px auto' }}
+          sx={{ m: 1, width: '25ch' }}
           id="outlined-basic"
           label="Password"
           variant="outlined"
@@ -112,6 +115,8 @@ export default function Registration() {
 
         <DatePicker 
         className='datepicker'
+        sx={{ m: 1, width: '25ch' }}
+        style={{ margin: '10px auto' }}
          format="YYYY-MM-DD"
          maxDate={today.getDate}
          value={date}

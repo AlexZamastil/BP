@@ -51,11 +51,11 @@ export default function Login(){
       
         <h1>Login form</h1>
       
-      <TextField  style={{ margin: "10px auto", opacity: 1 }} id="outlined-basic" label="Email" variant="outlined" fullWidth 
+      <TextField  style={{ margin: "10px auto", opacity: 1 }} id="outlined-basic" label="Email" variant="outlined" fullWidth sx={{ m: 1, width: '25ch' }}
         value={email}
         onChange={(e)=>setEmail(e.target.value)} />
       
-        <TextField   style={{ margin: "10px auto", opacity: 1 }} type="password"  id="outlined-basic" label="Password" variant="outlined" fullWidth 
+        <TextField   style={{ margin: "10px auto", opacity: 1 }} type="password"  id="outlined-basic" label="Password" variant="outlined" fullWidth sx={{ m: 1, width: '25ch' }}
        value={password}
        onChange={(e)=>setPassword(e.target.value)} />
       

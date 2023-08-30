@@ -206,9 +206,13 @@ html, body {
   background-image: url(/src/sources/img_legs.jpg);
 
 }
-.paper b {
- 
+.paperProfile b {
+  color: var(--yellow-color)
 
+}
+.Logout{
+  text-align: center;
+  padding : 20px;
 }
 .paper h1 {
   font-size: 30px;
@@ -223,6 +227,10 @@ footer {
   color: #000000;
   padding: 30px 0px;
   text-align: center;
+}
+.divupdate{margin: auto;
+padding: 30px;
+text-align: center;
 }
 
 @media (max-width: 768px) {

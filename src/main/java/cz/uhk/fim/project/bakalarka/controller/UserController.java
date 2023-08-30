@@ -53,15 +53,17 @@ public class UserController {
         String header = httpServletRequest.getHeader("Authorization");
         return userService.generateUserStats(header);
     }
+    @PostMapping(value = "authorized/user/updateData",consumes = {"application/json"})
+    public ResponseEntity<?> updateData(@RequestBody User user, HttpServletRequest httpServletRequest){
+        return userService.updateData(user, httpServletRequest);
+
+    }
 
     @GetMapping(value= "authorized/user/getuserdata")
     public ResponseEntity<?> getUserData(HttpServletRequest httpServletRequest){
         String header = httpServletRequest.getHeader("Authorization");
         return userService.getUserData(header);
     }
-
-
-
     @GetMapping(value = "authorized/test")
     public String test(){
         return "TEST";

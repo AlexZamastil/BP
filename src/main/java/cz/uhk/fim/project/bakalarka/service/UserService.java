@@ -5,6 +5,7 @@ import cz.uhk.fim.project.bakalarka.DataAccessObject.UserStatsRepository;
 import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import cz.uhk.fim.project.bakalarka.model.User;
@@ -96,17 +97,30 @@ public class UserService {
                 userStats.setBmi(user.getWeight()/(user.getHeight()/100* user.getHeight()/100));
                 userStats.setWaterneeded(0.033* user.getWeight());
                 userStatsRepository.save(userStats);
+                System.out.println("USER UPDATED" + userStats.getUser());
                 return MessageHandler.success("values updated into database");
             }
             else{
                 UserStats userStats2 = new UserStats(user.getWeight()/(user.getHeight()/100* user.getHeight()/100),0.033* user.getWeight(),user);
                 userStatsRepository.save(userStats2);
+                System.out.println("USER UPDATED" + userStats2.getUser());
                 return MessageHandler.success("values inserted into database");
             }
-
-
         }
         else return MessageHandler.error("invalid user ID");
+    }
+
+    public ResponseEntity<?> updateData(User user, HttpServletRequest httpServletRequest){
+        if(user != null){
+           User user2 = userRepository.findUserById(user.getId());
+           user.setId(user2.getId());
+           userRepository.save(user);
+
+            generateUserStats(httpServletRequest.getHeader("Authorization"));
+
+            return MessageHandler.success("User updated");
+        }
+        return MessageHandler.error("user is null");
 
     }
 
