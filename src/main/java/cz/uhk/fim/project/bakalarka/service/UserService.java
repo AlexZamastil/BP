@@ -2,6 +2,7 @@ package cz.uhk.fim.project.bakalarka.service;
 
 
 import cz.uhk.fim.project.bakalarka.DataAccessObject.UserStatsRepository;
+import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import org.springframework.http.ResponseEntity;
@@ -84,6 +85,28 @@ public class UserService {
             else return MessageHandler.error("no user found");
         }
         else return MessageHandler.error("invalid header");
+
+    }
+
+    public ResponseEntity<?> generateUserStats(String header){
+        User user = userRepository.findUserById(jwtUtils.getID(header).asLong());
+        if(user != null){
+            UserStats userStats = userStatsRepository.findUserStatsByUser(user);
+            if(userStats != null){
+                userStats.setBmi(user.getWeight()/(user.getHeight()/100* user.getHeight()/100));
+                userStats.setWaterneeded(0.033* user.getWeight());
+                userStatsRepository.save(userStats);
+                return MessageHandler.success("values updated into database");
+            }
+            else{
+                UserStats userStats2 = new UserStats(user.getWeight()/(user.getHeight()/100* user.getHeight()/100),0.033* user.getWeight(),user);
+                userStatsRepository.save(userStats2);
+                return MessageHandler.success("values inserted into database");
+            }
+
+
+        }
+        else return MessageHandler.error("invalid user ID");
 
     }
 

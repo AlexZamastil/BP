@@ -1,5 +1,6 @@
 package cz.uhk.fim.project.bakalarka.model;
 
+import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -34,6 +35,9 @@ public class User {
 
     @Column(name = "weight")
     private double weight;
+    @Column(name = "bodytype")
+    @Enumerated(EnumType.STRING)
+    private BodyType bodytype;
 
     @Column(name = "adminprivileges")
     private boolean adminPrivileges;
@@ -52,7 +56,7 @@ public class User {
     }
 
 
-    public User(long id, float customIndex, LocalDate dateOfBirth, String email, double height, String nickname, String password, double weight, boolean adminPrivileges, Set<Food> bannedFood, String token) {
+    public User(long id, float customIndex, LocalDate dateOfBirth, String email, double height, String nickname, String password,BodyType bodyType, double weight, boolean adminPrivileges, Set<Food> bannedFood, String token) {
         this.id = id;
         this.customIndex = customIndex;
         this.dateOfBirth = dateOfBirth;
@@ -60,6 +64,7 @@ public class User {
         this.height = height;
         this.nickname = nickname;
         this.password = password;
+        this.bodytype = bodyType;
         this.weight = weight;
         this.adminPrivileges = adminPrivileges;
         this.bannedFood = bannedFood;
@@ -90,6 +95,14 @@ public class User {
 
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
+    }
+
+    public BodyType getBodytype() {
+        return bodytype;
+    }
+
+    public void setBodytype(BodyType bodytype) {
+        this.bodytype = bodytype;
     }
 
     public void setDateOfBirth(LocalDate dateOfBirth) {

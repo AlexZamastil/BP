@@ -6,7 +6,6 @@
   --greer-color: #61e248;
 }
 
-
 * {
   margin: 0;
   padding: 0;
@@ -101,6 +100,15 @@ html, body {
   background-repeat: no-repeat;
   background-size: cover;
 }
+.flexDiv {
+  background-image: url(/src/sources/racing_track.jpg);
+  background-image:
+  linear-gradient(45deg,
+    rgba(27, 90, 25, 0.836),
+    rgba(161, 63, 6, 0.57)), url(/src/sources/racing_track.jpg);
+  display: flex;
+}
+
 .welcomeDiv1 p {
   padding : 10px;
   font-size: 25px;
@@ -111,21 +119,61 @@ html, body {
   color: var(--yellow-color);
 }
 .welcomeDiv2 {
-  background-image: url(/src/sources/racing_track.jpg);
-  background-image:
-  linear-gradient(45deg,
-    rgba(27, 90, 25, 0.836),
-    rgba(161, 63, 6, 0.57)), url(/src/sources/racing_track.jpg);
+
   text-align: left;
-  padding: 75px 200px;
+  padding: 75px 100px;
   background-repeat: no-repeat;
   background-size: cover;
+  flex : 1;
+ 
 }
 .welcomeDiv2 h1 {
   font-size: 75px;
   text-align:justify;
   color: var(--yellow-color);
 }
+.flex2 {
+  margin: auto;
+  
+  text-align: center;
+}
+.animatedLink{
+	background-color:transparent;
+	border-radius:42px;
+	border:2px solid var(--greer-color);
+	display:inline-block;
+	cursor:pointer;
+	color:var(--yellow-color);
+	font-size:25px;
+	padding:17px 57px;
+	text-decoration:none;
+  transition: transform 0.2s ease-in-out;
+  margin-right: 50px;
+}
+.animatedLink:hover {
+	background-color:var(--greer-color);
+  color: #ffffff;
+  transform: translateY(-10px);
+}
+.animatedLink2{
+	background-color:transparent;
+	border-radius:42px;
+	border:2px solid var(--greer-color);
+	display:inline-block;
+	cursor:pointer;
+	color: #ffffff;
+	font-size:25px;
+	padding:17px 57px;
+	text-decoration:none;
+  transition: transform 0.2s ease-in-out;
+  margin-right: 20px;
+}
+.animatedLink2:hover {
+	background-color:var(--greer-color);
+  transform: translateY(-10px);
+}
+
+
 .h11{
   padding-left: 100px;
 }
@@ -140,15 +188,26 @@ html, body {
 }
 .paper {
   padding: 10px;
-  margin: 0px;
   max-width: 300px;
   opacity: 0.9;
   
 }
+.paperProfile {
+  padding: 10px;
+  max-width: 300px;
+  opacity: 0.9;
+  margin: auto;
+  margin-top: 100px;
+}
+
 
 .loginBG{
   padding: 150px;
   background-image: url(/src/sources/img_legs.jpg);
+
+}
+.paper b {
+ 
 
 }
 .paper h1 {
@@ -161,7 +220,7 @@ html, body {
 }
 footer {
   background-color: var(--greer-color); 
-  color: #fff;
+  color: #000000;
   padding: 30px 0px;
   text-align: center;
 }

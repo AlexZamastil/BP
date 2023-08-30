@@ -2,7 +2,6 @@ package cz.uhk.fim.project.bakalarka.controller;
 
 import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.request.ChangePasswordRequest;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import cz.uhk.fim.project.bakalarka.service.UserService;
 @RequestMapping("/api")
 public class UserController {
     private UserService userService;
+
 
     @Autowired
 
@@ -48,9 +48,15 @@ public class UserController {
         );
     }
 
+    @PostMapping(value = "authorized/user/generatestats")
+    public ResponseEntity<?> generateStats(HttpServletRequest httpServletRequest){
+        String header = httpServletRequest.getHeader("Authorization");
+        return userService.generateUserStats(header);
+    }
+
     @GetMapping(value= "authorized/user/getuserdata")
-    public ResponseEntity<?> getUserData(HttpServletRequest request){
-        String header = request.getHeader("Authorization");
+    public ResponseEntity<?> getUserData(HttpServletRequest httpServletRequest){
+        String header = httpServletRequest.getHeader("Authorization");
         return userService.getUserData(header);
     }
 

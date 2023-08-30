@@ -12,7 +12,6 @@ export default function Login(){
     e.preventDefault();
 
    
-    
    fetch("http://localhost:8080/api/nonauthorized/user/login",{
         method:"POST",
         headers:{
@@ -23,23 +22,22 @@ export default function Login(){
                 password : password
             })
         }).then(async(response)=>{
-          if (response.status == 200){
+          if (response.status === 200){
+            
             console.log('Logged in successfully')
-            return await response;
+            return await response.json();
           } else{
-            throw await response;
+            throw await response.json();
           }  
         }).then(async(response) => {
-         localStorage.setItem('token', response.message)
+          
+         localStorage.setItem('token', response.jwt)
          localStorage.setItem('user', email)
+        
         return await response;
-        }).then((response) => {
-          if (response.status == 200){
+        }).then(() => {
             console.log("redirect");
            navigate("/profile");
-           
-          }
-          else {console.log (response.status)}
         })
    }
 

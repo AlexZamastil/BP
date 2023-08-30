@@ -21,7 +21,7 @@ public class JWTUtils {
 
         Algorithm algorithm = Algorithm.HMAC256(secret);
 
-        return jwtBuilder.sign(algorithm);
+        return "{\"jwt\": \"" + jwtBuilder.sign(algorithm) + "\"}";
     }
 
     public Claim getID(String token) {

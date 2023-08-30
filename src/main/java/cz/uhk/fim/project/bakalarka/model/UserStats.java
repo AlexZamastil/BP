@@ -15,9 +15,7 @@ public class UserStats {
     @Column(name = "bmi")
     private double bmi;
 
-    @Column(name = "bodytype")
-    @Enumerated(EnumType.STRING)
-    private BodyType bodytype;
+
 
     @Column(name = "waterneeded")
     private double waterneeded;
@@ -29,10 +27,15 @@ public class UserStats {
     public UserStats() {
     }
 
-    public UserStats(long id, double bmi, BodyType bodytype, double waterneeded, User user) {
+    public UserStats(long id, double bmi, double waterneeded, User user) {
         this.id = id;
         this.bmi = bmi;
-        this.bodytype = bodytype;
+        this.waterneeded = waterneeded;
+        this.user = user;
+    }
+
+    public UserStats(double bmi,  double waterneeded, User user) {
+        this.bmi = bmi;
         this.waterneeded = waterneeded;
         this.user = user;
     }
@@ -51,14 +54,6 @@ public class UserStats {
 
     public void setBmi(double bmi) {
         this.bmi = bmi;
-    }
-
-    public BodyType getBodytype() {
-        return bodytype;
-    }
-
-    public void setBodytype(BodyType bodytype) {
-        this.bodytype = bodytype;
     }
 
     public double getWaterneeded() {

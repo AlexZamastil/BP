@@ -48,7 +48,7 @@ export default function Registration() {
                 password : password
             })
         }).then(async(response)=>{
-          if (response.status == 200){
+          if (response.status === 200){
             console.log('Logged in successfully')
             return await response;
           } else{
@@ -59,7 +59,7 @@ export default function Registration() {
          localStorage.setItem('user', email)
         return await response;
         }).then((response) => {
-          if (response.status == 200){
+          if (response.status === 200){
             console.log("redirect");
            navigate("/profile");
            
@@ -73,6 +73,7 @@ export default function Registration() {
   };
 
   return (
+    <div className='loginBG'>
     <Container>
        <Paper elevation={3} className='paper'>
       <form noValidate autoComplete="off">
@@ -121,5 +122,6 @@ export default function Registration() {
       </form>
       </Paper>
     </Container>
+    </div>
   );
 }
