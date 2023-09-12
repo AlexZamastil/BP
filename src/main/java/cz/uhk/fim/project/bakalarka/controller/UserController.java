@@ -12,11 +12,10 @@ import cz.uhk.fim.project.bakalarka.service.UserService;
 @RestController
 @RequestMapping("/api")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
 
     @Autowired
-
     public UserController(UserService userService) {
         this.userService = userService;
     }

@@ -43,7 +43,7 @@ public class User {
     private boolean adminPrivileges;
     @Column(name = "token")
     private String token;
-    @OneToMany
+    @ManyToMany
     @JoinTable(name = "userbannedfood",
             joinColumns = {
                     @JoinColumn(name = "fk_userid", referencedColumnName = "pk_userid")},
