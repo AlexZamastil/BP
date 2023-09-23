@@ -9,6 +9,7 @@ import Login from "./Login"
 import Registration from "./Registration"
 import PageNotFound from "./PageNotFound";
 import UpdateData from "./UpdateData";
+import AddExercise from "./AddExercise";
 
 
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="/register" element={<Registration/>} />
           <Route path="/UpdateData" element={<UpdateData/>}/>
           <Route path="/" element={<WelcomePage/>}/>
+          <Route path="/addExercise" element={<AddExercise/>}/>
           <Route path="*" element={<PageNotFound/>}/>
         </Routes>
         

@@ -33,6 +33,11 @@ public class Run {
         this.exercise = exercise;
     }
 
+    public Run(Integer lenglhinmeters, RunCategory runcategory, Exercise exercise) {
+        this.lenglhinmeters = lenglhinmeters;
+        this.runcategory = runcategory;
+        this.exercise = exercise;
+    }
 
     public long getId() {
         return id;

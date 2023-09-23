@@ -33,6 +33,12 @@ public class Swimming {
         this.exercise = exercise;
     }
 
+    public Swimming(Integer lenglhinmeters, SwimmingStyle swimmingstyle, Exercise exercise) {
+        this.lenglhinmeters = lenglhinmeters;
+        this.swimmingstyle = swimmingstyle;
+        this.exercise = exercise;
+    }
+
     public long getId() {
         return id;
     }

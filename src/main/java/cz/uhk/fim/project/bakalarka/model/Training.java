@@ -43,6 +43,14 @@ public class Training {
         this.user = user;
     }
 
+    public Training(LocalDate raceday, Goal type, LocalDate startday, Integer lengthinmeters, User user) {
+        this.raceday = raceday;
+        this.type = type;
+        this.startday = startday;
+        this.lengthinmeters = lengthinmeters;
+        this.user = user;
+    }
+
     public long getId() {
         return id;
     }

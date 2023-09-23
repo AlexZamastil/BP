@@ -37,7 +37,7 @@ public class User {
     private double weight;
     @Column(name = "bodytype")
     @Enumerated(EnumType.STRING)
-    private BodyType bodytype;
+    private BodyType bodyType;
 
     @Column(name = "adminprivileges")
     private boolean adminPrivileges;
@@ -64,7 +64,7 @@ public class User {
         this.height = height;
         this.nickname = nickname;
         this.password = password;
-        this.bodytype = bodyType;
+        this.bodyType = bodyType;
         this.weight = weight;
         this.adminPrivileges = adminPrivileges;
         this.bannedFood = bannedFood;
@@ -97,12 +97,12 @@ public class User {
         return dateOfBirth;
     }
 
-    public BodyType getBodytype() {
-        return bodytype;
+    public BodyType getBodyType() {
+        return bodyType;
     }
 
-    public void setBodytype(BodyType bodytype) {
-        this.bodytype = bodytype;
+    public void setBodyType(BodyType bodytype) {
+        this.bodyType = bodytype;
     }
 
     public void setDateOfBirth(LocalDate dateOfBirth) {

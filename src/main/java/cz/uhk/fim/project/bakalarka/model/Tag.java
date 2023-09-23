@@ -42,6 +42,10 @@ public class Tag {
         this.text = text;
     }
 
+    public Tag(String text) {
+        this.text = text;
+    }
+
     public Tag() {
     }
 
@@ -60,5 +64,25 @@ public class Tag {
     public void setText(String text) {
         this.text = text;
     }
+
+    public Set<Food> getTagfood() {
+        return tagfood;
+    }
+
+    public void setTagfood(Set<Food> tagfood) {
+        this.tagfood = tagfood;
+    }
+
+    public Set<Exercise> getTagexercise() {
+        return tagexercise;
+    }
+
+    public void setTagexercise(Set<Exercise> tagexercise) {
+        this.tagexercise = tagexercise;
+    }
+    public void addTagexercise(Exercise exercise) {
+        this.tagexercise.add(exercise);
+    }
+
 }
 

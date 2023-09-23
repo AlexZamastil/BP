@@ -40,6 +40,7 @@ useEffect(()=>{
           Weight <b>{userStats.user.weight}</b><br/>
           Date of birth<b>{userStats.user.dateOfBirth}</b><br/>
           BodyType<b>{userStats.user.bodyType}</b><br/>
+          {userStats.user.adminPrivileges}
           <br/>
           <Button color='primary' variant='contained' onClick={handleChange}> {t('change_data')} </Button>
         </div>

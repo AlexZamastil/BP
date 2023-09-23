@@ -19,6 +19,7 @@ import java.util.Objects;
 public class AuthFilter extends OncePerRequestFilter {
     JWTUtils jwtUtils;
     UserRepository userRepository;
+
     @Autowired
     public AuthFilter(JWTUtils jwtUtils, UserRepository userRepository) {
         this.jwtUtils = jwtUtils;
@@ -28,44 +29,38 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-            boolean isPrivileged = request.getServletPath().startsWith("/api/privileged/");
-            boolean isAuthorized = request.getServletPath().startsWith("/api/authorized/");
-            boolean isNonauthorized = request.getServletPath().startsWith("/api/nonauthorized/");
+        boolean isPrivileged = request.getServletPath().startsWith("/api/privileged/");
+        boolean isAuthorized = request.getServletPath().startsWith("/api/authorized/");
+        boolean isNonauthorized = request.getServletPath().startsWith("/api/nonauthorized/");
 
-                    if(isNonauthorized){
-                        filterChain.doFilter(request,response);
+        if (isNonauthorized) {
+            filterChain.doFilter(request, response);
+        } else {
+            if (isAuthorized || isPrivileged) {
+                try {
+                    String token = request.getHeader("Authorization").replace("Bearer ", "");
+                    if (token.equals("")) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     }
-                        else {
-                        if (isAuthorized || isPrivileged) {
-                            try {
-                                String token = request.getHeader("Authorization").replace("Bearer ","");
-                                System.out.println(token);
-                                if(token.equals("")){
-                                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                                }
-
-                                Claim userIDClaim = jwtUtils.getID(token);
-                                System.out.println(userIDClaim + "   CLAIM");
-                                User user = userRepository.findUserById(userIDClaim.asLong());
-
-                                if(Objects.equals(user.getToken(), token)){
-                                    if (isPrivileged) {
-                                        if (user.isAdminPrivileges()) {
-                                            filterChain.doFilter(request, response);
-                                        } else response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                                    }
-                                }
-
+                    Claim userIDClaim = jwtUtils.getID(token);
+                    System.out.println(userIDClaim + "   CLAIM");
+                    User user = userRepository.findUserById(userIDClaim.asLong());
+                    if (Objects.equals(user.getToken(), token)) {
+                        if (isPrivileged) {
+                            if (user.isAdminPrivileges()) {
                                 filterChain.doFilter(request, response);
-                            } catch (IOException | ServletException e) {
-                                e.printStackTrace();
+                            } else {
                                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             }
-
-
-                        }
-                        else  response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        } else filterChain.doFilter(request, response);
                     }
+                } catch (IOException | ServletException e) {
+                    e.printStackTrace();
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
+
+            } else response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
 
 
     }

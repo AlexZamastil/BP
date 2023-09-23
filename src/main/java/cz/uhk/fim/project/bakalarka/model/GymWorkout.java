@@ -31,6 +31,12 @@ public class GymWorkout {
         this.exercise = exercise;
     }
 
+    public GymWorkout(Integer series, Integer repetitions, Exercise exercise) {
+        this.series = series;
+        this.repetitions = repetitions;
+        this.exercise = exercise;
+    }
+
     public long getId() {
         return id;
     }

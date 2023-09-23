@@ -22,16 +22,16 @@ export default function Login(){
                 password : password
             })
         }).then(async(response)=>{
+          
           if (response.status === 200){
-            
             console.log('Logged in successfully')
-            return await response.json();
+            return await response.text();
           } else{
             throw await response.json();
           }  
+        
         }).then(async(response) => {
-          
-         localStorage.setItem('token', response.jwt)
+         localStorage.setItem('token', response)
          localStorage.setItem('user', email)
         
         return await response;
