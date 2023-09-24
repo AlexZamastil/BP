@@ -28,6 +28,7 @@ public class ExerciseService {
     }
 
     public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, String type, String category_style, int lengthInMeters, List<String> tags) {
+        System.out.println(tags);
         Exercise exercise = new Exercise(name, name_eng, description, description_eng);
         exerciseRepository.save(exercise);
         handleTags(tags, exercise);
@@ -45,6 +46,7 @@ public class ExerciseService {
     }
 
     public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, String type, String category_style, int lengthInMeters, List<String> tags, byte[] imageData) {
+        System.out.println(tags);
         Exercise exercise = new Exercise(name, name_eng, imageData, description, description_eng);
         exerciseRepository.save(exercise);
         handleTags(tags, exercise);
@@ -61,6 +63,7 @@ public class ExerciseService {
     }
 
     public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags) {
+        System.out.println(tags);
         Exercise exercise = new Exercise(name, name_eng, description, description_eng);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         exerciseRepository.save(exercise);
@@ -72,6 +75,7 @@ public class ExerciseService {
     }
 
     public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, byte[] imageData) {
+        System.out.println(tags);
         Exercise exercise = new Exercise(name, name_eng, imageData, description, description_eng);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         exerciseRepository.save(exercise);
@@ -84,6 +88,7 @@ public class ExerciseService {
 
     public void handleTags(List<String> tags, Exercise exercise) {
         System.out.println("ch1");
+        System.out.println(tags);
         for (String tag : tags) {
             System.out.println("ch2");
             tag = tag.toUpperCase();

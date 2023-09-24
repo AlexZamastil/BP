@@ -173,6 +173,9 @@ html, body {
 	background-color:var(--greer-color);
   transform: translateY(-10px);
 }
+.listStyleTypeNone{
+  list-style-type: none;
+}
 
 
 .h11{

@@ -1,9 +1,7 @@
 import { Paper, Button, TextField} from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link} from "react-router-dom"
 import { Container} from '@mui/system';
-import { useNavigate} from "react-router-dom"
+import TagSelection from './TagSelection';
 
 export default function AddExercise(){
   const [name,setName] = useState(null);
@@ -21,11 +19,7 @@ export default function AddExercise(){
 
   const [isAdmin, setIsAdmin] = useState(false);
 
-
-    const navigate = useNavigate();
-
-    const {t} = useTranslation();
-
+  const [exerciseTags, setExerciseTags] = useState([]); 
     useEffect(() => {
         fetch("http://localhost:8080/api/authorized/user/getuserdata", {
             method: "GET",
@@ -42,26 +36,63 @@ export default function AddExercise(){
             console.error(error);
         });
     }, []);
-    
 
-    const addExercise =(e)=>{
-        e.preventDefault();
-        fetch("http://localhost:8080/api/privileged/addExercise",{
-            method:"POST",
-            headers:{
-              'Authorization': localStorage.getItem("token"),
-                "Content-Type":"application/json"},
-                body : JSON.stringify({
-                    name : name,
-                    name_eng : name_eng,
-                    description : description,
-                    description_eng : description_eng,
-                    series : series,
-                    repetitions : repetitions,
-                    tags : tags
-                })
-            })
-    }
+    useEffect(() => {
+      fetch("http://localhost:8080/api/nonauthorized/getExerciseTags", {
+        method: "GET",
+        headers: {
+          'Authorization': ""
+        }
+      })
+      .then(async (response) => {
+        if (response.ok) {
+          const exerciseTagsText = await response.text();
+          const exerciseTagsArray = exerciseTagsText
+            .slice(1, -1) 
+            .split(', ')
+            .map((item) => item.trim()); 
+  
+          console.log(exerciseTagsArray);
+          setExerciseTags(exerciseTagsArray);
+        } else {
+          console.error("Failed to fetch exercise tags");
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    }, []);
+
+    const addExercise = async (e) => {
+      e.preventDefault();
+      try {
+        const response = await fetch("http://localhost:8080/api/privileged/addExercise", {
+          method: "POST",
+          headers: {
+            'Authorization': localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: name,
+            name_eng: name_eng,
+            description: description,
+            description_eng: description_eng,
+            series: series,
+            repetitions: repetitions,
+            tags: tags
+          })
+        });
+    
+        if (response.ok) {
+          const responseBody = await response.text();
+          console.log(responseBody);
+        } else {
+          console.error("Request failed with status:", response.status);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
     return (
         <div>
           {isAdmin !== undefined ? ( 
@@ -164,6 +195,9 @@ export default function AddExercise(){
                    value={series}
                    onChange={(e) => setSeries(e.target.value)}
                  />
+                  <TagSelection pool={exerciseTags} maxSelection={2}/>
+                  <br/>
+
            
            
                  <Button variant="contained" onClick={addExercise}> Submit </Button>
@@ -178,6 +212,43 @@ export default function AddExercise(){
           )}
         </div>
       );
+
+
+      function TagSelection({pool}) {
+      
+      
+        const handleTagSelection = (tag) => {
+          setTags((prevSelectedTags) => {
+            if (prevSelectedTags.includes(tag)) {
+              return prevSelectedTags.filter((item) => item !== tag);
+            } else {
+              return [...prevSelectedTags, tag];
+            }
+          });
+        };
+      
+        console.log(tags);
+      
+        return (
+          <div>
+            <h1>Tag Selection</h1> <br/>
+            <ul>
+              {pool.map((tag) => (
+                <li className='listStyleTypeNone' key={tag}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={tags.includes(tag)}
+                      onChange={() => handleTagSelection(tag)}
+                    />
+                    {tag}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
     }
     
     

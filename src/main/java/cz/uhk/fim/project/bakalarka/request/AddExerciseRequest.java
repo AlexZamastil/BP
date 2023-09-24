@@ -2,6 +2,7 @@ package cz.uhk.fim.project.bakalarka.request;
 
 import cz.uhk.fim.project.bakalarka.model.Tag;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class AddExerciseRequest {
@@ -104,5 +105,22 @@ public class AddExerciseRequest {
 
     public void setImageData(byte[] imageData) {
         this.imageData = imageData;
+    }
+
+    @Override
+    public String toString() {
+        return "AddExerciseRequest{" +
+                "name='" + name + '\'' +
+                ", name_eng='" + name_eng + '\'' +
+                ", description='" + description + '\'' +
+                ", description_eng='" + description_eng + '\'' +
+                ", type='" + type + '\'' +
+                ", category_style='" + category_style + '\'' +
+                ", length=" + length +
+                ", repetitions=" + repetitions +
+                ", series=" + series +
+                ", imageData=" + Arrays.toString(imageData) +
+                ", tags=" + tags +
+                '}';
     }
 }

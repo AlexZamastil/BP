@@ -22,6 +22,7 @@ public class ExerciseController {
 
     @PostMapping(value = "privileged/addExercise", consumes = {"Application/json"})
     public ResponseEntity<?> addExercise(@RequestBody AddExerciseRequest addExerciseRequest) {
+        System.out.println(addExerciseRequest);
         if (addExerciseRequest.getImageData() != null) {
             if (addExerciseRequest.getCategory_style() != null) {
                 return exerciseService.addNewExercise(addExerciseRequest.getName(),
