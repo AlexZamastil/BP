@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static cz.uhk.fim.project.bakalarka.enumerations.Goal.RUN;
 
@@ -59,13 +60,12 @@ public class TrainingService {
     }
 
 
-
     public ResponseEntity<?> testRunSpecs(LocalDate startDay,
                                           LocalDate raceDay,
                                           Integer lengthOfRaceInMeters,
                                           Integer wantedTimeInSeconds,
                                           Integer actualRunLength,
-                                          Integer actualTimeInSeconds){
+                                          Integer actualTimeInSeconds) {
         if (!isGoalSuitable(lengthOfRaceInMeters)) {
             return MessageHandler.error("Run length is not suitable. Please choose between 1 km an 42 km");
         }
@@ -80,7 +80,7 @@ public class TrainingService {
  */
         boolean temp = isGoalAchievable(startDay, raceDay, lengthOfRaceInMeters, wantedTimeInSeconds, actualRunLength, actualTimeInSeconds);
         System.out.println(temp + " BOOLEAN");
-        if (temp == false){
+        if (temp == false) {
             return MessageHandler.error("Goal is too hard, training would not be safe");
         }
 
@@ -130,8 +130,19 @@ public class TrainingService {
         System.out.println("percentage weekly intensity increase " + percentageWeeklyIntensityIncrease);
         //TODO DODELAT, VYRESIT % A VZIT V UVAHU TEMPO
         return percentageWeeklyVolumeIncrease >= 0 &&
-                !(percentageWeeklyVolumeIncrease > MAX_PERCENTAGE_INCREASE)&&
+                !(percentageWeeklyVolumeIncrease > MAX_PERCENTAGE_INCREASE) &&
                 percentageWeeklyIntensityIncrease >= 0 &&
                 !(percentageWeeklyIntensityIncrease > MAX_PERCENTAGE_INCREASE);
+    }
+
+    public Boolean hasActiveTraining(long id) {
+        LocalDate today = LocalDate.now();
+        List<Training> t = trainingRepository.findTrainingsContainingUser(id);
+        for (Training training : t
+        ) {
+            if (today.isBefore(training.getFinalday()))
+                return true;
+        }
+        return false;
     }
 }

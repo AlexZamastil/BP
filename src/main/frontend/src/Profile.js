@@ -34,6 +34,7 @@ useEffect(()=>{
   {userStats.user ? (
 <Paper elevation={3} className='paperProfile'>
         <div>
+          
           Nickname <b> {userStats.user.nickname}</b> <br/>
           Email <b>{userStats.user.email}</b><br/>
           Height <b>{userStats.user.height}</b><br/>

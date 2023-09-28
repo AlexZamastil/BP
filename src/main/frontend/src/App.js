@@ -10,6 +10,7 @@ import Registration from "./Registration"
 import PageNotFound from "./PageNotFound";
 import UpdateData from "./UpdateData";
 import AddExercise from "./AddExercise";
+import Training from "./Training"
 
 
 
@@ -31,6 +32,7 @@ function App() {
           <Route path="/UpdateData" element={<UpdateData/>}/>
           <Route path="/" element={<WelcomePage/>}/>
           <Route path="/addExercise" element={<AddExercise/>}/>
+          <Route path="/training" element={<Training/>}/>
           <Route path="*" element={<PageNotFound/>}/>
         </Routes>
         

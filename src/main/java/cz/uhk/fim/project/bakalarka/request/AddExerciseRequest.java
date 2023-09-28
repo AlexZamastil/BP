@@ -1,6 +1,7 @@
 package cz.uhk.fim.project.bakalarka.request;
 
 import cz.uhk.fim.project.bakalarka.model.Tag;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +16,12 @@ public class AddExerciseRequest {
     int length;
     int repetitions;
     int series;
-    byte[] imageData;
+
 
     List<String> tags;
+
+    public AddExerciseRequest() {
+    }
 
     public List<String> getTags() {
         return tags;
@@ -99,14 +103,6 @@ public class AddExerciseRequest {
         this.series = series;
     }
 
-    public byte[] getImageData() {
-        return imageData;
-    }
-
-    public void setImageData(byte[] imageData) {
-        this.imageData = imageData;
-    }
-
     @Override
     public String toString() {
         return "AddExerciseRequest{" +
@@ -119,7 +115,6 @@ public class AddExerciseRequest {
                 ", length=" + length +
                 ", repetitions=" + repetitions +
                 ", series=" + series +
-                ", imageData=" + Arrays.toString(imageData) +
                 ", tags=" + tags +
                 '}';
     }

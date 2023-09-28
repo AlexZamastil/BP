@@ -1,7 +1,7 @@
 import { Paper, Button, TextField} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Container} from '@mui/system';
-import TagSelection from './TagSelection';
+import { splitFieldInternalAndForwardedProps } from '@mui/x-date-pickers/internals';
 
 export default function AddExercise(){
   const [name,setName] = useState(null);
@@ -14,8 +14,11 @@ export default function AddExercise(){
   const [series,setSeries] = useState(null);
   const [repetitions,setRepetitions] = useState(null);
   const [tags,setTags] = useState([]);
+  const [picture, setPicture] = useState(null);
 
   const [userStats,setUserStats] = useState([]);
+
+  const [SFILE,setSelectedFile] = useState(null);
 
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -65,22 +68,30 @@ export default function AddExercise(){
 
     const addExercise = async (e) => {
       e.preventDefault();
+    
+ 
+      const formData = new FormData();
+    
+      formData.append('addExerciseRequest', new Blob([JSON.stringify({
+        name: name,
+        name_eng: name_eng,
+        description: description,
+        description_eng: description_eng,
+        series: series,
+        repetitions: repetitions,
+        tags: tags
+      })], { type: 'application/json' }));
+    
+   
+      formData.append('imageData', SFILE);
+    
       try {
         const response = await fetch("http://localhost:8080/api/privileged/addExercise", {
           method: "POST",
           headers: {
             'Authorization': localStorage.getItem("token"),
-            "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            name: name,
-            name_eng: name_eng,
-            description: description,
-            description_eng: description_eng,
-            series: series,
-            repetitions: repetitions,
-            tags: tags
-          })
+          body: formData 
         });
     
         if (response.ok) {
@@ -93,6 +104,22 @@ export default function AddExercise(){
         console.error("Error:", error);
       }
     };
+    const handleImageChange = (e) => {
+       setSelectedFile(e.target.files[0])    
+      if (SFILE) {
+        const reader = new FileReader();
+    
+        reader.onload = (e) => {
+          const base64Data = e.target.result;
+          setPicture(base64Data);
+  
+          addExercise(e, SFILE);
+        };
+    
+        reader.readAsDataURL(SFILE);
+      }
+    };
+
     return (
         <div>
           {isAdmin !== undefined ? ( 
@@ -198,8 +225,21 @@ export default function AddExercise(){
                   <TagSelection pool={exerciseTags} maxSelection={2}/>
                   <br/>
 
-           
-           
+                <input
+                 type="file"
+                 accept="image/*" 
+                 enctype='multipart/form-data'
+                 onChange={handleImageChange}
+                 />
+
+                   {picture && (
+                  <div>
+                  <h3>Preview:</h3>
+                  <img src={picture} alt="Selected" style={{ maxWidth: '100%' }} />
+                </div>
+              )}
+   
+
                  <Button variant="contained" onClick={addExercise}> Submit </Button>
                </form>
                </Paper>
@@ -212,6 +252,7 @@ export default function AddExercise(){
           )}
         </div>
       );
+      
 
 
       function TagSelection({pool}) {

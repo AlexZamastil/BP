@@ -24,9 +24,10 @@ export default function Navbar(props) {
                 <CustomLink className="registernav" to="/register"> <p>{t('register')}</p> </CustomLink>
               </>
               
-        ) : (
+        ) : (<>
+          <CustomLink className="c-link" to="/training"> <p> Training</p> </CustomLink>
           <CustomLink className="c-link" to="/profile"> <p>{props}</p> </CustomLink>
-          
+          </>
         )
         }
         </ul>

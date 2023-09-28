@@ -1,7 +1,8 @@
 package cz.uhk.fim.project.bakalarka.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
+
 
 @Entity
 @Table(name = "exercise")
@@ -83,5 +84,16 @@ public class Exercise {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

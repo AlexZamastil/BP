@@ -8,7 +8,11 @@ import cz.uhk.fim.project.bakalarka.model.*;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -45,8 +49,9 @@ public class ExerciseService {
         return MessageHandler.success("Exercise saved successfufly");
     }
 
-    public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, String type, String category_style, int lengthInMeters, List<String> tags, byte[] imageData) {
+    public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, String type, String category_style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
         System.out.println(tags);
+        byte[] imageData = handlePicture(multipartFile);
         Exercise exercise = new Exercise(name, name_eng, imageData, description, description_eng);
         exerciseRepository.save(exercise);
         handleTags(tags, exercise);
@@ -74,8 +79,9 @@ public class ExerciseService {
 
     }
 
-    public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, byte[] imageData) {
+    public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
         System.out.println(tags);
+        byte[] imageData = handlePicture(multipartFile);
         Exercise exercise = new Exercise(name, name_eng, imageData, description, description_eng);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         exerciseRepository.save(exercise);
@@ -114,6 +120,13 @@ public class ExerciseService {
                 tag2.addTagexercise(exercise);
                 tagRepository.save(tag2);
             }
+        }
+    }
+    public byte[] handlePicture(MultipartFile f){
+        try {
+            return f.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
