@@ -18,7 +18,7 @@ export default function AddExercise(){
 
   const [userStats,setUserStats] = useState([]);
 
-  const [SFILE,setSelectedFile] = useState(null);
+  const [selectedFile,setSelectedFile] = useState(null);
 
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -73,6 +73,7 @@ export default function AddExercise(){
       const formData = new FormData();
     
       formData.append('addExerciseRequest', new Blob([JSON.stringify({
+
         name: name,
         name_eng: name_eng,
         description: description,
@@ -83,7 +84,7 @@ export default function AddExercise(){
       })], { type: 'application/json' }));
     
    
-      formData.append('imageData', SFILE);
+      formData.append('imageData', selectedFile);
     
       try {
         const response = await fetch("http://localhost:8080/api/privileged/addExercise", {
@@ -106,17 +107,17 @@ export default function AddExercise(){
     };
     const handleImageChange = (e) => {
        setSelectedFile(e.target.files[0])    
-      if (SFILE) {
+      if (selectedFile) {
         const reader = new FileReader();
     
         reader.onload = (e) => {
           const base64Data = e.target.result;
           setPicture(base64Data);
   
-          addExercise(e, SFILE);
+          addExercise(e, base64Data);
         };
     
-        reader.readAsDataURL(SFILE);
+        reader.readAsDataURL(selectedFile);
       }
     };
 

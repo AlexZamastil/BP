@@ -71,7 +71,12 @@ html, body {
 .nav ul .registernav:hover {
   color: #ffffff;
 }
-
+.trainingDiv {
+  display: flex;
+  flex-direction: row;
+  justify-content:center;
+  padding: 20px;
+}
 
 .logo {
   display: block;
@@ -203,6 +208,25 @@ html, body {
   margin: auto;
   margin-top: 100px;
 }
+
+.paperRun {
+  padding: 10px;
+  max-width: 300px;
+  opacity: 0.9;
+  margin: auto;
+  margin-top: 100px;
+  background: aqua;
+}
+
+.paperOCR {
+  padding: 10px;
+  max-width: 300px;
+  opacity: 0.9;
+  margin: auto;
+  margin-top: 100px;
+  
+}
+
 
 
 .loginBG{

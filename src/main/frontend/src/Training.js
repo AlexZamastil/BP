@@ -1,8 +1,29 @@
-import { useEffect, useState } from "react";
+import { Paper, Button } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import GenerateTraining from "./GenerateTraining";
+import {useNavigate} from "react-router-dom"
 
 export default function Training() {
     const [userStats, setUserStats] = useState([]);
     const [boolean, setBoolean] = useState(null);
+    const navigate = useNavigate();
+
+    const paperRun = {
+        backgroundColor: `rgb(${255}, ${132}, ${132})`,
+        padding: '20px', 
+        border: '2px solid red',
+        margin: "20px"
+    };
+
+    const paperOCR = {
+        backgroundColor: `rgb(${125}, ${175}, ${255})`,
+        padding: '20px',
+        border: '2px solid blue',
+        margin: "20px"
+    };
+
+    const [pageContent, setPageContent] = useState(null);
+
 
     useEffect(() => {
         fetch("http://localhost:8080/api/authorized/user/getuserdata", {
@@ -14,9 +35,6 @@ export default function Training() {
         .then(async (response) => {
             const userStatsData = await response.json();
             setUserStats(userStatsData);
-            console.log("userstats", userStatsData);
-
-            
             return fetch(`http://localhost:8080/api/authorized/hasActiveTraining/${userStatsData.user.id}`, {
                 method: "GET",
                 headers: {
@@ -28,21 +46,32 @@ export default function Training() {
             const booleanData = await response.json();
             setBoolean(booleanData);
             console.log(booleanData);
-        });
-    }, []);
+            if (boolean === true) {
+              setPageContent(<div>User has active training // TEMP</div>);
+          } else 
+              setPageContent(
+                  <div className="trainingDiv">
+                      <Paper elevation={3} style={paperRun}>
+              <h1> <b>Run</b> </h1> <br /> Suitable for beginners<br /> Get in shape <br /> <br />
+              <Button variant="contained" onClick={() => generateTraining("RUN")}>Submit</Button>
+            </Paper>
+            <Paper elevation={3} style={paperOCR}>
+              <h1> <b>Gladiator race</b> </h1> <br /> Suitable for experienced runner <br /> try a new challenge <br /> <br />
+              <Button variant="contained" onClick={() => generateTraining("OCR")}>Submit</Button>
+            </Paper>
+                  </div>
+              );
+          
+        })
+    }, [boolean]);
 
 
-    return (<div>
-        
-        {boolean == true ? (
-              <>
-              User has active training // TEMP
-              </>
-              
-        ) : (<>
-          User doesnt have active training //TEMP
-          </>
-        )
-        }
-    </div>)
+    function generateTraining(trainingType) {
+        navigate(`/generateTraining/${trainingType}`);
+    }
+
+    return (
+       pageContent
+      );
+      
 }
