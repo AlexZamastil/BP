@@ -22,8 +22,11 @@ public class Food {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "picture")
-    private byte[] picture;
+    @OneToOne
+    @JoinColumn(name = "fk_pictureid", referencedColumnName = "pk_pictureid")
+    private Picture picture;
+
+
 
     @OneToMany
     @JoinTable(name = "foodingredient",
@@ -40,6 +43,14 @@ public class Food {
     }
 
     public Food(long id, double calories, String description, String name, byte[] picture, Set<Ingredient> ingredients) {
+        this.id = id;
+        this.calories = calories;
+        this.description = description;
+        this.name = name;
+        this.ingredients = ingredients;
+    }
+
+    public Food(long id, double calories, String description, String name, Picture picture, Set<Ingredient> ingredients) {
         this.id = id;
         this.calories = calories;
         this.description = description;
@@ -80,11 +91,5 @@ public class Food {
         this.name = name;
     }
 
-    public byte[] getPicture() {
-        return picture;
-    }
 
-    public void setPicture(byte[] picture) {
-        this.picture = picture;
-    }
 }

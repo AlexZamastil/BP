@@ -2,6 +2,7 @@ package cz.uhk.fim.project.bakalarka.request;
 
 import cz.uhk.fim.project.bakalarka.enumerations.Goal;
 
+import java.time.Duration;
 import java.time.LocalDate;
 
 public class CreateTrainingRequest {
@@ -9,9 +10,9 @@ public class CreateTrainingRequest {
     LocalDate raceDay;
     Goal goal;
     Integer lengthOfRaceInMeters;
-    Integer wantedTimeInSeconds;
+    Duration wantedTime;
     Integer actualRunLength;
-    Integer actualTimeInSeconds;
+    Duration actualTime;
 
     public LocalDate getStartDay() {
         return startDay;
@@ -45,12 +46,12 @@ public class CreateTrainingRequest {
         this.lengthOfRaceInMeters = lengthOfRaceInMeters;
     }
 
-    public Integer getWantedTimeInSeconds() {
-        return wantedTimeInSeconds;
+    public Duration getWantedTime() {
+        return wantedTime;
     }
 
-    public void setWantedTimeInSeconds(Integer wantedTimeInSeconds) {
-        this.wantedTimeInSeconds = wantedTimeInSeconds;
+    public void setWantedTime(Integer wantedTimeInSeconds) {
+        this.wantedTime = wantedTime;
     }
 
     public Integer getActualRunLength() {
@@ -61,12 +62,12 @@ public class CreateTrainingRequest {
         this.actualRunLength = actualRunLength;
     }
 
-    public Integer getActualTimeInSecond() {
-        return actualTimeInSeconds;
+    public Duration getActualTime() {
+        return actualTime;
     }
 
-    public void setActualTimeInSeconds(Integer actualTimeInSecond) {
-        this.actualTimeInSeconds = actualTimeInSecond;
+    public void setActualTime(Duration actualTimeInSecond) {
+        this.actualTime = actualTimeInSecond;
     }
 
     @Override
@@ -76,9 +77,9 @@ public class CreateTrainingRequest {
                 ", raceDay=" + raceDay +
                 ", goal=" + goal +
                 ", lengthOfRaceInMeters=" + lengthOfRaceInMeters +
-                ", wantedTimeInSeconds=" + wantedTimeInSeconds +
+                ", wantedTimeInSeconds=" + wantedTime +
                 ", actualRunLength=" + actualRunLength +
-                ", actualTimeInSeconds=" + actualTimeInSeconds +
+                ", actualTimeInSeconds=" + actualTime +
                 '}';
     }
 }

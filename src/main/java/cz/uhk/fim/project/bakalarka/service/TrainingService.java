@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -35,13 +36,13 @@ public class TrainingService {
                                             LocalDate raceDay,
                                             Goal goal,
                                             Integer lengthOfRaceInMeters,
-                                            Integer wantedTimeInSeconds,
+                                            Duration wantedTime,
                                             Integer actualRunLength,
-                                            Integer actualTimeInSeconds,
+                                            Duration actualTime,
                                             HttpServletRequest httpServletRequest) {
 
         if (goal.equals(RUN)) {
-            ResponseEntity<?> test = testRunSpecs(startDay, raceDay, lengthOfRaceInMeters, wantedTimeInSeconds, actualRunLength, actualTimeInSeconds);
+            ResponseEntity<?> test = testRunSpecs(startDay, raceDay, lengthOfRaceInMeters, wantedTime, actualRunLength, actualTime);
             System.out.println(test.getStatusCode() + " STATUS CODE");
             if (test.getStatusCode() == HttpStatus.OK) {
                 String token = httpServletRequest.getHeader("Authorization");
@@ -63,26 +64,28 @@ public class TrainingService {
     public ResponseEntity<?> testRunSpecs(LocalDate startDay,
                                           LocalDate raceDay,
                                           Integer lengthOfRaceInMeters,
-                                          Integer wantedTimeInSeconds,
+                                          Duration wantedTime,
                                           Integer actualRunLength,
-                                          Integer actualTimeInSeconds) {
+                                         Duration actualTime) {
         if (!isGoalSuitable(lengthOfRaceInMeters)) {
             return MessageHandler.error("Run length is not suitable. Please choose between 1 km an 42 km");
         }
-
-        if (wantedTimeInSeconds == 0) {
-            wantedTimeInSeconds = (int) (lengthOfRaceInMeters / (6 / 3.6));//6km/h = slow jogging, divide to get m/s
-        }
 /*
+        if (wantedTime) {
+            wantedTime = (int) (lengthOfRaceInMeters / (6 / 3.6));//6km/h = slow jogging, divide to get m/s
+        }
+
         if (!isGoalAchievable(startDay, raceDay, lengthOfRaceInMeters, wantedTimeInSeconds, actualRunLength, actualTimeInSeconds))
             return MessageHandler.error("Goal is too hard, training would not be safe");
 
- */
+
         boolean temp = isGoalAchievable(startDay, raceDay, lengthOfRaceInMeters, wantedTimeInSeconds, actualRunLength, actualTimeInSeconds);
         System.out.println(temp + " BOOLEAN");
         if (temp == false) {
             return MessageHandler.error("Goal is too hard, training would not be safe");
         }
+
+ */
 
         return MessageHandler.success("This goal is achievable");
     }

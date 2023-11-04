@@ -12,22 +12,30 @@ export default function GenerateTraining() {
     const [trainingData, setTrainingData] = useState(() => ({
         goal: trainingType,
         lengthOfRaceInMeters: 0,
-        wantedTimeInSeconds: 0,
+        wantedTime: null,
         actualRunLength: 0,
-        actualTimeInSeconds: 0,
+        actualTime: null,
         raceDay: new Date(),
         startDay: new Date()
     }));
+    
     const onlyNumbers = (e) => {
         const inputValue = e.target.value.replace(/[^0-9]/g, '');
         
         e.target.value = inputValue;
       };
 
-     //TODO : prevest Date na cas v sekundach
+      function handleWantedTimeChange(value) {
+        setTrainingData({ ...trainingData, wantedTime: value });
+    }
+
+    function handleActualTimeChange(value) {
+        setTrainingData({ ...trainingData, actualTime: value });
+    }
+
 
     function generateTrainingx() {
-      //  console.log(averageTime);
+       console.log(trainingData);
        
     }
         return (
@@ -53,11 +61,10 @@ export default function GenerateTraining() {
                         <TimeField
                             style={{ margin: '10px auto' }}
                             sx={{ m: 1, width: '25ch' }}
-                            label="Average Time"
+                            label="Wanted Time"
                             format="HH:mm:ss"
-                           // value={wantedTime}
-                           // onChange={(newValue) => setWantedTime(newValue)}
-                        />
+                            onChange={(value) => handleWantedTimeChange(value)}
+                          />
                         <TextField
                             style={{ margin: '10px auto' }}
                             label="Average run length   "
@@ -75,10 +82,9 @@ export default function GenerateTraining() {
                         <TimeField
                             style={{ margin: '10px auto' }}
                             sx={{ m: 1, width: '25ch' }}
-                            label="Average Time"
+                            label="Average run time"
                             format="HH:mm:ss"
-                           // value={averageTime}
-                           // onChange={(newValue) => setAverageTime(newValue)}
+                            onChange={(value) => handleActualTimeChange(value)}
                         />
                         <DatePicker 
                                 className='datepicker'

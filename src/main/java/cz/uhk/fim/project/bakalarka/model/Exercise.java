@@ -18,31 +18,37 @@ public class Exercise {
     @Column(name = "name_eng")
     private String name_eng;
 
-    @Column(name = "picture", columnDefinition = "bytea")
-    private byte[] picture;
-
     @Column(name = "description")
     private String description;
     @Column(name = "description_eng")
     private String description_eng;
-
+    @OneToOne
+    @JoinColumn(name = "fk_pictureid", referencedColumnName = "pk_pictureid")
+    private Picture picture;
 
     public Exercise() {
 
     }
 
-    public Exercise(long id, String name, byte[] picture, String description) {
+    public Exercise(long id, String name, String name_eng, String description, String description_eng, Picture picture) {
+        this.id = id;
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.picture = picture;
+    }
+
+    public Exercise(long id, String name, String description) {
 
         this.id = id;
         this.name = name;
-        this.picture = picture;
         this.description = description;
     }
 
     public Exercise(String name, String name_eng, byte[] picture, String description, String description_eng) {
         this.name = name;
         this.name_eng = name_eng;
-        this.picture = picture;
         this.description = description;
         this.description_eng = description_eng;
     }
@@ -70,14 +76,6 @@ public class Exercise {
         this.name = name;
     }
 
-    public byte[] getPicture() {
-        return picture;
-    }
-
-    public void setPicture(byte[] picture) {
-        this.picture = picture;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -85,6 +83,7 @@ public class Exercise {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
     @Override
     public String toString() {

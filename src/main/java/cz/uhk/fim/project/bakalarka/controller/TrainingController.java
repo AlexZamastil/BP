@@ -26,9 +26,9 @@ public class TrainingController {
                 createTrainingRequest.getRaceDay(),
                 createTrainingRequest.getGoal(),
                 createTrainingRequest.getLengthOfRaceInMeters(),
-                createTrainingRequest.getWantedTimeInSeconds(),
+                createTrainingRequest.getWantedTime(),
                 createTrainingRequest.getActualRunLength(),
-                createTrainingRequest.getActualTimeInSecond(),
+                createTrainingRequest.getActualTime(),
                 httpServletRequest);
     }
 
