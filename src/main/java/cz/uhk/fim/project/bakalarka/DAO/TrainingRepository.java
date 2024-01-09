@@ -1,7 +1,6 @@
-package cz.uhk.fim.project.bakalarka.DataAccessObject;
+package cz.uhk.fim.project.bakalarka.DAO;
 
 import cz.uhk.fim.project.bakalarka.model.Training;
-import cz.uhk.fim.project.bakalarka.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

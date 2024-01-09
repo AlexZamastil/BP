@@ -25,13 +25,7 @@ public class Tag {
     )
     private Set<Food> tagfood = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "tagexercise",
-            joinColumns = @JoinColumn(name = "fk_tagid"),
-            inverseJoinColumns = @JoinColumn(name = "fk_exerciseid")
-    )
-    private Set<Exercise> tagexercise = new HashSet<>();
+
 
 
 
@@ -73,16 +67,11 @@ public class Tag {
         this.tagfood = tagfood;
     }
 
-    public Set<Exercise> getTagexercise() {
-        return tagexercise;
+    @Override
+    public String toString() {
+        return "Tag{" +
+                "id=" + id +
+                ", text='" + text ;
     }
-
-    public void setTagexercise(Set<Exercise> tagexercise) {
-        this.tagexercise = tagexercise;
-    }
-    public void addTagexercise(Exercise exercise) {
-        this.tagexercise.add(exercise);
-    }
-
 }
 

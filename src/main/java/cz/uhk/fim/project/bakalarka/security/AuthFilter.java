@@ -1,7 +1,7 @@
 package cz.uhk.fim.project.bakalarka.security;
 
 import com.auth0.jwt.interfaces.Claim;
-import cz.uhk.fim.project.bakalarka.DataAccessObject.UserRepository;
+import cz.uhk.fim.project.bakalarka.DAO.UserRepository;
 import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import jakarta.servlet.FilterChain;

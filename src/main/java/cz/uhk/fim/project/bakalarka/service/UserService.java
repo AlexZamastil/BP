@@ -1,8 +1,7 @@
 package cz.uhk.fim.project.bakalarka.service;
 
 
-import cz.uhk.fim.project.bakalarka.DataAccessObject.UserStatsRepository;
-import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
+import cz.uhk.fim.project.bakalarka.DAO.UserStatsRepository;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import cz.uhk.fim.project.bakalarka.model.User;
 
-import cz.uhk.fim.project.bakalarka.DataAccessObject.UserRepository;
+import cz.uhk.fim.project.bakalarka.DAO.UserRepository;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 
 import java.time.LocalDate;

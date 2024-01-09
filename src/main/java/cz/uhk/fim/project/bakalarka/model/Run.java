@@ -47,7 +47,7 @@ public class Run {
         this.id = id;
     }
 
-    public double getLenglhinmeters() {
+    public Integer getLenglhinmeters() {
         return lenglhinmeters;
     }
 

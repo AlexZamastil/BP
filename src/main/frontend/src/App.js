@@ -11,6 +11,7 @@ import UpdateData from "./UpdateData";
 import AddExercise from "./AddExercise";
 import Training from "./Training";
 import GenerateTraining from "./GenerateTraining";
+import Exercise from "./Exercise"
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
           <Route path="/addExercise" element={<AddExercise/>}/>
           <Route path="/training" element={<Training/>}/>
           <Route path="/generateTraining/:trainingType" element={<GenerateTraining />} />
+          <Route path="/exercise/:exerciseID" element={<Exercise/>}/>
           <Route path="*" element={<PageNotFound/>}/>
           <Route path="/" element={<WelcomePage/>}/>
 

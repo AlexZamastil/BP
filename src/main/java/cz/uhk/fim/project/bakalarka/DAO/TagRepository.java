@@ -1,4 +1,4 @@
-package cz.uhk.fim.project.bakalarka.DataAccessObject;
+package cz.uhk.fim.project.bakalarka.DAO;
 
 import cz.uhk.fim.project.bakalarka.model.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;

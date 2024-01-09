@@ -2,6 +2,20 @@
     "site-name" : "Název stránky",
     "profile" : "Profil",
     "about-project" : "O Projektu",
+    "training":"Trénink",
     "log-in" : "Přihlásit",
-    "register" : "Registrace"
+    "log-out" : "Odhlásit",
+    "register" : "Registrace",
+    "register_now":"Registruj se teď",
+    "welcomepage_text1" : "Bezplatná aplikace pro přípravu na závod",
+    "welcomepage_text2" : "Překonej sám sebe, vytvoř si tréninkový plán na míru. Dostaň své tělo do životní formy",
+    "welcomepage_text3" : "Vítej na webu. Jsme rádi, že jste si vybrali naší bezplatnou službu pro realizaci sportovní přípravy. Ať už jsi úplný nováček, nebo zaběhlý sportovec, naše aplikace ti pomůže v dosažení tvých cílu a zlepšení sportovního výkonu. Připrav se na parádní výkony a začni svou cestu k úspěchu právě teď! ",
+    "footertext1" : "Tento projekt je bakalářská práce. Poskytované informace jsou založeny na relevantních knihách a výzkumech. Vždy upřednostňujte své zdraví a bezpečí při konání aktivit. Tento projekt není určen pro osoby mladší 18 let nebo těhotné, či kojící ženy.",
+    "welcomepage_inspiration" : "EXCELUJ",
+    "welcomepage_inspiration2" : "PŘEKONEJ",
+    "welcomepage_inspiration3" : "ZLEPŠI",
+    "welcomepage_inspiration4" : "ZVÍTĚZ",
+    "change_data" : "Změnit uživatelská data",
+    "about_project" : "O projektu",
+    "about_project_text1:":""
 }

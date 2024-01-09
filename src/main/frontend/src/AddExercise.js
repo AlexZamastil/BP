@@ -1,7 +1,6 @@
 import { Paper, Button, TextField} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Container} from '@mui/system';
-import { splitFieldInternalAndForwardedProps } from '@mui/x-date-pickers/internals';
 
 export default function AddExercise(){
   const [name,setName] = useState(null);
@@ -72,7 +71,7 @@ export default function AddExercise(){
  
       const formData = new FormData();
     
-      formData.append('addExerciseRequest', new Blob([JSON.stringify({
+      formData.append('exerciseRequest', new Blob([JSON.stringify({
 
         name: name,
         name_eng: name_eng,
@@ -80,6 +79,9 @@ export default function AddExercise(){
         description_eng: description_eng,
         series: series,
         repetitions: repetitions,
+        type: type,
+        length: length,
+        category_style: category_style,
         tags: tags
       })], { type: 'application/json' }));
     

@@ -20,8 +20,8 @@ export default function WelcomePage() {
         <h1 className='h44'> {t("welcomepage_inspiration4")}</h1>
     </div>
     <div className='flex2'>
-    <Link to="/Login" class="animatedLink2">Login</Link>
-    <Link to="/Register" class="animatedLink">Register now</Link>
+    <Link to="/Login" class="animatedLink2">{t("log-in")}</Link>
+    <Link to="/Register" class="animatedLink">{t("register_now")}</Link>
     </div>
 </div>
         </>

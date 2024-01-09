@@ -13,7 +13,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"))
 
 i18next.init({
   interpolation: { escapeValue: false },
-  lng: 'en', // Default language
+  lng: 'cs', // Default language
   resources: {
     en: { translation: require('./locales/en.json') },
     cs: { translation: require('./locales/cs.json') }

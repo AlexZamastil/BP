@@ -3,6 +3,9 @@ package cz.uhk.fim.project.bakalarka.model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Entity
 @Table(name = "exercise")
@@ -26,6 +29,14 @@ public class Exercise {
     @JoinColumn(name = "fk_pictureid", referencedColumnName = "pk_pictureid")
     private Picture picture;
 
+    @ManyToMany
+    @JoinTable(
+            name = "tagexercise",
+            joinColumns = @JoinColumn(name = "fk_exerciseid"),
+            inverseJoinColumns = @JoinColumn(name = "fk_tagid")
+    )
+    private Set<Tag> tagexercise = new HashSet<>();
+
     public Exercise() {
 
     }
@@ -46,11 +57,12 @@ public class Exercise {
         this.description = description;
     }
 
-    public Exercise(String name, String name_eng, byte[] picture, String description, String description_eng) {
+    public Exercise(String name, String name_eng, Picture picture, String description, String description_eng) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
         this.description_eng = description_eng;
+        this.picture = picture;
     }
 
     public Exercise(String name, String name_eng, String description, String description_eng) {
@@ -84,6 +96,32 @@ public class Exercise {
         this.description = description;
     }
 
+    public String getName_eng() {
+        return name_eng;
+    }
+
+    public void setName_eng(String name_eng) {
+        this.name_eng = name_eng;
+    }
+
+    public String getDescription_eng() {
+        return description_eng;
+    }
+
+    public void setDescription_eng(String description_eng) {
+        this.description_eng = description_eng;
+    }
+
+    public Picture getPicture() {
+        return picture;
+    }
+
+    public void setPicture(Picture picture) {
+        this.picture = picture;
+    }
+    public void addTagexercise(Tag t) {
+        this.tagexercise.add(t);
+    }
 
     @Override
     public String toString() {

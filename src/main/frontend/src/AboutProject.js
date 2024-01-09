@@ -1,8 +1,13 @@
 
+import { useTranslation } from 'react-i18next';
+
 export default function AboutProject(){
+
+    const {t} = useTranslation();
+
     return(<div>
-        <h2>About project</h2>
-        <p>This project is bachelor degree work</p>
+        <h1 >{t("about_project")}</h1>
+        
     </div>)
     
 }

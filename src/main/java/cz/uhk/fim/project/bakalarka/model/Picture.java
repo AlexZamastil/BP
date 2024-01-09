@@ -26,4 +26,12 @@ public class Picture {
 
     public Picture() {
     }
+
+    public byte[] getPictureData() {
+        return pictureData;
+    }
+
+    public void setPictureData(byte[] pictureData) {
+        this.pictureData = pictureData;
+    }
 }

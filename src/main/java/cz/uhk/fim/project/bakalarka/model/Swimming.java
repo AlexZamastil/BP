@@ -47,7 +47,7 @@ public class Swimming {
         this.id = id;
     }
 
-    public double getLenglhinmeters() {
+    public Integer getLenglhinmeters() {
         return lenglhinmeters;
     }
 
