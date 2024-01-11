@@ -7,6 +7,7 @@ import {useNavigate} from "react-router-dom"
 
 export default function Registration() {
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState('');
   const today = new Date();
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
@@ -48,27 +49,21 @@ export default function Registration() {
                 password : password
             })
         }).then(async(response)=>{
+          
           if (response.status === 200){
             console.log('Logged in successfully')
-            return await response;
-          } else{
-            throw await response;
-          }  
-        }).then(async(response) => {
-         localStorage.setItem('token', response.message)
-         localStorage.setItem('user', email)
-        return await response;
-        }).then((response) => {
-          if (response.status === 200){
-            console.log("redirect");
-           navigate("/profile");
-           
-          }
-          else {console.log (response.status)}
-        })
-        } else {
-          throw await response;
-        }
+            const token = await response.text();
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', email);
+            console.log("redirect to profile");
+          navigate("/profile");
+          }})
+        } else {const errorResponse = await response.text();
+          setErrorMessage(errorResponse);
+          console.error('Registration failed:', errorResponse);
+        }}).catch(error => {
+        console.error('Error occurred during login:', error);
+        setErrorMessage('An error occurred during login');
       });
   };
 
@@ -124,6 +119,12 @@ export default function Registration() {
          />
 
         <Button variant="contained" onClick={handleClick}> Submit </Button>
+
+        {errorMessage && (
+              <div style={{ color: 'red', marginTop: '10px' }}>
+                {errorMessage}
+              </div>
+            )}
       </form>
       </Paper>
     </Container>

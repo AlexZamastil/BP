@@ -68,7 +68,7 @@ export default function UpdateData() {
         dateOfBirth: formattedBirthdate,
         weight: weight,
         height: height,
-        bodytype: bodyType,
+        bodyType: bodyType,
         token : token
       }),
     };

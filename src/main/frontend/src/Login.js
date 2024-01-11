@@ -7,6 +7,9 @@ import {useNavigate} from "react-router-dom";
 export default function Login(){
 
   const navigate = useNavigate();
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
     
   const logInRequest =(e)=>{
     e.preventDefault();
@@ -25,24 +28,21 @@ export default function Login(){
           
           if (response.status === 200){
             console.log('Logged in successfully')
-            return await response.text();
-          } else{
-            throw await response.json();
-          }  
-        
-        }).then(async(response) => {
-         localStorage.setItem('token', response)
-         localStorage.setItem('user', email)
-        
-        return await response;
-        }).then(() => {
-            console.log("redirect");
-           navigate("/profile");
+            const token = await response.text();
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', email);
+            console.log("redirect to profile");
+          navigate("/profile");
+          } else{const errorResponse = await response.text();
+            setErrorMessage(errorResponse);
+            console.error('Login failed:', errorResponse);
+          }}).catch(error => {
+          console.error('Error occurred during login:', error);
+          setErrorMessage('An error occurred during login');
         })
    }
 
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
+    
     return (
       <div className='loginBG'>
       <Container >
@@ -61,6 +61,11 @@ export default function Login(){
       
       
        <Button variant="contained" onClick={logInRequest}> Submit </Button>
+       {errorMessage && (
+              <div style={{ color: 'red', marginTop: '10px' }}>
+                {errorMessage}
+              </div>
+            )}
       </form>
       </Paper>
       </Container>

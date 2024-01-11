@@ -1,5 +1,6 @@
 package cz.uhk.fim.project.bakalarka.security;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,6 +71,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
  /*
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
