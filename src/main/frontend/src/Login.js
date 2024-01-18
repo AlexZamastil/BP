@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container} from '@mui/system';
 import { Paper } from '@mui/material';
 import {TextField,Button} from '@mui/material';
@@ -10,16 +10,34 @@ export default function Login(){
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [csrfToken,setCsrfToken] = useState("") 
+
+  useEffect(() => {
+    const xsrfToken = getCookie('XSRF-TOKEN');
+    setCsrfToken(xsrfToken);
+    console.log(csrfToken);
+  },[])
+  
     
   const logInRequest =(e)=>{
     e.preventDefault();
 
-   
-   fetch("http://localhost:8080/api/nonauthorized/user/login",{
+    
+
+  if (!csrfToken) {
+    console.error('CSRF token not found');
+    setErrorMessage("Security problem, try again")
+    return;
+  }
+
+
+   fetch("https://localhost:8443/api/nonauthorized/user/login",{
         method:"POST",
         headers:{
           'Authorization': 'No Auth',
-            "Content-Type":"application/json"},
+           'X-XSRF-TOKEN': csrfToken ,
+            "Content-Type":"application/json"},credentials : "include",
+            
             body : JSON.stringify({
                 email : email,
                 password : password
@@ -36,6 +54,7 @@ export default function Login(){
           } else{const errorResponse = await response.text();
             setErrorMessage(errorResponse);
             console.error('Login failed:', errorResponse);
+            console.log(csrfToken);
           }}).catch(error => {
           console.error('Error occurred during login:', error);
           setErrorMessage('An error occurred during login');
@@ -72,6 +91,16 @@ export default function Login(){
       </div>
      
     )
+    function getCookie(name) {
+      const cookies = document.cookie.split(';');
+      for (const cookie of cookies) {
+          const [cookieName, cookieValue] = cookie.trim().split('=');
+          if (cookieName === name) {
+              return cookieValue;
+          }
+      }
+      return null;
+  }
 }
 
 

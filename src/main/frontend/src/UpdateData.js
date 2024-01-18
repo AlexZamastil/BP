@@ -22,6 +22,7 @@ export default function UpdateData() {
   const [height, setHeight] = useState("");
   const [bodyType, setBodyType] = useState("");
   const [token, setToken] = useState("");
+  const [csrfToken,setCsrfToken] = useState("") 
 
   useEffect(() => {
     fetch("http://localhost:8080/api/authorized/user/getuserdata", {
@@ -46,6 +47,23 @@ export default function UpdateData() {
 
   }, []);
 
+  useEffect(() => {
+    
+    fetch("http://localhost:8080/api/nonauthorized/getCSRFToken", {
+      method: "GET",
+      headers: {
+        "Authorization": "No Auth"
+      }
+    })
+      .then(async (response) => {
+        if (response.status === 200) {
+          const {token} = await response.json();
+          setCsrfToken(token);
+          console.log("XRSF TOKEN: " + token);
+        }
+      });
+  }, []);
+
 
   
   const date = useState("");
@@ -58,7 +76,8 @@ export default function UpdateData() {
       method: 'POST',
       headers: {
         'Authorization': localStorage.getItem("token"),
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-XSRF-TOKEN': csrfToken 
       },
         body: JSON.stringify({
         id : id,
