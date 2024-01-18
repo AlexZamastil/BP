@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container} from '@mui/system';
 import {TextField,Button} from '@mui/material';
 import { Paper } from '@mui/material';
@@ -15,6 +15,14 @@ export default function Registration() {
   const [birthdate, setBirthdate] = useState(null);
   const date = useState("");
   const formattedBirthdate = birthdate ? birthdate.toISOString().split('T')[0] : '';
+
+  const [csrfToken,setCsrfToken] = useState("") 
+
+  useEffect(() => {
+    const xsrfToken = getCookie('XSRF-TOKEN');
+    setCsrfToken(xsrfToken);
+    console.log(csrfToken);
+  },[])
   
 
   const handleClick = (e) => {
@@ -22,10 +30,11 @@ export default function Registration() {
 
     const user = {
       method: 'POST',
-      headers: {
-        'Authorization': '',
-        'Content-Type': 'application/json'
-      },
+      headers:{
+        'Authorization': 'No Auth',
+          "Content-Type":"application/json",
+          'X-XSRF-TOKEN': csrfToken 
+        },credentials : "include",
       body: JSON.stringify({
         email: email,
         nickname: nickname,
@@ -36,14 +45,16 @@ export default function Registration() {
 
     console.log(user.body);
 
-    fetch('http://localhost:8080/api/nonauthorized/user/register', user)
+    fetch('https://localhost:8443/api/nonauthorized/user/register', user)
       .then(async (response) => {
         if (response.status === 200) {
-          fetch("http://localhost:8080/api/nonauthorized/user/login",{
+          fetch("https://localhost:8443/api/nonauthorized/user/login",{
         method:"POST",
         headers:{
           'Authorization': 'No Auth',
-            "Content-Type":"application/json"},
+            "Content-Type":"application/json",
+            'X-XSRF-TOKEN': csrfToken 
+          },credentials : "include",
             body : JSON.stringify({
                 email : email,
                 password : password
@@ -130,4 +141,15 @@ export default function Registration() {
     </Container>
     </div>
   );
+
+  function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+        const [cookieName, cookieValue] = cookie.trim().split('=');
+        if (cookieName === name) {
+            return cookieValue;
+        }
+    }
+    return null;
+}
 }

@@ -25,7 +25,14 @@ export default function UpdateData() {
   const [csrfToken,setCsrfToken] = useState("") 
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/authorized/user/getuserdata", {
+    const xsrfToken = getCookie('XSRF-TOKEN');
+    setCsrfToken(xsrfToken);
+    console.log(csrfToken);
+  },[])
+  
+
+  useEffect(() => {
+    fetch("https://localhost:8443/api/authorized/user/getuserdata", {
       method: "GET",
       headers: {
         'Authorization': localStorage.getItem("token")
@@ -47,23 +54,6 @@ export default function UpdateData() {
 
   }, []);
 
-  useEffect(() => {
-    
-    fetch("http://localhost:8080/api/nonauthorized/getCSRFToken", {
-      method: "GET",
-      headers: {
-        "Authorization": "No Auth"
-      }
-    })
-      .then(async (response) => {
-        if (response.status === 200) {
-          const {token} = await response.json();
-          setCsrfToken(token);
-          console.log("XRSF TOKEN: " + token);
-        }
-      });
-  }, []);
-
 
   
   const date = useState("");
@@ -78,7 +68,7 @@ export default function UpdateData() {
         'Authorization': localStorage.getItem("token"),
         'Content-Type': 'application/json',
         'X-XSRF-TOKEN': csrfToken 
-      },
+      },credentials : "include",
         body: JSON.stringify({
         id : id,
         email: email,
@@ -94,7 +84,7 @@ export default function UpdateData() {
 
     console.log(user.body);
 
-    fetch('http://localhost:8080/api/authorized/user/updateData', user)
+    fetch('https://localhost:8443/api/authorized/user/updateData', user)
       .then(async (response) => {
         if (response.status === 200) {
                 console.log("DATA UPDATED SUCCESSFULLY");
@@ -183,4 +173,15 @@ export default function UpdateData() {
     </Container>
     </div>
   );
+
+  function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+        const [cookieName, cookieValue] = cookie.trim().split('=');
+        if (cookieName === name) {
+            return cookieValue;
+        }
+    }
+    return null;
+}
 }

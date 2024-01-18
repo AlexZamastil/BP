@@ -22,8 +22,18 @@ export default function AddExercise(){
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [exerciseTags, setExerciseTags] = useState([]); 
+
+  const [csrfToken,setCsrfToken] = useState("");
+
+
+  useEffect(() => {
+    const xsrfToken = getCookie('XSRF-TOKEN');
+    setCsrfToken(xsrfToken);
+    console.log(csrfToken);
+  },[])
+  
     useEffect(() => {
-        fetch("http://localhost:8080/api/authorized/user/getuserdata", {
+        fetch("https://localhost:8443/api/authorized/user/getuserdata", {
             method: "GET",
             headers: {
                 'Authorization': localStorage.getItem("token")
@@ -40,7 +50,7 @@ export default function AddExercise(){
     }, []);
 
     useEffect(() => {
-      fetch("http://localhost:8080/api/nonauthorized/getExerciseTags", {
+      fetch("https://localhost:8443/api/nonauthorized/getExerciseTags", {
         method: "GET",
         headers: {
           'Authorization': ""
@@ -89,11 +99,12 @@ export default function AddExercise(){
       formData.append('imageData', selectedFile);
     
       try {
-        const response = await fetch("http://localhost:8080/api/privileged/addExercise", {
+        const response = await fetch("https://localhost:8443/api/privileged/addExercise", {
           method: "POST",
           headers: {
             'Authorization': localStorage.getItem("token"),
-          },
+            'X-XSRF-TOKEN': csrfToken 
+          },credentials : "include",
           body: formData 
         });
     
@@ -293,6 +304,16 @@ export default function AddExercise(){
           </div>
         );
       }
+      function getCookie(name) {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+            const [cookieName, cookieValue] = cookie.trim().split('=');
+            if (cookieName === name) {
+                return cookieValue;
+            }
+        }
+        return null;
+    }
     }
     
     

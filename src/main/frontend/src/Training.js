@@ -26,7 +26,7 @@ export default function Training() {
 
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/authorized/user/getuserdata", {
+        fetch("https://localhost:8443/api/authorized/user/getuserdata", {
             method: "GET",
             headers: {
                 'Authorization': localStorage.getItem("token")

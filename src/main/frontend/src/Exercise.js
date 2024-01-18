@@ -5,7 +5,7 @@ export default function Exercise(){
     const { exerciseID } = useParams();
     const [exerciseData, setExerciseData] = useState([]);
     useEffect(()=> {
-        fetch("http://localhost:8080/api/nonauthorized/getExercise/"+exerciseID, {
+        fetch("https://localhost:8443/api/nonauthorized/getExercise/"+exerciseID, {
             method: "GET"
         }).then(async(response)=> {
             setExerciseData(await response.text())
