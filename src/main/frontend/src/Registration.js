@@ -3,7 +3,11 @@ import { Container} from '@mui/system';
 import {TextField,Button} from '@mui/material';
 import { Paper } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import {useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom";
+import {FormHelperText} from '@mui/material';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
 
 export default function Registration() {
   const navigate = useNavigate();
@@ -12,13 +16,14 @@ export default function Registration() {
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [sex, setSex] = useState(null);
   const [birthdate, setBirthdate] = useState(null);
   const date = useState("");
   const formattedBirthdate = birthdate ? birthdate.toISOString().split('T')[0] : '';
 
   const [csrfToken,setCsrfToken] = useState("") 
 
-  useEffect(() => {
+  useEffect((csrfToken) => {
     const xsrfToken = getCookie('XSRF-TOKEN');
     setCsrfToken(xsrfToken);
     console.log(csrfToken);
@@ -39,7 +44,8 @@ export default function Registration() {
         email: email,
         nickname: nickname,
         password: password,
-        dateOfBirth: formattedBirthdate
+        dateOfBirth: formattedBirthdate,
+        sex : sex
       })
     };
 
@@ -119,13 +125,26 @@ export default function Registration() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
+<FormHelperText>Select your biological sex</FormHelperText>
+<Select
+  labelId="demo-simple-select-label"
+  id="demo-simple-select"
+  value={sex}
+  label="Sex"
+  sx={{ m: 1, width: '25ch' }}
+  onChange={(e) => setSex(e.target.value)}
+>
+  <MenuItem value={"MALE"}>Male</MenuItem>
+  <MenuItem value={"FEMALE"}>Female</MenuItem>
+</Select>
+
+
         <DatePicker 
         className='datepicker'
         sx={{ m: 1, width: '25ch' }}
         style={{ margin: '10px auto' }}
          format="YYYY-MM-DD"
-         maxDate={today.getDate}
-         value={date}
+         label="Birthdate"
          onChange={(newDate) => setBirthdate(newDate)}
          />
 

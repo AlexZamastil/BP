@@ -2,6 +2,7 @@ package cz.uhk.fim.project.bakalarka.service;
 
 
 import cz.uhk.fim.project.bakalarka.DAO.UserStatsRepository;
+import cz.uhk.fim.project.bakalarka.enumerations.Sex;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,14 +65,14 @@ public class UserService {
         } else return MessageHandler.error("Wrong password");
     }
 
-    public ResponseEntity<?> register(String email, String nickname, String password, LocalDate birthdate) {
+    public ResponseEntity<?> register(String email, String nickname, String password, LocalDate birthdate, Sex sex) {
         if (userRepository.findUserByEmail(email) != null) {
             return MessageHandler.error("Account using this email already exist");
         } else if (!emailValidator.isValid(email)) {
             return MessageHandler.error("The entered text is not a valid email address");
         } else {
             String encryptedPassword = passwordEncoder.encode(password);
-            User user = new User(email, nickname, encryptedPassword, birthdate);
+            User user = new User(email, nickname, encryptedPassword, birthdate, sex);
             userRepository.save(user);
             return MessageHandler.success("Account created successfully");
         }

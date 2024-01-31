@@ -35,7 +35,7 @@ export default function Training() {
         .then(async (response) => {
             const userStatsData = await response.json();
             setUserStats(userStatsData);
-            return fetch(`http://localhost:8080/api/authorized/hasActiveTraining/${userStatsData.user.id}`, {
+            return fetch(`https://localhost:8443/api/authorized/hasActiveTraining/${userStatsData.user.id}`, {
                 method: "GET",
                 headers: {
                     'Authorization': localStorage.getItem("token")

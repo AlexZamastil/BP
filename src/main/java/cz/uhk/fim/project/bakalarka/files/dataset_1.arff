@@ -3,7 +3,7 @@
 @attribute weight numeric
 @attribute height numeric
 @attribute bmi numeric
-@attribute sex {M, F}
+@attribute sex {MALE, FEMALE}
 @attribute bodyType {Average, Athletic, Obese}
 @attribute availibleTrainingDays numeric
 @attribute trainingLengthInDays numeric
@@ -12,7 +12,7 @@
 @attribute raceLengthInMeters numeric
 @attribute racePaceToAchieve numeric
 @attribute raceType {Run, OCR}
-@attribute raceElevation {Low, Average, High}
+@attribute raceElevation {FLAT_ROAD, CROSS, UPHILL}
 @attribute trainingsPerWeek numeric
 @attribute trainingsDemandingness {Easy, EasyMedium, Medium, MediumHard, Hard, HardWithJogging}
 
@@ -25,85 +25,85 @@
 
 @data
 
-70, 175, 22.9, M, Average,  5, 90,  5000, 6.5, 10000,  6.5, Run, Low,     4, MediumHard
+70, 175, 22.9, MALE, Average,  5, 90,  5000, 6.5, 10000,  6.5, Run, FLAT_ROAD,     4, MediumHard
 
-85, 180, 26.2, F, Obese,    4, 120, 2000, 7.2, 7000,   10,  Run, Average, 3, EasyMedium
+85, 180, 26.2, FEMALE, Obese,    4, 120, 2000, 7.2, 7000,   10,  Run, CROSS, 3, EasyMedium
 
-63, 168, 24.1, M, Athletic, 6, 60,  5000, 6.0, 6000,  6.0,  OCR, Average, 5, Hard
+63, 168, 24.1, MALE, Athletic, 6, 60,  5000, 6.0, 6000,  6.0,  OCR, CROSS, 5, Hard
 
-72, 172, 24.3, F, Athletic, 5, 90,  8000, 6.8, 6000,   6.8, OCR, Average, 4, MediumHard
+72, 172, 24.3, FEMALE, Athletic, 5, 90,  8000, 6.8, 6000,   6.8, OCR, CROSS, 4, MediumHard
 
-58, 160, 22.7, M, Average,  6, 75,  6000, 6.0, 6000,   5.5, OCR, Average, 5, MediumHard
+58, 160, 22.7, MALE, Average,  6, 75,  6000, 6.0, 6000,   5.5, OCR, CROSS, 5, MediumHard
  
-78, 185, 22.8, F, Athletic, 4, 100, 8000, 7.5, 10000,  7.0, Run, Average, 4, MediumHard
+78, 185, 22.8, FEMALE, Athletic, 4, 100, 8000, 7.5, 10000,  7.0, Run, CROSS, 4, MediumHard
 
-95, 190, 26.3, M, Obese,    3, 150, 3000, 8.0, 6000,   8.0, Run, Low,     3, Easy
+95, 190, 26.3, MALE, Obese,    3, 150, 3000, 8.0, 6000,   8.0, Run, FLAT_ROAD,     3, Easy
 
-67, 170, 23.2, F, Average,  5, 120, 6000, 6.2, 6000,   6.0, Run, Average, 5, MediumHard
+67, 170, 23.2, FEMALE, Average,  5, 120, 6000, 6.2, 6000,   6.0, Run, CROSS, 5, MediumHard
 
-73, 175, 23.8, M, Athletic, 4, 90,  8000, 6.7, 6000,   6.5, OCR, Low,     4, MediumHard
+73, 175, 23.8, MALE, Athletic, 4, 90,  8000, 6.7, 6000,   6.5, OCR, FLAT_ROAD,     4, MediumHard
 
-80, 177, 25.5, F, Obese,    3, 110, 4000, 7.2, 8000,   7.0, Run, Average, 3, Medium
+80, 177, 25.5, FEMALE, Obese,    3, 110, 4000, 7.2, 8000,   7.0, Run, CROSS, 3, Medium
 
-68, 168, 24,   M, Average,  5, 80,  6000, 6.3, 8000,   7.0, OCR, Average, 5, MediumHard
+68, 168, 24,   MALE, Average,  5, 80,  6000, 6.3, 8000,   7.0, OCR, CROSS, 5, MediumHard
 
-75, 180, 23.1, F, Athletic, 6, 100, 8000, 7.0, 10000,  5.8, Run, Average, 6, HardWithJogging
+75, 180, 23.1, FEMALE, Athletic, 6, 100, 8000, 7.0, 10000,  5.8, Run, CROSS, 6, HardWithJogging
 
-90, 185, 26.3, M, Average,  4, 120, 3500, 8.2, 8000,   8.0, OCR, Average  4, MediumHard
+90, 185, 26.3, MALE, Average,  4, 120, 3500, 8.2, 8000,   8.0, OCR, CROSS,  4, MediumHard
 
-61, 165, 22.4, F, Average,  5, 70,  6000, 7.0, 6000,   6.5, OCR, Average, 5, MediumHard
+61, 165, 22.4, FEMALE, Average,  5, 70,  6000, 7.0, 6000,   6.5, OCR, CROSS, 5, MediumHard
 
-65, 170, 23,   M, Athletic, 3, 80,  8000, 6.4, 8000,   6.0, Run, High   , 3, MediumHard
+65, 170, 23,   MALE, Athletic, 3, 80,  8000, 6.4, 8000,   6.0, Run, UPHILL   , 3, MediumHard
 
-70, 175, 23.7, F, Average,  6, 90,  6000, 6.6, 6000,   5.5, OCR, Average, 5, MediumHard
+70, 175, 23.7, FEMALE, Average,  6, 90,  6000, 6.6, 6000,   5.5, OCR, CROSS, 5, MediumHard
 
-80, 180, 25.0, M, Athletic, 5, 100, 8000, 6.8, 10000,  5.0, Run, Average, 5, HardWithJogging
+80, 180, 25.0, MALE, Athletic, 5, 100, 8000, 6.8, 10000,  5.0, Run, CROSS, 5, HardWithJogging
 
-80, 170, 24.0, F, Average,  6, 90,  9000, 6.8, 15000,  6.5, Run, Average, 5, HardWithJogging
+80, 170, 24.0, FEMALE, Average,  6, 90,  9000, 6.8, 15000,  6.5, Run, CROSS, 5, HardWithJogging
 
-70, 180, 23.0, M, Average,  5, 90,  5000, 6.8, 7000,   6.0, Run, Average, 4, EasyMedium
+70, 180, 23.0, MALE, Average,  5, 90,  5000, 6.8, 7000,   6.0, Run, CROSS, 4, EasyMedium
 
-75, 175, 25.0, F, Obese,    4, 60,  3000, 7.2, 6500,   7.0, Run, Average, 3, Easy
+75, 175, 25.0, FEMALE, Obese,    4, 60,  3000, 7.2, 6500,   7.0, Run, CROSS, 3, Easy
 
-70, 175, 22.9, M, Average,  3, 90,  5000, 6.5, 10000,  6.5, Run, Low,     3, Hard
+70, 175, 22.9, MALE, Average,  3, 90,  5000, 6.5, 10000,  6.5, Run, FLAT_ROAD,     3, Hard
 
-85, 180, 26.2, F, Obese,    4, 120, 2000, 7.2, 4000,   10,  Run, Average, 3, Easy
+85, 180, 26.2, FEMALE, Obese,    4, 120, 2000, 7.2, 4000,   10,  Run, CROSS, 3, Easy
 
-63, 168, 24.1, M, Athletic, 6, 60,  5000, 6.0, 5000,   6.0, OCR, High,    5, Hard
+63, 168, 24.1, MALE, Athletic, 6, 60,  5000, 6.0, 5000,   6.0, OCR, UPHILL,    5, Hard
 
-72, 172, 24.3, F, Athletic, 5, 90,  15000, 6.8, 20000, 6.8, Run, Average, 4, Medium
+72, 172, 24.3, FEMALE, Athletic, 5, 90,  15000, 6.8, 20000, 6.8, Run, CROSS, 4, Medium
 
-58, 160, 22.7, M, Average,  6, 75,  6000, 6.0, 6000,   5.5, OCR, Average, 5, MediumHard
+58, 160, 22.7, MALE, Average,  6, 75,  6000, 6.0, 6000,   5.5, OCR, CROSS, 5, MediumHard
 
-78, 185, 22.8, F, Athletic, 4, 100, 8000, 7.5, 12000,  7.0, Run, Average, 4, Hard
+78, 185, 22.8, FEMALE, Athletic, 4, 100, 8000, 7.5, 12000,  7.0, Run, CROSS, 4, Hard
 
-95, 190, 26.3, M, Obese,    3, 150, 3000, 8.0, 6000,   8.0, Run, Low,     3, Easy
+95, 190, 26.3, MALE, Obese,    3, 150, 3000, 8.0, 6000,   8.0, Run, FLAT_ROAD,     3, Easy
 
-67, 170, 23.2, F, Average,  5, 120, 6000, 6.2, 6000,   6.0, Run, Average, 5, MediumHard
+67, 170, 23.2, FEMALE, Average,  5, 120, 6000, 6.2, 6000,   6.0, Run, CROSS, 5, MediumHard
 
-73, 175, 23.8, M, Athletic, 4, 90,  8000, 6.7, 6000,   6.5, OCR, Low,     4, MediumHard
+73, 175, 23.8, MALE, Athletic, 4, 90,  8000, 6.7, 6000,   6.5, OCR, FLAT_ROAD,     4, MediumHard
 
-80, 177, 25.5, F, Obese,    3, 110, 4000, 7.2, 8000,   7.0, Run, Average, 3, Medium
+80, 177, 25.5, FEMALE, Obese,    3, 110, 4000, 7.2, 8000,   7.0, Run, CROSS, 3, Medium
 
-68, 168, 24,   M, Average,  5, 80,  6000, 6.3, 8000,   7.0, OCR, Average, 5, MediumHard
+68, 168, 24,   MALE, Average,  5, 80,  6000, 6.3, 8000,   7.0, OCR, CROSS, 5, MediumHard
 
-75, 180, 23.1, F, Athletic, 6, 100, 8000, 7.0, 10000,  5.8, Run, Average, 6, HardWithJogging
+75, 180, 23.1, FEMALE, Athletic, 6, 100, 8000, 7.0, 10000,  5.8, Run, CROSS, 6, HardWithJogging
 
-90, 185, 26.3, M, Average,  4, 120, 3500, 8.2, 8000,   8.0, OCR, Average  4, MediumHard
+90, 185, 26.3, MALE, Average,  4, 120, 3500, 8.2, 8000,   8.0, OCR, CROSS,  4, MediumHard
 
-61, 165, 22.4, F, Average,  5, 70,  6000, 7.0, 6000,   6.5, OCR, Average, 5, MediumHard
+61, 165, 22.4, FEMALE, Average,  5, 70,  6000, 7.0, 6000,   6.5, OCR, CROSS, 5, MediumHard
 
-65, 170, 23,   M, Athletic, 3, 80,  8000, 6.4, 8000,   6.0, Run, High,    3, MediumHard
+65, 170, 23,   MALE, Athletic, 3, 80,  8000, 6.4, 8000,   6.0, Run, UPHILL,    3, MediumHard
 
-70, 175, 23.7, F, Average,  6, 90,  6000, 6.6, 6000,   5.8, OCR, Low,     5, MediumHard
+70, 175, 23.7, FEMALE, Average,  6, 90,  6000, 6.6, 6000,   5.8, OCR, FLAT_ROAD,     5, MediumHard
 
-80, 180, 25.0, M, Athletic, 5, 100, 8000, 6.8, 10000,  5.0, Run, High,    5, MediumHard
+80, 180, 25.0, MALE, Athletic, 5, 100, 8000, 6.8, 10000,  5.0, Run, UPHILL,    5, MediumHard
 
-80, 170, 24.0, F, Average,  6, 120, 9000, 6.8, 20000,  6.5, Run, Average, 5, HardWithJogging
+80, 170, 24.0, FEMALE, Average,  6, 120, 9000, 6.8, 20000,  6.5, Run, CROSS, 5, HardWithJogging
 
-70, 180, 23.0, M, Average,  5, 90,  5000, 6.8, 13000,  6.0, Run, Average, 4, MediumHard
+70, 180, 23.0, MALE, Average,  5, 90,  5000, 6.8, 13000,  6.0, Run, CROSS, 4, MediumHard
 
-75, 175, 25.0, F, Obese,    2, 60,  3000, 7.2, 6500,   7.0, Run, Average, 2, Medium
+75, 175, 25.0, FEMALE, Obese,    2, 60,  3000, 7.2, 6500,   7.0, Run, CROSS, 2, Medium
 
 
 

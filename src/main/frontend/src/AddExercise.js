@@ -1,6 +1,9 @@
 import { Paper, Button, TextField} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Container} from '@mui/system';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function AddExercise(){
   const [name,setName] = useState(null);
@@ -8,14 +11,16 @@ export default function AddExercise(){
   const [description,setDescription] = useState(null);
   const [description_eng,setDescription_eng] = useState(null);
   const [type,setType] = useState(null);
-  const [category_style,setCategory_Style] = useState(null);
+  const [category,setCategory] = useState(null);
+  const [style,setStyle] = useState(null);
   const [length,setLength] = useState(null);
   const [series,setSeries] = useState(null);
   const [repetitions,setRepetitions] = useState(null);
   const [tags,setTags] = useState([]);
   const [picture, setPicture] = useState(null);
+  const [exerciseType, setExerciseType] = useState('');
 
-  const [userStats,setUserStats] = useState([]);
+  //const [userStats,setUserStats] = useState([]);
 
   const [selectedFile,setSelectedFile] = useState(null);
 
@@ -25,8 +30,11 @@ export default function AddExercise(){
 
   const [csrfToken,setCsrfToken] = useState("");
 
+  const handleExerciseTypeChange = (selectedType) => {
+    setExerciseType(selectedType);
+  };
 
-  useEffect(() => {
+  useEffect((csrfToken) => {
     const xsrfToken = getCookie('XSRF-TOKEN');
     setCsrfToken(xsrfToken);
     console.log(csrfToken);
@@ -41,7 +49,7 @@ export default function AddExercise(){
         })
         .then(async (response) => {
             const userData = await response.json();
-            setUserStats(userData);
+            //setUserStats(userData);
             setIsAdmin(userData.user.adminPrivileges);
         })
         .catch(error => {
@@ -80,22 +88,47 @@ export default function AddExercise(){
     
  
       const formData = new FormData();
-    
-      formData.append('exerciseRequest', new Blob([JSON.stringify({
 
-        name: name,
-        name_eng: name_eng,
-        description: description,
-        description_eng: description_eng,
-        series: series,
-        repetitions: repetitions,
-        type: type,
-        length: length,
-        category_style: category_style,
-        tags: tags
-      })], { type: 'application/json' }));
-    
-   
+      if (exerciseType == "RUN") {
+        formData.append('exerciseRequest', new Blob([JSON.stringify({
+
+          name: name,
+          name_eng: name_eng,
+          description: description,
+          description_eng: description_eng,
+          type: exerciseType,
+          length: length,
+          category: category,
+          tags: tags
+        })], { type: 'application/json' }));
+
+      } else if (exerciseType == "GYM") {
+        formData.append('exerciseRequest', new Blob([JSON.stringify({
+
+          name: name,
+          name_eng: name_eng,
+          description: description,
+          description_eng: description_eng,
+          type: exerciseType,
+          series: series,
+          repetitions: repetitions,
+          tags: tags
+        })], { type: 'application/json' }));
+
+      } else if (exerciseType == "SWIMMING") {
+        formData.append('exerciseRequest', new Blob([JSON.stringify({
+
+          name: name,
+          name_eng: name_eng,
+          description: description,
+          description_eng: description_eng,
+          type: exerciseType,
+          length: length,
+          style: style,
+          tags: tags
+        })], { type: 'application/json' }));
+      }
+
       formData.append('imageData', selectedFile);
     
       try {
@@ -131,6 +164,91 @@ export default function AddExercise(){
         };
     
         reader.readAsDataURL(selectedFile);
+      }
+    };
+
+
+
+
+    const renderExerciseForm = () => {
+      switch (exerciseType) {
+        case 'RUN':
+          return ( 
+          <>
+            <TextField
+            style={{ margin: '10px auto' }}
+            sx={{ m: 1, width: '25ch' }}
+            id="outlined-basic"
+            label="length (m)"
+            variant="outlined"
+            fullWidth
+            value={length}
+            onChange={(e) => setLength(e.target.value)}
+          />
+          <TextField
+                   style={{ margin: '10px auto' }}
+                   sx={{ m: 1, width: '25ch' }}
+                   id="outlined-basic"
+                   label="category_style"
+                   variant="outlined"
+                   fullWidth
+                   value={category}
+                   onChange={(e) => setCategory(e.target.value)}
+                 />
+
+            </>
+          );
+        case 'GYM':
+          return (
+            <> <TextField
+            style={{ margin: '10px auto' }}
+            sx={{ m: 1, width: '25ch' }}
+            id="outlined-basic"
+            label="repetitions"
+            variant="outlined"
+            fullWidth
+            value={repetitions}
+            onChange={(e) => setRepetitions(e.target.value)}
+          />
+           <TextField
+            style={{ margin: '10px auto' }}
+            sx={{ m: 1, width: '25ch' }}
+            id="outlined-basic"
+            label="series"
+            variant="outlined"
+            fullWidth
+            value={series}
+            onChange={(e) => setSeries(e.target.value)}
+          /></>
+          );
+        case 'SWIMMING':
+          return (
+            <>
+             <TextField
+                   style={{ margin: '10px auto' }}
+                   sx={{ m: 1, width: '25ch' }}
+                   id="outlined-basic"
+                   label="category_style"
+                   variant="outlined"
+                   fullWidth
+                   value={style}
+                   onChange={(e) => setStyle(e.target.value)}
+                 />
+            
+            <TextField
+                   style={{ margin: '10px auto' }}
+                   sx={{ m: 1, width: '25ch' }}
+                   id="outlined-basic"
+                   label="length (m)"
+                   variant="outlined"
+                   fullWidth
+                   value={length}
+                   onChange={(e) => setLength(e.target.value)}
+                 />
+            </>
+          );
+        default:
+          return null;
       }
     };
 
@@ -186,56 +304,26 @@ export default function AddExercise(){
                    value={description_eng}
                    onChange={(e) => setDescription_eng(e.target.value)}
                  />
-                  <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="type"
-                   variant="outlined"
-                   fullWidth
-                   value={type}
-                   onChange={(e) => setType(e.target.value)}
-                 />
-                  <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="category_style"
-                   variant="outlined"
-                   fullWidth
-                   value={category_style}
-                   onChange={(e) => setCategory_Style(e.target.value)}
-                 />
-                  <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="length (m)"
-                   variant="outlined"
-                   fullWidth
-                   value={length}
-                   onChange={(e) => setLength(e.target.value)}
-                 />
-                  <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="repetitions"
-                   variant="outlined"
-                   fullWidth
-                   value={repetitions}
-                   onChange={(e) => setRepetitions(e.target.value)}
-                 />
-                  <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="series"
-                   variant="outlined"
-                   fullWidth
-                   value={series}
-                   onChange={(e) => setSeries(e.target.value)}
-                 />
+
+
+                <InputLabel id="demo-simple-select-label"> Exercise type </InputLabel>
+                  <Select
+                  style={{ margin: '10px auto' }}
+                  sx={{ m: 1, width: '25ch' }}
+                  select
+                  label="Select Exercise Type"
+                  variant="outlined"
+                  fullWidth
+                  value={exerciseType}
+                  onChange={(e) => handleExerciseTypeChange(e.target.value)}
+                >
+                  <MenuItem value="RUN">Run</MenuItem>
+                  <MenuItem value="GYM">Gym</MenuItem>
+                  <MenuItem value="SWIMMING">Swimming</MenuItem>
+                </Select>
+
+                {renderExerciseForm()}
+
                   <TagSelection pool={exerciseTags} maxSelection={2}/>
                   <br/>
 
@@ -266,11 +354,8 @@ export default function AddExercise(){
           )}
         </div>
       );
-      
-
 
       function TagSelection({pool}) {
-      
       
         const handleTagSelection = (tag) => {
           setTags((prevSelectedTags) => {

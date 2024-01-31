@@ -12,6 +12,7 @@ import AddExercise from "./AddExercise";
 import Training from "./Training";
 import GenerateTraining from "./GenerateTraining";
 import Exercise from "./Exercise"
+import AdminTools from "./AdminTools"
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/training" element={<Training/>}/>
           <Route path="/generateTraining/:trainingType" element={<GenerateTraining />} />
           <Route path="/exercise/:exerciseID" element={<Exercise/>}/>
+          <Route path="/adminTools" element={<AdminTools/>} />
           <Route path="*" element={<PageNotFound/>}/>
           <Route path="/" element={<WelcomePage/>}/>
 

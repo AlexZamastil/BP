@@ -23,7 +23,6 @@ public class UserController {
     @PostMapping(value = "nonauthorized/user/login", consumes = {"application/json"})
     public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletRequest request) {
         String csrfToken = request.getHeader("X-XSRF-TOKEN");
-        System.out.println("CSRF TOKEN: " + csrfToken);
         return userService.login(
                 user.getEmail(),
                 user.getPassword()
@@ -37,7 +36,8 @@ public class UserController {
                 user.getEmail(),
                 user.getNickname(),
                 user.getPassword(),
-                user.getDateOfBirth()
+                user.getDateOfBirth(),
+                user.getSex()
         );
     }
     @PostMapping(value = "authorized/user/passwordreset", consumes = {"application/json"})

@@ -34,45 +34,32 @@ public class ExerciseService {
     }
 
 
-
-    public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, @Nonnull String type, String category_style, int lengthInMeters, List<String> tags) {
+/*
+    public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags) {
         System.out.println(tags);
         Exercise exercise = new Exercise(name, name_eng, description, description_eng);
         exerciseRepository.save(exercise);
         handleTags(tags, exercise);
-
-        if (type.equals("RUN")) {
-            Run run = new Run(lengthInMeters, RunCategory.valueOf(category_style), exercise);
-            runRepository.save(run);
-
-        } else {
-            Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(category_style), exercise);
-            swimmingRepository.save(swimming);
-        }
-
+        Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
+        runRepository.save(run);
         return MessageHandler.success("Exercise saved successfufly");
     }
 
-    public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng,@Nonnull String type, String category_style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
+ */
+
+    public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags, MultipartFile multipartFile) throws IOException {
         byte[] pictureData = handlePicture(multipartFile);
         Picture picture = new Picture(pictureData);
         pictureRepository.save(picture);
         Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng);
         exerciseRepository.save(exercise);
         handleTags(tags, exercise);
-        if (type.equals("RUN")) {
-            Run run = new Run(lengthInMeters, RunCategory.valueOf(category_style), exercise);
-            runRepository.save(run);
-
-        } else {
-            Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(category_style), exercise);
-            swimmingRepository.save(swimming);
-        }
-
+        Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
+        runRepository.save(run);
         return MessageHandler.success("Exercise saved successfufly");
     }
-
-    public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng,@Nonnull int repetitions,@Nonnull int series, List<String> tags) {
+/*
+    public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng,@Nonnull int repetitions,@Nonnull int series, List<String> tags) {
         System.out.println(tags);
         Exercise exercise = new Exercise(name, name_eng, description, description_eng);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
@@ -84,16 +71,44 @@ public class ExerciseService {
 
     }
 
-    public ResponseEntity<?> addNewExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
+ */
+
+    public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
+        byte[] pictureData = handlePicture(multipartFile);
+        System.out.println("X");
+        Picture picture = new Picture(pictureData);
+        System.out.println("XX");
+        pictureRepository.save(picture);
+        System.out.println("XXX");
+        Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng);
+        GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
+        exerciseRepository.save(exercise);
+        System.out.println("XXXX");
+        gymWorkoutRepository.save(gymWorkout);
+        handleTags(tags, exercise);
+
+        return MessageHandler.success("Exercise saved successfufly");
+    }
+
+    public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags) {
+        System.out.println(tags);
+        Exercise exercise = new Exercise(name, name_eng, description, description_eng);
+        exerciseRepository.save(exercise);
+        handleTags(tags, exercise);
+        Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
+        swimmingRepository.save(swimming);
+        return MessageHandler.success("Exercise saved successfufly");
+    }
+
+    public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
         byte[] pictureData = handlePicture(multipartFile);
         Picture picture = new Picture(pictureData);
         pictureRepository.save(picture);
         Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng);
-        GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         exerciseRepository.save(exercise);
-        gymWorkoutRepository.save(gymWorkout);
         handleTags(tags, exercise);
-
+        Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
+        swimmingRepository.save(swimming);
         return MessageHandler.success("Exercise saved successfufly");
     }
 

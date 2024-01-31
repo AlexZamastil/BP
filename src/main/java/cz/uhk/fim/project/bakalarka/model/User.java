@@ -1,6 +1,7 @@
 package cz.uhk.fim.project.bakalarka.model;
 
 import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
+import cz.uhk.fim.project.bakalarka.enumerations.Sex;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -38,6 +39,9 @@ public class User {
     @Column(name = "bodytype")
     @Enumerated(EnumType.STRING)
     private BodyType bodyType;
+    @Column(name = "sex")
+    @Enumerated(EnumType.STRING)
+    private Sex sex;
 
     @Column(name = "adminprivileges")
     private boolean adminPrivileges;
@@ -70,11 +74,12 @@ public class User {
         this.bannedFood = bannedFood;
         this.token = token;
     }
-    public User(String email, String nickname, String password, LocalDate dateOfBirth){
+    public User(String email, String nickname, String password, LocalDate dateOfBirth, Sex sex){
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.dateOfBirth = dateOfBirth;
+        this.sex = sex;
     }
 
     public long getId() {
@@ -163,6 +168,14 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
     }
 
     public Set<Food> getBannedFood() {

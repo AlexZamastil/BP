@@ -25,8 +25,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final List<String> allowedMethods = Arrays.asList("GET", "POST","OPTIONS","DELETE","PUT");
-    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "X-CSRF-TOKEN", "Authorization","XSRF-TOKEN");
-    private final List<String> allowedOrigins = Arrays.asList("http://localhost:3000","http://192.168.1.106:3000","https://localhost:8443","https://localhost:3000");
+    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization","XSRF-TOKEN");
+    private final List<String> allowedOrigins = Arrays.asList("https://192.168.1.106:3000","https://localhost:3000");
     AuthFilter authFilter;
 
     @Autowired
@@ -68,8 +68,6 @@ public class SecurityConfig {
         return urlCorfConfig;
     }
 
-
-
     @Bean
     public CookieCsrfTokenRepository csrfTokenRepository() {
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
@@ -77,10 +75,8 @@ public class SecurityConfig {
         repository.setSecure(true);
         repository.setCookiePath("/");
 
-
         return repository;
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

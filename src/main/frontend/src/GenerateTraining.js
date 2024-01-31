@@ -1,49 +1,108 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container } from '@mui/system';
 import { TextField, Button } from '@mui/material';
 import { Paper } from '@mui/material';
-import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useParams } from 'react-router-dom';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import 'dayjs/locale/en';
+import {FormHelperText} from '@mui/material';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function GenerateTraining() {
     const { trainingType } = useParams();
+    const [csrfToken, setCsrfToken] = useState("");
+    const timeZone = "UTC";
+
     const [trainingData, setTrainingData] = useState(() => ({
+        startDay : dayjs().toISOString().split("T")[0],
         goal: trainingType,
         lengthOfRaceInMeters: 0,
         wantedTime: null,
         actualRunLength: 0,
         actualTime: null,
-        raceDay: new Date(),
-        startDay: new Date()
+        raceDay: dayjs().toISOString().split("T")[0],
+        elevationProfile: ""
     }));
-    
+
+    useEffect(() => {
+        const xsrfToken = getCookie('XSRF-TOKEN');
+        setCsrfToken(xsrfToken);
+    }, []);
+
+    const setRaceDay = (selectedDate) => {
+        const formattedDate = selectedDate ? selectedDate.toISOString().split("T")[0] : null;
+        setTrainingData({ ...trainingData, raceDay: formattedDate });
+    };
+
     const onlyNumbers = (e) => {
         const inputValue = e.target.value.replace(/[^0-9]/g, '');
-        
         e.target.value = inputValue;
-      };
+    };
 
-      function handleWantedTimeChange(value) {
-        setTrainingData({ ...trainingData, wantedTime: value });
+    function generateTraining() {
+        fetch("https://localhost:8443/api/authorized/generateTraining", {
+            method: "POST",
+            headers: {
+                'Authorization': localStorage.getItem("token"),
+                'X-XSRF-TOKEN': csrfToken,
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify(trainingData)
+        });
+        console.log(trainingData);
+       console.log(csrfToken);
+        console.log("Actual Time:", trainingData.actualTime);
+        console.log("Wanted Time:", trainingData.wantedTime);
     }
 
-    function handleActualTimeChange(value) {
-        setTrainingData({ ...trainingData, actualTime: value });
-    }
-
-
-    function generateTrainingx() {
-       console.log(trainingData);
-       
-    }
-        return (
-            <div>
-                  <Container>
+    return (
+        <div>
+            <Container>
                 <Paper elevation={3} className='paper'>
                     <form noValidate autoComplete="off">
                         <h1>set up training</h1>
+
+                        <TextField
+                            style={{ margin: '10px auto' }}
+                            label="Average run length   "
+                            id="outlined-start-adornment"
+                            sx={{ m: 1, width: '25ch' }}
+                            InputProps={{
+                                inputMode: 'numeric',
+                                pattern: '[0-9]*',
+                                startAdornment: <InputAdornment position="start">Meters</InputAdornment>,
+                            }}
+                            onInput={onlyNumbers}
+                            onChange={(e) => setTrainingData({ ...trainingData, actualRunLength: e.target.value })}
+                        />
+
+                        <TimeField
+                            style={{ margin: '10px auto' }}
+                            sx={{ m: 1, width: '25ch' }}
+                            label="Average run time"
+                            format="HH:mm:ss"
+                            onChange={(e) => setTrainingData({ ...trainingData, actualTime: e })}
+                            timezone={timeZone}
+                        />
+
+                        <DatePicker
+                            className='datepicker'
+                            style={{ margin: '10px auto' }}
+                            sx={{ m: 0, width: '25ch' }}
+                            format="DD-MM-YYYY"
+                            label="Race Date"
+                            onChange={(newDate) => setRaceDay(newDate)}
+                        />
 
                         <TextField
                             style={{ margin: '10px auto' }}
@@ -53,27 +112,7 @@ export default function GenerateTraining() {
                             InputProps={{
                                 inputMode: 'numeric',
                                 pattern: '[0-9]*',
-                                startAdornment: <InputAdornment position="start">M</InputAdornment>,
-                            }}
-                            onInput={onlyNumbers}
-                            onChange={(e) => setTrainingData({ ...trainingData, lengthOfRaceInMeters: e.target.value })}
-                        />
-                        <TimeField
-                            style={{ margin: '10px auto' }}
-                            sx={{ m: 1, width: '25ch' }}
-                            label="Wanted Time"
-                            format="HH:mm:ss"
-                            onChange={(value) => handleWantedTimeChange(value)}
-                          />
-                        <TextField
-                            style={{ margin: '10px auto' }}
-                            label="Average run length   "
-                            id="outlined-start-adornment"
-                            sx={{ m: 1, width: '25ch' }}
-                            InputProps={{
-                                inputMode: 'numeric',
-                                pattern: '[0-9]*',
-                                startAdornment: <InputAdornment position="start">M</InputAdornment>,
+                                startAdornment: <InputAdornment position="start">Meters</InputAdornment>,
                             }}
                             onInput={onlyNumbers}
                             onChange={(e) => setTrainingData({ ...trainingData, lengthOfRaceInMeters: e.target.value })}
@@ -82,22 +121,52 @@ export default function GenerateTraining() {
                         <TimeField
                             style={{ margin: '10px auto' }}
                             sx={{ m: 1, width: '25ch' }}
-                            label="Average run time"
+                            label="Wanted time"
                             format="HH:mm:ss"
-                            onChange={(value) => handleActualTimeChange(value)}
+                            onChange={(e) => setTrainingData({ ...trainingData, wantedTime: e })}
+                            timezone={timeZone}
                         />
-                        <DatePicker 
-                                className='datepicker'
-                                style={{ margin: '10px auto' }}
-                                sx={{ m: 1, width: '25ch' }}
-                                format="DD-MM-YYYY"
-                                label="Race Date"
-                                onChange={(newDate) => setTrainingData({ ...trainingData, raceDay: newDate })}
-                                />
-                        <Button variant="contained" onClick={generateTrainingx}> Submit </Button>
+
+                        {onlyRunSelect()}
+                        <br/>
+
+                        <Button variant="contained" onClick={generateTraining}> Submit </Button>
                     </form>
                 </Paper>
             </Container>
-            </div>
-        );
-    };
+        </div>
+    );
+
+    function getCookie(name) {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+            const [cookieName, cookieValue] = cookie.trim().split('=');
+            if (cookieName === name) {
+                return cookieValue;
+            }
+        }
+        return null;
+    }
+
+    function onlyRunSelect(){
+        if(trainingData.goal === "RUN"){
+            return <>
+            
+            <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Race type"
+                        sx={{ m: 1, width: '25ch' }}
+                        style={{ margin: '10px auto' }}
+                        onChange={(e) => setTrainingData({ ...trainingData, elevationProfile: e.target.value })}
+                        >
+                        <MenuItem value={"FLAT_ROAD"}> FLAT </MenuItem>
+                        <MenuItem value={"CROSS"}> CROSS </MenuItem>
+                        <MenuItem value={"UPHILL"}> UPHILL </MenuItem>
+                        </Select>
+
+                        <FormHelperText>Select elevation profile, that defines major part of the race</FormHelperText>
+            </>
+        } else return null;
+    }
+}

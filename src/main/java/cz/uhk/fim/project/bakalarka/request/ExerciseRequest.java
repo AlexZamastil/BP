@@ -1,6 +1,7 @@
 package cz.uhk.fim.project.bakalarka.request;
 
-import java.util.Arrays;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 public class ExerciseRequest {
@@ -9,29 +10,88 @@ public class ExerciseRequest {
     String description;
     String description_eng;
     String type;
-    String category_style;
+    String category;
+    String style;
     int length;
     int repetitions;
     int series;
-    byte[] pictureData;
+    MultipartFile pictureData;
     String tagsJSON;
     List<String> tags;
 
     public ExerciseRequest() {
     }
+    //run
+/*
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String category, int length, String tagsJSON) {
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.category = category;
+        this.length = length;
+        this.tagsJSON = tagsJSON;
+    }
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String type, String category, int length, String tagsJSON) {
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.type = type;
+        this.category = category;
+        this.length = length;
+        this.tagsJSON = tagsJSON;
+    }
 
-    public ExerciseRequest(String name, String name_eng, String description, String description_eng, Integer repetitions, Integer series, byte[] pictureData, String tagsJSON) {
+ */
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String type, String category, int length, MultipartFile pictureData, String tagsJSON) {
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.type = type;
+        this.category = category;
+        this.length = length;
+        this.pictureData = pictureData;
+        this.tagsJSON = tagsJSON;
+    }
+
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String category, int length, MultipartFile pictureData, String tagsJSON) {
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.category = category;
+        this.length = length;
+        this.pictureData = pictureData;
+        this.tagsJSON = tagsJSON;
+    }
+    //gym
+/*
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, int repetitions, int series, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
         this.description_eng = description_eng;
         this.repetitions = repetitions;
         this.series = series;
-        this.pictureData = pictureData;
         this.tagsJSON = tagsJSON;
     }
 
-    public ExerciseRequest(String name, String name_eng, String description, String description_eng, Integer repetitions, Integer series, String  tagsJSON) {
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String type, int repetitions, int series, String tagsJSON) {
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.type = type;
+        this.repetitions = repetitions;
+        this.series = series;
+        this.tagsJSON = tagsJSON;
+    }
+
+ */
+
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, int repetitions, int series, String tagsJSON, MultipartFile multipartFile) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -39,26 +99,64 @@ public class ExerciseRequest {
         this.repetitions = repetitions;
         this.series = series;
         this.tagsJSON = tagsJSON;
+        this.pictureData = multipartFile;
     }
 
-    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String category_style, Integer length,  byte[] pictureData, String tagsJSON) {
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String type, int repetitions, int series, String tagsJSON, MultipartFile multipartFile) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
         this.description_eng = description_eng;
-        this.category_style = category_style;
+        this.type = type;
+        this.repetitions = repetitions;
+        this.series = series;
+        this.tagsJSON = tagsJSON;
+        this.pictureData = multipartFile;
+    }
+
+    //swimming
+/*
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng,int length, String style,  String tagsJSON) {
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.style = style;
+        this.length = length;
+        this.tagsJSON = tagsJSON;
+    }
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String type,int length, String style,  String tagsJSON) {
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.type = type;
+        this.style = style;
+        this.length = length;
+        this.tagsJSON = tagsJSON;
+    }
+
+ */
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String type, int length, String style,  MultipartFile pictureData, String tagsJSON) {
+        this.name = name;
+        this.name_eng = name_eng;
+        this.description = description;
+        this.description_eng = description_eng;
+        this.type = type;
+        this.style = style;
         this.length = length;
         this.pictureData = pictureData;
         this.tagsJSON = tagsJSON;
     }
 
-    public ExerciseRequest(String name, String name_eng, String description, String description_eng, String category_style, Integer length,  String tagsJSON) {
+    public ExerciseRequest(String name, String name_eng, String description, String description_eng,  int length, String style, MultipartFile pictureData, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
         this.description_eng = description_eng;
-        this.category_style = category_style;
+        this.style = style;
         this.length = length;
+        this.pictureData = pictureData;
         this.tagsJSON = tagsJSON;
     }
 
@@ -113,20 +211,28 @@ public class ExerciseRequest {
         this.type = type;
     }
 
-    public String getCategory_style() {
-        return category_style;
-    }
-
-    public void setCategory_style(String category_style) {
-        this.category_style = category_style;
-    }
-
     public int getLength() {
         return length;
     }
 
     public void setLength(int length) {
         this.length = length;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
     }
 
     public int getRepetitions() {
@@ -145,29 +251,31 @@ public class ExerciseRequest {
         this.series = series;
     }
 
-    public byte[] getPictureData() {
+    public MultipartFile getPictureData() {
         return pictureData;
     }
 
-    public void setPictureData(byte[] pictureData) {
+    public void setPictureData(MultipartFile pictureData) {
         this.pictureData = pictureData;
     }
 
 
     @Override
     public String toString() {
-        return "{" +
-                "\"name\":\"" + name + "\"," +
-                "\"name_eng\":\"" + name_eng + "\"," +
-                "\"description\":\"" + description + "\"," +
-                "\"description_eng\":\"" + description_eng + "\"," +
-                "\"type\":\"" + type + "\"," +
-                "\"category_style\":\"" + category_style + "\"," +
-                "\"length\":" + length + "," +
-                "\"repetitions\":" + repetitions + "," +
-                "\"series\":" + series + "," +
-                "\"pictureData\":" + Arrays.toString(pictureData) + "," +
-                "\"tags\":" + tags +
-                "}";
+        return "ExerciseRequest{" +
+                "name='" + name + '\'' +
+                ", name_eng='" + name_eng + '\'' +
+                ", description='" + description + '\'' +
+                ", description_eng='" + description_eng + '\'' +
+                ", type='" + type + '\'' +
+                ", category='" + category + '\'' +
+                ", style='" + style + '\'' +
+                ", length=" + length +
+                ", repetitions=" + repetitions +
+                ", series=" + series +
+                ", pictureData=" + pictureData +
+                ", tagsJSON='" + tagsJSON + '\'' +
+                ", tags=" + tags +
+                '}';
     }
 }

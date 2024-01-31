@@ -8,6 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import {FormHelperText} from '@mui/material';
 
 export default function UpdateData() {
   const navigate = useNavigate();
@@ -21,10 +22,11 @@ export default function UpdateData() {
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [bodyType, setBodyType] = useState("");
+  const [sex,setSex] = useState("");
   const [token, setToken] = useState("");
   const [csrfToken,setCsrfToken] = useState("") 
 
-  useEffect(() => {
+  useEffect((csrfToken) => {
     const xsrfToken = getCookie('XSRF-TOKEN');
     setCsrfToken(xsrfToken);
     console.log(csrfToken);
@@ -48,6 +50,7 @@ export default function UpdateData() {
       setWeight(response.user.weight);
       setHeight(response.user.height);
       setBodyType(response.user.bodyType);
+      setSex(response.user.sex);
       setToken(response.user.token);
     
     });
@@ -78,6 +81,7 @@ export default function UpdateData() {
         weight: weight,
         height: height,
         bodyType: bodyType,
+        sex : sex,
         token : token
       }),
     };
@@ -143,7 +147,7 @@ export default function UpdateData() {
           onChange={(e) => setHeight(e.target.value)}
         />
 
-        <InputLabel id="demo-simple-select-label">Body Type</InputLabel>
+<FormHelperText>Select what body type describes you best</FormHelperText>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
@@ -157,13 +161,24 @@ export default function UpdateData() {
           <MenuItem value={"OBESE"}>Obese</MenuItem>
         </Select>
 
+        <FormHelperText>Select your biological sex</FormHelperText>
+<Select
+  labelId="demo-simple-select-label"
+  id="demo-simple-select"
+  value={sex}
+  label="Sex"
+  sx={{ m: 1, width: '25ch' }}
+  onChange={(e) => setSex(e.target.value)}
+>
+  <MenuItem value={"MALE"}>Male</MenuItem>
+  <MenuItem value={"FEMALE"}>Female</MenuItem>
+</Select>
+
         <DatePicker 
         className='datepicker'
         sx={{ m: 1, width: '25ch' }}
         style={{ margin: '10px auto' }}
          format="YYYY-MM-DD"
-         maxDate={today.getDate}
-         value={date}
          onChange={(newDate) => setBirthdate(newDate)}
          />
 

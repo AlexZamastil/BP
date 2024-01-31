@@ -6,12 +6,14 @@ import cz.uhk.fim.project.bakalarka.model.*;
 import cz.uhk.fim.project.bakalarka.request.ExerciseRequest;
 import cz.uhk.fim.project.bakalarka.service.ExerciseService;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
+import cz.uhk.fim.project.bakalarka.util.MultiPartFileConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -26,6 +28,7 @@ public class ExerciseController {
     private final SwimmingRepository swimmingRepository;
     private final TagRepository tagRepository;
 
+    private final MultiPartFileConverter multiPartFileConverter = new MultiPartFileConverter();
 
 
     @Autowired
@@ -36,69 +39,111 @@ public class ExerciseController {
         this.runRepository = runRepository;
         this.swimmingRepository = swimmingRepository;
         this.tagRepository = tagRepository;
+
     }
 
     @PostMapping(value = "privileged/addExercise", consumes = "multipart/form-data")
     public ResponseEntity<?> addExercise(
             @RequestPart(name = "exerciseRequest") ExerciseRequest exerciseRequest,
             @RequestPart(name = "imageData", required = false) MultipartFile imageData
-    ){
-        System.out.println(imageData);
-        if (imageData != null) {
-            if (exerciseRequest.getCategory_style() != null) {
-                return exerciseService.addNewExercise(exerciseRequest.getName(),
-                        exerciseRequest.getDescription(),
-                        exerciseRequest.getName_eng(),
-                        exerciseRequest.getDescription_eng(),
-                        exerciseRequest.getType(),
-                        exerciseRequest.getCategory_style(),
-                        exerciseRequest.getLength(),
-                        exerciseRequest.getTags(),
-                        imageData);
-            } else {
-                return exerciseService.addNewExercise(exerciseRequest.getName(),
-                        exerciseRequest.getDescription(),
-                        exerciseRequest.getName_eng(),
-                        exerciseRequest.getDescription_eng(),
-                        exerciseRequest.getRepetitions(),
-                        exerciseRequest.getSeries(),
-                        exerciseRequest.getTags(),
-                        imageData);
-            }
-        } else {
-            if (exerciseRequest.getCategory_style() != null) {
-                return exerciseService.addNewExercise(exerciseRequest.getName(),
-                        exerciseRequest.getDescription(),
-                        exerciseRequest.getName_eng(),
-                        exerciseRequest.getDescription_eng(),
-                        exerciseRequest.getType(),
-                        exerciseRequest.getCategory_style(),
-                        exerciseRequest.getLength(),
-                        exerciseRequest.getTags());
-            } else {
-                return exerciseService.addNewExercise(exerciseRequest.getName(),
-                        exerciseRequest.getDescription(),
-                        exerciseRequest.getName_eng(),
-                        exerciseRequest.getDescription_eng(),
-                        exerciseRequest.getRepetitions(),
-                        exerciseRequest.getSeries(),
-                        exerciseRequest.getTags());
-            }
+    ) throws IOException {
+        try {
+            System.out.println(Arrays.toString(imageData.getBytes()));
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read image data");
         }
+        /*
+        if (imageData != null) {
+            switch (exerciseRequest.getType()) {
+                case "RUN" -> {
+                    return exerciseService.addNewRunExercise(
+                            exerciseRequest.getName(),
+                            exerciseRequest.getDescription(),
+                            exerciseRequest.getName_eng(),
+                            exerciseRequest.getDescription_eng(),
+                            exerciseRequest.getCategory(),
+                            exerciseRequest.getLength(),
+                            exerciseRequest.getTags());
+                }
+                case "GYM" -> {
+                    return exerciseService.addNewGymExercise(
+                            exerciseRequest.getName(),
+                            exerciseRequest.getDescription(),
+                            exerciseRequest.getName_eng(),
+                            exerciseRequest.getDescription_eng(),
+                            exerciseRequest.getRepetitions(),
+                            exerciseRequest.getSeries(),
+                            exerciseRequest.getTags());
+                }
+                case "SWIMMING" -> {
+                    return exerciseService.addNewSwimmingExercise(
+                            exerciseRequest.getName(),
+                            exerciseRequest.getDescription(),
+                            exerciseRequest.getName_eng(),
+                            exerciseRequest.getDescription_eng(),
+                            exerciseRequest.getStyle(),
+                            exerciseRequest.getLength(),
+                            exerciseRequest.getTags());
+                }
+            }
+
+        }
+        else {
+         */
+            switch (exerciseRequest.getType()) {
+                case "RUN" -> {
+                    System.out.println("R");
+                    return exerciseService.addNewRunExercise(
+                            exerciseRequest.getName(),
+                            exerciseRequest.getDescription(),
+                            exerciseRequest.getName_eng(),
+                            exerciseRequest.getDescription_eng(),
+                            exerciseRequest.getCategory(),
+                            exerciseRequest.getLength(),
+                            exerciseRequest.getTags(),
+                            imageData);
+                }
+                case "GYM" -> {
+                    System.out.println("G");
+                    return exerciseService.addNewGymExercise(
+                            exerciseRequest.getName(),
+                            exerciseRequest.getDescription(),
+                            exerciseRequest.getName_eng(),
+                            exerciseRequest.getDescription_eng(),
+                            exerciseRequest.getRepetitions(),
+                            exerciseRequest.getSeries(),
+                            exerciseRequest.getTags(),
+                            imageData);
+                }
+                case "SWIMMING" -> {
+                    System.out.println("S");
+                    return exerciseService.addNewSwimmingExercise(
+                            exerciseRequest.getName(),
+                            exerciseRequest.getDescription(),
+                            exerciseRequest.getName_eng(),
+                            exerciseRequest.getDescription_eng(),
+                            exerciseRequest.getStyle(),
+                            exerciseRequest.getLength(),
+                            exerciseRequest.getTags(),
+                            imageData);
+                }
+            }
+        return MessageHandler.error("Failed to add a new exercise");
     }
+
     @GetMapping(value = "/nonauthorized/getExercise/{id}")
-    public ResponseEntity<?> getExercise(@PathVariable Long id) throws JsonProcessingException {
+    public ResponseEntity<?> getExercise(@PathVariable Long id) throws IOException {
         Optional<Exercise> e = exerciseRepository.findExerciseById(id);
         System.out.println(e + " EXERCISE");
 
         if (e.isPresent()){
             Exercise exercise = e.get();
-            System.out.println("b");
             Optional<GymWorkout> g = gymWorkoutRepository.findByExercise(exercise);
             Optional<Run> r = runRepository.findByExercise(exercise);
             Optional<Swimming> s = swimmingRepository.findByExercise(exercise);
-            System.out.println("AA");
             Set<Tag> tags = exerciseRepository.findTagsByExerciseId(id);
+            Picture picture = exercise.getPicture();
+            MultipartFile multipartFile = multiPartFileConverter.convert("FILENAME",picture.getPictureData());
             List<String> tagList = new ArrayList<>();
             for (Tag t : tags){
                 tagList.add(t.getText());
@@ -110,14 +155,15 @@ public class ExerciseController {
             if(g.isPresent()){
                 GymWorkout gymWorkout = g.get();
                 ExerciseRequest exerciseRequest = new ExerciseRequest(
-                        exercise.getName(),
-                        exercise.getName_eng(),
-                        exercise.getDescription(),
-                        exercise.getDescription_eng(),
-                        gymWorkout.getRepetitions(),
-                        gymWorkout.getSeries(),
-                        jsonList
-                        );
+                                        exercise.getName(),
+                                        exercise.getName_eng(),
+                                        exercise.getDescription(),
+                                        exercise.getDescription_eng(),
+                                        gymWorkout.getRepetitions(),
+                                        gymWorkout.getSeries(),
+                        jsonList,
+                        multipartFile
+                                        );
                 return MessageHandler.success(exerciseRequest.toString());
             } else if (r.isPresent()){
                 Run run = r.get();
@@ -128,6 +174,7 @@ public class ExerciseController {
                         exercise.getDescription_eng(),
                         run.getRuncategory().toString(),
                         run.getLenglhinmeters(),
+                        multipartFile,
                         jsonList
                         );
                 return MessageHandler.success(exerciseRequest.toString());
@@ -140,6 +187,7 @@ public class ExerciseController {
                         exercise.getDescription_eng(),
                         swimming.getSwimmingstyle().toString(),
                         swimming.getLenglhinmeters(),
+                        multipartFile,
                         jsonList);
                 return MessageHandler.success(exerciseRequest.toString());
             }

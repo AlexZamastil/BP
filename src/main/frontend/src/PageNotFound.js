@@ -1,9 +1,13 @@
-import styling from "./styling.css"
-import error from "./sources/error-icon.png"
+import styling from "./styling.css";
+import error from "./sources/error-icon.png";
+import { useTranslation } from 'react-i18next';
 
 export default function PageNotFound() {
+
+     const {t} = useTranslation();
+
 return (<div className="error404">
      <img src={error}  width={80} alt="ERROR"/> 
-     Error 404 - Page not found
+     {t("page_not_found")}
      </div>)
 }

@@ -19,6 +19,7 @@ import weka.core.converters.ConverterUtils;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static cz.uhk.fim.project.bakalarka.enumerations.Goal.RUN;
@@ -56,12 +57,12 @@ public class TrainingService {
         classifier = j48;
     }
 
-    public ResponseEntity<?> generateTrainingPlan(int weight,
-                                                  int height,
+    public ResponseEntity<?> generateTrainingPlan(double weight,
+                                                  double height,
                                                   double bmi,
                                                   String sex,
                                                   String bodyType,
-                                                  int availibleTrainingDays,
+                                                  int availableTrainingDays,
                                                   int trainingLengthInDays,
                                                   int trainingLengthInMeters,
                                                   double trainingPace,
@@ -84,7 +85,7 @@ public class TrainingService {
                 instance.setValue(2,bmi);
                 instance.setValue(3,sex);
                 instance.setValue(4,bodyType);
-                instance.setValue(5,availibleTrainingDays);
+                instance.setValue(5,availableTrainingDays);
                 instance.setValue(6,trainingLengthInDays);
                 instance.setValue(7,trainingLengthInMeters);
                 instance.setValue(8,trainingPace);
@@ -121,10 +122,8 @@ public class TrainingService {
 
                     String predictedClass = data.attribute(attributeIndex).value(predictedClassIndex);
                     System.out.println("Predicted Nominal Value for Attribute " + attributeIndex + ": " + predictedClass);
-
                 }
             }
-
             return ResponseEntity.ok("training plan generated");
         }
         catch (Exception e){
@@ -143,7 +142,7 @@ public class TrainingService {
                                             HttpServletRequest httpServletRequest) {
 
         if (goal.equals(RUN)) {
-            ResponseEntity<?> test = testRunSpecs(startDay, raceDay, lengthOfRaceInMeters, wantedTime, actualRunLength, actualTime);
+            ResponseEntity<?> test = testTrainingPossibility(startDay, raceDay, lengthOfRaceInMeters, wantedTime, actualRunLength, actualTime);
             System.out.println(test.getStatusCode() + " STATUS CODE");
             if (test.getStatusCode() == HttpStatus.OK) {
                 String token = httpServletRequest.getHeader("Authorization");
@@ -162,38 +161,40 @@ public class TrainingService {
     }
 
 
-    public ResponseEntity<?> testRunSpecs(LocalDate startDay,
-                                          LocalDate raceDay,
-                                          Integer lengthOfRaceInMeters,
-                                          Duration wantedTime,
-                                          Integer actualRunLength,
-                                         Duration actualTime) {
+    public ResponseEntity<?> testTrainingPossibility(LocalDate startDay,
+                                                     LocalDate raceDay,
+                                                     Integer lengthOfRaceInMeters,
+                                                     Duration wantedTime,
+                                                     Integer actualRunLength,
+                                                     Duration actualTime) {
+        System.out.println("A");
         if (!isGoalSuitable(lengthOfRaceInMeters)) {
             return MessageHandler.error("Run length is not suitable. Please choose between 1 km an 42 km");
         }
-/*
-        if (wantedTime) {
-            wantedTime = (int) (lengthOfRaceInMeters / (6 / 3.6));//6km/h = slow jogging, divide to get m/s
-        }
+        double numberOfDays = ChronoUnit.DAYS.between(startDay, raceDay);
+        System.out.println("number of days " + numberOfDays);
+        double numberOfWeeks = numberOfDays / 7;
+        System.out.println("number of weeks " + numberOfWeeks);
+        double x = weeklyPercentageIncreaseInLength(numberOfWeeks,actualRunLength,lengthOfRaceInMeters);
+        System.out.println(x);
 
+
+
+/*
         if (!isGoalAchievable(startDay, raceDay, lengthOfRaceInMeters, wantedTimeInSeconds, actualRunLength, actualTimeInSeconds))
             return MessageHandler.error("Goal is too hard, training would not be safe");
-
 
         boolean temp = isGoalAchievable(startDay, raceDay, lengthOfRaceInMeters, wantedTimeInSeconds, actualRunLength, actualTimeInSeconds);
         System.out.println(temp + " BOOLEAN");
         if (temp == false) {
             return MessageHandler.error("Goal is too hard, training would not be safe");
         }
-
  */
 
         return MessageHandler.success("This goal is achievable");
     }
 
-    public Boolean isGoalSuitable(Integer lengthOfRaceInMeters) {
-        return lengthOfRaceInMeters >= 1000 && lengthOfRaceInMeters <= 42195;
-    }
+
     /*
 
     public Boolean isGoalAchievable(LocalDate startDay,
@@ -241,6 +242,16 @@ public class TrainingService {
     }
 
     */
+    public double weeklyPercentageIncreaseInLength(double numberOfWeeks, int currentRunLength, int raceLength){
+        int metersDifference = raceLength - currentRunLength;
+        double weeklyDifference = metersDifference/numberOfWeeks;
+        return weeklyDifference/currentRunLength*100;
+
+    }
+
+    public Boolean isGoalSuitable(Integer lengthOfRaceInMeters) {
+        return lengthOfRaceInMeters >= 1000 && lengthOfRaceInMeters <= 42195;
+    }
 
     public Boolean hasActiveTraining(long id) {
         LocalDate today = LocalDate.now();

@@ -1,5 +1,6 @@
 package cz.uhk.fim.project.bakalarka.request;
 
+import cz.uhk.fim.project.bakalarka.enumerations.ElevationProfile;
 import cz.uhk.fim.project.bakalarka.enumerations.Goal;
 
 import java.time.Duration;
@@ -10,9 +11,22 @@ public class CreateTrainingRequest {
     LocalDate raceDay;
     Goal goal;
     Integer lengthOfRaceInMeters;
-    Duration wantedTime;
+    String wantedTime;
     Integer actualRunLength;
-    Duration actualTime;
+    String actualTime;
+
+    ElevationProfile elevationProfile;
+
+    public CreateTrainingRequest(LocalDate startDay, LocalDate raceDay, Goal goal, Integer lengthOfRaceInMeters, String wantedTime, Integer actualRunLength, String actualTime, ElevationProfile elevationProfile) {
+        this.startDay = startDay;
+        this.raceDay = raceDay;
+        this.goal = goal;
+        this.lengthOfRaceInMeters = lengthOfRaceInMeters;
+        this.wantedTime = wantedTime;
+        this.actualRunLength = actualRunLength;
+        this.actualTime = actualTime;
+        this.elevationProfile = elevationProfile;
+    }
 
     public LocalDate getStartDay() {
         return startDay;
@@ -46,7 +60,7 @@ public class CreateTrainingRequest {
         this.lengthOfRaceInMeters = lengthOfRaceInMeters;
     }
 
-    public Duration getWantedTime() {
+    public String getWantedTime() {
         return wantedTime;
     }
 
@@ -62,12 +76,24 @@ public class CreateTrainingRequest {
         this.actualRunLength = actualRunLength;
     }
 
-    public Duration getActualTime() {
+    public String getActualTime() {
         return actualTime;
     }
 
-    public void setActualTime(Duration actualTimeInSecond) {
+    public void setActualTime(String actualTimeInSecond) {
         this.actualTime = actualTimeInSecond;
+    }
+
+    public void setWantedTime(String wantedTime) {
+        this.wantedTime = wantedTime;
+    }
+
+    public ElevationProfile getElevationProfile() {
+        return elevationProfile;
+    }
+
+    public void setElevationProfile(ElevationProfile elevationProfile) {
+        this.elevationProfile = elevationProfile;
     }
 
     @Override

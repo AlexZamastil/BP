@@ -3,6 +3,7 @@ import { Container} from '@mui/system';
 import { Paper } from '@mui/material';
 import {TextField,Button} from '@mui/material';
 import {useNavigate} from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 export default function Login(){
 
@@ -12,25 +13,18 @@ export default function Login(){
   const [errorMessage, setErrorMessage] = useState('');
   const [csrfToken,setCsrfToken] = useState("") 
 
+  const {t} = useTranslation();
+
   useEffect(() => {
     const xsrfToken = getCookie('XSRF-TOKEN');
     setCsrfToken(xsrfToken);
     console.log(csrfToken);
   },[])
-  
+
     
   const logInRequest =(e)=>{
     e.preventDefault();
-
-    
-
-  if (!csrfToken) {
-    console.error('CSRF token not found');
-    setErrorMessage("Security problem, try again")
-    return;
-  }
-
-
+  
    fetch("https://localhost:8443/api/nonauthorized/user/login",{
         method:"POST",
         headers:{
@@ -68,18 +62,18 @@ export default function Login(){
         <Paper elevation={3} className='paper'>
       <form noValidate autoComplete="off">
       
-        <h1>Login form</h1>
+        <h1>{t("login_form")}</h1>
       
       <TextField  style={{ margin: "10px auto", opacity: 1 }} id="outlined-basic" label="Email" variant="outlined" fullWidth sx={{ m: 1, width: '25ch' }}
         value={email}
         onChange={(e)=>setEmail(e.target.value)} />
       
-        <TextField   style={{ margin: "10px auto", opacity: 1 }} type="password"  id="outlined-basic" label="Password" variant="outlined" fullWidth sx={{ m: 1, width: '25ch' }}
+        <TextField   style={{ margin: "10px auto", opacity: 1 }} type="password"  id="outlined-basic" label={t("password")} variant="outlined" fullWidth sx={{ m: 1, width: '25ch' }}
        value={password}
        onChange={(e)=>setPassword(e.target.value)} />
       
       
-       <Button variant="contained" onClick={logInRequest}> Submit </Button>
+       <Button variant="contained" onClick={logInRequest}> {t("submit")} </Button>
        {errorMessage && (
               <div style={{ color: 'red', marginTop: '10px' }}>
                 {errorMessage}

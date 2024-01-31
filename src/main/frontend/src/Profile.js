@@ -6,17 +6,28 @@ import {useNavigate} from "react-router-dom"
 
 export default function Profile(){
   const [userStats,setUserStats] = useState([]);
+  
     const navigate = useNavigate();
     const {t} = useTranslation();
+
     const handleLogout = ()=> {
       localStorage.clear("user");
       navigate("/WelcomePage");
       window.location.reload(false);
     }
+
     const handleChange = ()=> {
       navigate("/UpdateData");
       window.location.reload(false);
     }
+
+    const handleAdminTools = ()=> {
+      navigate("/AdminTools");
+      window.location.reload(false);
+    }
+
+
+    const [adminTools,setAdminTools] = useState(null);
     
 useEffect(()=>{
   fetch("https://localhost:8443/api/authorized/user/getuserdata",{
@@ -24,12 +35,16 @@ useEffect(()=>{
     headers:{
       'Authorization': localStorage.getItem("token")}
     }).then(async(response)=>response.json())
-    .then((userStats)=> setUserStats(userStats),
-    console.log("userstats"),
-    console.log(userStats));
-},[])
-   
-
+    .then((userStats)=> {
+      setUserStats(userStats);
+        if (userStats.user && userStats.user.adminPrivileges) {
+          setAdminTools(
+            <Button color="dark" variant="contained" onClick={handleAdminTools}>
+              {t('admin_button')}
+            </Button>
+          );
+        }
+      })},[])
 
     return( <div>
   {userStats.user ? (
@@ -42,7 +57,7 @@ useEffect(()=>{
           Weight <b>{userStats.user.weight}</b><br/>
           Date of birth<b>{userStats.user.dateOfBirth}</b><br/>
           BodyType<b>{userStats.user.bodyType}</b><br/>
-          {userStats.user.adminPrivileges}
+          Sex <b>{userStats.user.sex}</b>
           <br/>
           <Button color='primary' variant='contained' onClick={handleChange}> {t('change_data')} </Button>
         </div>
@@ -52,10 +67,15 @@ useEffect(()=>{
         <Link to="/WelcomePage">
         <Button color='secondary' variant='contained' onClick={handleLogout}> {t('log-out')} </Button>
         </Link>
+        <br/>
+        <br/>
+        {adminTools}
         </div>
         
       </div>)
 }
+
+
 
 
 

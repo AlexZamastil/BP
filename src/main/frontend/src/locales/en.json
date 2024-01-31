@@ -16,7 +16,11 @@
     "welcomepage_inspiration3" : "EXCEL",
     "welcomepage_inspiration4" : "WIN",
     "change_data" : "Change user data",
-    "about_project" : "About project",
-    "about_project_text1:":""
-
+    "about_project" : "Comming soon",
+    "about_project_text1:":"",
+    "page_not_found" : "404 - Page not found",
+    "submit" : "Submit",
+    "login_form" : "Login",
+    "password" : "Password",
+    "admin_button" : "Admin tools"
 }

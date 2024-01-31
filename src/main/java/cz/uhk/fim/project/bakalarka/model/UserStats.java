@@ -15,8 +15,6 @@ public class UserStats {
     @Column(name = "bmi")
     private double bmi;
 
-
-
     @Column(name = "waterneeded")
     private double waterneeded;
 

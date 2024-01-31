@@ -16,6 +16,11 @@
     "welcomepage_inspiration3" : "ZLEPŠI",
     "welcomepage_inspiration4" : "ZVÍTĚZ",
     "change_data" : "Změnit uživatelská data",
-    "about_project" : "O projektu",
-    "about_project_text1:":""
-}
+    "about_project" : "Již brzy",
+    "about_project_text1:":"",
+    "page_not_found" : "404 - Stránka nenalezena",
+    "submit" : "Potvrdit",
+    "login_form" : "Přihlášení",
+    "password" : "Heslo",
+    "admin_button" : "Nástroje administrátora"
+    }
