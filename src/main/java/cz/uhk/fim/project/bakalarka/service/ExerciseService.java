@@ -1,18 +1,20 @@
 package cz.uhk.fim.project.bakalarka.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.uhk.fim.project.bakalarka.DAO.*;
 import cz.uhk.fim.project.bakalarka.enumerations.RunCategory;
 import cz.uhk.fim.project.bakalarka.enumerations.SwimmingStyle;
 import cz.uhk.fim.project.bakalarka.enumerations.Tag_Exercise;
 import cz.uhk.fim.project.bakalarka.model.*;
+import cz.uhk.fim.project.bakalarka.request.ExerciseRequest;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
-import jakarta.annotation.Nonnull;
+import cz.uhk.fim.project.bakalarka.util.MultiPartFileConverter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ExerciseService {
@@ -23,6 +25,7 @@ public class ExerciseService {
 
     PictureRepository pictureRepository;
     TagRepository tagRepository;
+    MultiPartFileConverter multiPartFileConverter = new MultiPartFileConverter();
 
     public ExerciseService(ExerciseRepository exerciseRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, PictureRepository pictureRepository, TagRepository tagRepository) {
         this.exerciseRepository = exerciseRepository;
@@ -33,85 +36,136 @@ public class ExerciseService {
         this.tagRepository = tagRepository;
     }
 
+    public ResponseEntity<?> addNewExercise(ExerciseRequest exerciseRequest, MultipartFile multipartFile) {
+        try {
+            System.out.println(Arrays.toString(multipartFile.getBytes()));
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read image data");
+        }
+        switch (exerciseRequest.getType()) {
+            case "RUN" -> {
+                System.out.println("R");
+                return addNewRunExercise(
+                        exerciseRequest.getName(),
+                        exerciseRequest.getDescription(),
+                        exerciseRequest.getName_eng(),
+                        exerciseRequest.getDescription_eng(),
+                        exerciseRequest.getCategory(),
+                        exerciseRequest.getLength(),
+                        exerciseRequest.getTags(),
+                        multipartFile);
+            }
+            case "GYM" -> {
+                System.out.println("G");
+                return addNewGymExercise(
+                        exerciseRequest.getName(),
+                        exerciseRequest.getDescription(),
+                        exerciseRequest.getName_eng(),
+                        exerciseRequest.getDescription_eng(),
+                        exerciseRequest.getRepetitions(),
+                        exerciseRequest.getSeries(),
+                        exerciseRequest.getTags(),
+                        multipartFile);
+            }
+            case "SWIMMING" -> {
+                System.out.println("S");
+                return addNewSwimmingExercise(
+                        exerciseRequest.getName(),
+                        exerciseRequest.getDescription(),
+                        exerciseRequest.getName_eng(),
+                        exerciseRequest.getDescription_eng(),
+                        exerciseRequest.getStyle(),
+                        exerciseRequest.getLength(),
+                        exerciseRequest.getTags(),
+                        multipartFile);
+            }
+        }
+        return MessageHandler.error("Failed to add a new exercise");
+    }
 
-/*
-    public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags) {
-        System.out.println(tags);
-        Exercise exercise = new Exercise(name, name_eng, description, description_eng);
-        exerciseRepository.save(exercise);
-        handleTags(tags, exercise);
+    public ResponseEntity<?> getExercise(long id) throws IOException {
+        Optional<Exercise> e = exerciseRepository.findExerciseById(id);
+        System.out.println(e + " EXERCISE");
+
+        if (e.isPresent()) {
+            Exercise exercise = e.get();
+            Optional<GymWorkout> g = gymWorkoutRepository.findByExercise(exercise);
+            Optional<Run> r = runRepository.findByExercise(exercise);
+            Optional<Swimming> s = swimmingRepository.findByExercise(exercise);
+            Set<Tag> tags = exerciseRepository.findTagsByExerciseId(id);
+            Picture picture = exercise.getPicture();
+            MultipartFile multipartFile = multiPartFileConverter.convert("FILENAME", picture.getPictureData());
+            List<String> tagList = new ArrayList<>();
+            for (Tag t : tags) {
+                tagList.add(t.getText());
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonList = objectMapper.writeValueAsString(tagList);
+            System.out.println(jsonList);
+
+            if (g.isPresent()) {
+                GymWorkout gymWorkout = g.get();
+                ExerciseRequest exerciseRequest = new ExerciseRequest(
+                        exercise.getName(),
+                        exercise.getName_eng(),
+                        exercise.getDescription(),
+                        exercise.getDescription_eng(),
+                        gymWorkout.getRepetitions(),
+                        gymWorkout.getSeries(),
+                        jsonList,
+                        multipartFile
+                );
+                return MessageHandler.success(exerciseRequest.toString());
+            } else if (r.isPresent()) {
+                Run run = r.get();
+                ExerciseRequest exerciseRequest = new ExerciseRequest(
+                        exercise.getName(),
+                        exercise.getName_eng(),
+                        exercise.getDescription(),
+                        exercise.getDescription_eng(),
+                        run.getRuncategory().toString(),
+                        run.getLenglhinmeters(),
+                        multipartFile,
+                        jsonList
+                );
+                return MessageHandler.success(exerciseRequest.toString());
+            } else if (s.isPresent()) {
+                Swimming swimming = s.get();
+                ExerciseRequest exerciseRequest = new ExerciseRequest(
+                        exercise.getName(),
+                        exercise.getName_eng(),
+                        exercise.getDescription(),
+                        exercise.getDescription_eng(),
+                        swimming.getSwimmingstyle().toString(),
+                        swimming.getLenglhinmeters(),
+                        multipartFile,
+                        jsonList);
+                return MessageHandler.success(exerciseRequest.toString());
+            }
+
+        }
+        return MessageHandler.error("invalid exercise ID");
+    }
+
+    public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
+        Exercise exercise = createExercise(multipartFile,name,description,name_eng,description_eng,tags);
         Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
         runRepository.save(run);
-        return MessageHandler.success("Exercise saved successfufly");
+        return MessageHandler.success("Exercise saved successfully");
     }
-
- */
-
-    public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags, MultipartFile multipartFile) throws IOException {
-        byte[] pictureData = handlePicture(multipartFile);
-        Picture picture = new Picture(pictureData);
-        pictureRepository.save(picture);
-        Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng);
-        exerciseRepository.save(exercise);
-        handleTags(tags, exercise);
-        Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
-        runRepository.save(run);
-        return MessageHandler.success("Exercise saved successfufly");
-    }
-/*
-    public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng,@Nonnull int repetitions,@Nonnull int series, List<String> tags) {
-        System.out.println(tags);
-        Exercise exercise = new Exercise(name, name_eng, description, description_eng);
-        GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
-        exerciseRepository.save(exercise);
-        gymWorkoutRepository.save(gymWorkout);
-        handleTags(tags, exercise);
-
-        return MessageHandler.success("Exercise saved successfufly");
-
-    }
-
- */
-
     public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
-        byte[] pictureData = handlePicture(multipartFile);
-        System.out.println("X");
-        Picture picture = new Picture(pictureData);
-        System.out.println("XX");
-        pictureRepository.save(picture);
-        System.out.println("XXX");
-        Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng);
+        Exercise exercise = createExercise(multipartFile,name,description,name_eng,description_eng,tags);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
-        exerciseRepository.save(exercise);
-        System.out.println("XXXX");
         gymWorkoutRepository.save(gymWorkout);
-        handleTags(tags, exercise);
-
-        return MessageHandler.success("Exercise saved successfufly");
-    }
-
-    public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags) {
-        System.out.println(tags);
-        Exercise exercise = new Exercise(name, name_eng, description, description_eng);
-        exerciseRepository.save(exercise);
-        handleTags(tags, exercise);
-        Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
-        swimmingRepository.save(swimming);
-        return MessageHandler.success("Exercise saved successfufly");
+        return MessageHandler.success("Exercise saved successfully");
     }
 
     public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
-        byte[] pictureData = handlePicture(multipartFile);
-        Picture picture = new Picture(pictureData);
-        pictureRepository.save(picture);
-        Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng);
-        exerciseRepository.save(exercise);
-        handleTags(tags, exercise);
+        Exercise exercise = createExercise(multipartFile,name,description,name_eng,description_eng,tags);
         Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
         swimmingRepository.save(swimming);
-        return MessageHandler.success("Exercise saved successfufly");
+        return MessageHandler.success("Exercise saved successfully");
     }
-
 
     public void handleTags(List<String> tags, Exercise exercise) {
 
@@ -130,7 +184,7 @@ public class ExerciseService {
                 }
             }
             if (isMatch) {
-                    if (tagRepository.findTagByText(tag) == null) {
+                if (tagRepository.findTagByText(tag) == null) {
                     cz.uhk.fim.project.bakalarka.model.Tag newTag = new cz.uhk.fim.project.bakalarka.model.Tag(tag);
                     tagRepository.save(newTag);
                 }
@@ -141,11 +195,22 @@ public class ExerciseService {
             }
         }
     }
-    public byte[] handlePicture(MultipartFile f){
+
+    public byte[] handlePicture(MultipartFile f) {
         try {
             return f.getBytes();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Exercise createExercise(MultipartFile multipartFile, String name, String description, String name_eng, String description_eng, List<String> tags){
+        byte[] pictureData = handlePicture(multipartFile);
+        Picture picture = new Picture(pictureData);
+        pictureRepository.save(picture);
+        Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng);
+        exerciseRepository.save(exercise);
+        handleTags(tags, exercise);
+        return exercise;
     }
 }

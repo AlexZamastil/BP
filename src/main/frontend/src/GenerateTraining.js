@@ -30,7 +30,7 @@ export default function GenerateTraining() {
         actualRunLength: 0,
         actualTime: null,
         raceDay: dayjs().toISOString().split("T")[0],
-        elevationProfile: ""
+        elevationProfile: "CROSS"
     }));
 
     useEffect(() => {
@@ -49,7 +49,7 @@ export default function GenerateTraining() {
     };
 
     function generateTraining() {
-        fetch("https://localhost:8443/api/authorized/generateTraining", {
+        fetch(process.env.REACT_APP_BACKEND_API_URL+"/authorized/generateTraining", {
             method: "POST",
             headers: {
                 'Authorization': localStorage.getItem("token"),

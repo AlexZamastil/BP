@@ -1,11 +1,11 @@
 package cz.uhk.fim.project.bakalarka.util;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-
+@Component
 public class MultiPartFileConverter {
     public MultiPartFileConverter() {
     }

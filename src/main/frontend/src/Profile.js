@@ -30,14 +30,15 @@ export default function Profile(){
     const [adminTools,setAdminTools] = useState(null);
     
 useEffect(()=>{
-  fetch("https://localhost:8443/api/authorized/user/getuserdata",{
+  fetch(process.env.REACT_APP_BACKEND_API_URL+"/authorized/user/getUserData",{
     method:"GET",
     headers:{
       'Authorization': localStorage.getItem("token")}
     }).then(async(response)=>response.json())
     .then((userStats)=> {
       setUserStats(userStats);
-        if (userStats.user && userStats.user.adminPrivileges) {
+      console.log(userStats);
+        if (userStats.user && userStats.user.role === "ADMIN") {
           setAdminTools(
             <Button color="dark" variant="contained" onClick={handleAdminTools}>
               {t('admin_button')}

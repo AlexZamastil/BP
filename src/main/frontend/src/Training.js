@@ -1,6 +1,5 @@
 import { Paper, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import GenerateTraining from "./GenerateTraining";
 import {useNavigate} from "react-router-dom"
 
 export default function Training() {
@@ -26,7 +25,7 @@ export default function Training() {
 
 
     useEffect(() => {
-        fetch("https://localhost:8443/api/authorized/user/getuserdata", {
+        fetch(process.env.REACT_APP_BACKEND_API_URL+"/authorized/user/getUserData", {
             method: "GET",
             headers: {
                 'Authorization': localStorage.getItem("token")
@@ -35,7 +34,7 @@ export default function Training() {
         .then(async (response) => {
             const userStatsData = await response.json();
             setUserStats(userStatsData);
-            return fetch(`https://localhost:8443/api/authorized/hasActiveTraining/${userStatsData.user.id}`, {
+            return fetch(process.env.REACT_APP_BACKEND_API_URL+"/authorized/hasActiveTraining/${userStatsData.user.id}", {
                 method: "GET",
                 headers: {
                     'Authorization': localStorage.getItem("token")
@@ -63,7 +62,7 @@ export default function Training() {
               );
           
         })
-    }, [boolean]);
+    }, []);
 
 
     function generateTraining(trainingType) {

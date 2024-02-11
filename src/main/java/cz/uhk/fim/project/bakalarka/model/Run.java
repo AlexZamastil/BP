@@ -2,9 +2,11 @@ package cz.uhk.fim.project.bakalarka.model;
 
 import cz.uhk.fim.project.bakalarka.enumerations.RunCategory;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "run")
+@Data
 public class Run {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,48 +28,10 @@ public class Run {
 
     }
 
-    public Run(long id, Integer lenglhinmeters, RunCategory runcategory, Exercise exercise) {
-        this.id = id;
-        this.lenglhinmeters = lenglhinmeters;
-        this.runcategory = runcategory;
-        this.exercise = exercise;
-    }
-
     public Run(Integer lenglhinmeters, RunCategory runcategory, Exercise exercise) {
         this.lenglhinmeters = lenglhinmeters;
         this.runcategory = runcategory;
         this.exercise = exercise;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Integer getLenglhinmeters() {
-        return lenglhinmeters;
-    }
-
-    public void setLenglhinmeters(Integer lenglhinmeters) {
-        this.lenglhinmeters = lenglhinmeters;
-    }
-
-    public RunCategory getRuncategory() {
-        return runcategory;
-    }
-
-    public void setRuncategory(RunCategory runcategory) {
-        this.runcategory = runcategory;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
 }

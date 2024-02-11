@@ -1,9 +1,11 @@
 package cz.uhk.fim.project.bakalarka.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "gymworkout")
+@Data
 public class GymWorkout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,49 +25,10 @@ public class GymWorkout {
     public GymWorkout() {
 
     }
-
-    public GymWorkout(long id, Integer series, Integer repetitions, Exercise exercise) {
-        this.id = id;
-        this.series = series;
-        this.repetitions = repetitions;
-        this.exercise = exercise;
-    }
-
     public GymWorkout(Integer series, Integer repetitions, Exercise exercise) {
         this.series = series;
         this.repetitions = repetitions;
         this.exercise = exercise;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Integer getSeries() {
-        return series;
-    }
-
-    public void setSeries(Integer series) {
-        this.series = series;
-    }
-
-    public Integer getRepetitions() {
-        return repetitions;
-    }
-
-    public void setRepetitions(Integer repetitions) {
-        this.repetitions = repetitions;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
 }

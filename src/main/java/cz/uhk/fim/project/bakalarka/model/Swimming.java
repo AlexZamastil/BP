@@ -2,9 +2,13 @@ package cz.uhk.fim.project.bakalarka.model;
 
 import cz.uhk.fim.project.bakalarka.enumerations.SwimmingStyle;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "swimming")
+@Data
+@NoArgsConstructor
 public class Swimming {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,53 +26,11 @@ public class Swimming {
     @JoinColumn(name = "fk_exerciseid")
     private Exercise exercise;
 
-    public Swimming() {
-
-    }
-
-    public Swimming(long id, Integer lenglhinmeters, SwimmingStyle swimmingstyle, Exercise exercise) {
-        this.id = id;
-        this.lenglhinmeters = lenglhinmeters;
-        this.swimmingstyle = swimmingstyle;
-        this.exercise = exercise;
-    }
-
     public Swimming(Integer lenglhinmeters, SwimmingStyle swimmingstyle, Exercise exercise) {
         this.lenglhinmeters = lenglhinmeters;
         this.swimmingstyle = swimmingstyle;
         this.exercise = exercise;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Integer getLenglhinmeters() {
-        return lenglhinmeters;
-    }
-
-    public void setLenglhinmeters(Integer lenglhinmeters) {
-        this.lenglhinmeters = lenglhinmeters;
-    }
-
-    public SwimmingStyle getSwimmingstyle() {
-        return swimmingstyle;
-    }
-
-    public void setSwimmingstyle(SwimmingStyle swimmingstyle) {
-        this.swimmingstyle = swimmingstyle;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
 }
 

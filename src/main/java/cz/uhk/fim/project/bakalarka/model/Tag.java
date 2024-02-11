@@ -2,12 +2,16 @@
 package cz.uhk.fim.project.bakalarka.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "tag")
+@Data
+@NoArgsConstructor
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,47 +28,8 @@ public class Tag {
             inverseJoinColumns = @JoinColumn(name = "fk_foodid")
     )
     private Set<Food> tagfood = new HashSet<>();
-
-
-
-
-
-
-
-    public Tag(long id, String text) {
-        this.id = id;
-        this.text = text;
-    }
-
     public Tag(String text) {
         this.text = text;
-    }
-
-    public Tag() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Set<Food> getTagfood() {
-        return tagfood;
-    }
-
-    public void setTagfood(Set<Food> tagfood) {
-        this.tagfood = tagfood;
     }
 
     @Override

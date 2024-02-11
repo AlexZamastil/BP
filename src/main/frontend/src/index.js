@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client"
 import App from "./App"
 import { BrowserRouter } from "react-router-dom"
 import i18next from "i18next"
-import { I18nContext, I18nextProvider } from "react-i18next"
+import { I18nextProvider } from "react-i18next"
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import theme from './Theme'; 

@@ -1,8 +1,10 @@
 package cz.uhk.fim.project.bakalarka.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,6 +28,11 @@ public class SecurityConfig {
 
     private final List<String> allowedMethods = Arrays.asList("GET", "POST","OPTIONS","DELETE","PUT");
     private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization","XSRF-TOKEN");
+    @Value("${spring.security.fe-url}")
+    private String FE_url;
+    // system variable is dynamic data, therefore it cannot be used as allowed origin
+    @Value("${spring.security.be-url}")
+    private String BE_url;
     private final List<String> allowedOrigins = Arrays.asList("https://192.168.1.106:3000","https://localhost:3000");
     AuthFilter authFilter;
 
@@ -45,8 +52,21 @@ public class SecurityConfig {
                 .csrf().csrfTokenRepository(csrfTokenRepository())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 .and()
-                .authorizeRequests(authorizeRequests ->
+                .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
+                                .requestMatchers(HttpMethod.POST,"/authorized/user/passwordReset").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/authorized/user/updateData").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/authorized/user/getUserData").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/authorized/generateTraining").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/authorized/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/unauthorized/trainJ48").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/unauthorized/getExerciseTags").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/unauthorized/getFoodTags").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/unauthorized/getTimingTags").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/unauthorized/getExercise/{id}").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/privileged/addExercise").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/unauthorized/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/unauthorized/user/register").permitAll()
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(authFilter, BasicAuthenticationFilter.class);
@@ -62,10 +82,10 @@ public class SecurityConfig {
         config.setAllowedHeaders(allowedHeaders);
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource urlCorfConfig = new UrlBasedCorsConfigurationSource();
-        urlCorfConfig.registerCorsConfiguration("/api/**", config);
+        UrlBasedCorsConfigurationSource urlCORFConfig = new UrlBasedCorsConfigurationSource();
+        urlCORFConfig.registerCorsConfiguration("/api/**", config);
 
-        return urlCorfConfig;
+        return urlCORFConfig;
     }
 
     @Bean

@@ -3,12 +3,14 @@ package cz.uhk.fim.project.bakalarka.controller;
 import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.request.ChangePasswordRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import cz.uhk.fim.project.bakalarka.service.UserService;
 
+@Log4j2
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -20,18 +22,18 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "nonauthorized/user/login", consumes = {"application/json"})
-    public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletRequest request) {
-        String csrfToken = request.getHeader("X-XSRF-TOKEN");
+    @PostMapping(value = "unauthorized/user/login", consumes = {"application/json"})
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
         return userService.login(
                 user.getEmail(),
                 user.getPassword()
         );
     }
 
-    @PostMapping(value = "nonauthorized/user/register", consumes = {"application/json"})
+    @PostMapping(value = "unauthorized/user/register", consumes = {"application/json"})
     public ResponseEntity<?> registerUser(@RequestBody User user) {
-        System.out.println(user);
+        log.info(user);
+        userService.generateUserStats(user);
         return userService.register(
                 user.getEmail(),
                 user.getNickname(),
@@ -40,7 +42,7 @@ public class UserController {
                 user.getSex()
         );
     }
-    @PostMapping(value = "authorized/user/passwordreset", consumes = {"application/json"})
+    @PostMapping(value = "authorized/user/passwordReset", consumes = {"application/json"})
     public ResponseEntity<?> newPassword(@RequestBody ChangePasswordRequest changePasswordRequest){
         return userService.changePassword(
                 changePasswordRequest.getUserId(),
@@ -49,7 +51,7 @@ public class UserController {
         );
     }
 
-    @PostMapping(value = "authorized/user/generatestats")
+    @PostMapping(value = "authorized/user/generateStats")
     public ResponseEntity<?> generateStats(HttpServletRequest httpServletRequest){
         String header = httpServletRequest.getHeader("Authorization");
         return userService.generateUserStats(header);
@@ -59,19 +61,10 @@ public class UserController {
         return userService.updateData(user, httpServletRequest);
 
     }
-
-    @GetMapping(value= "authorized/user/getuserdata")
+    @GetMapping(value= "authorized/user/getUserData")
     public ResponseEntity<?> getUserData(HttpServletRequest httpServletRequest){
         String header = httpServletRequest.getHeader("Authorization");
         return userService.getUserData(header);
     }
-    @GetMapping(value = "authorized/test")
-    public String test(){
-        return "TEST";
-    }
 
-    @PostMapping("authorized/test-request")
-    public ResponseEntity<String> testPostRequest() {
-        return ResponseEntity.ok("POST request successful");
-    }
 }

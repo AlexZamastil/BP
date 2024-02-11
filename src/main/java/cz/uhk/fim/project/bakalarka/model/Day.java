@@ -1,6 +1,8 @@
 package cz.uhk.fim.project.bakalarka.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -8,6 +10,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "day")
+@Data
+@NoArgsConstructor
 public class Day {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,56 +50,4 @@ public class Day {
     )
     private Set<Food> menu = new HashSet<>();
 
-    public Day() {
-    }
-
-    public Day(long id, LocalDate date, double caloriesgained, double caloriesburned, Training training, Set<Exercise> exercises, Set<Food> menu) {
-        this.id = id;
-        this.date = date;
-        this.caloriesgained = caloriesgained;
-        this.caloriesburned = caloriesburned;
-        this.training = training;
-        this.exercises = exercises;
-        this.menu = menu;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public double getCaloriesgained() {
-        return caloriesgained;
-    }
-
-    public void setCaloriesgained(double caloriesgained) {
-        this.caloriesgained = caloriesgained;
-    }
-
-    public double getCaloriesburned() {
-        return caloriesburned;
-    }
-
-    public void setCaloriesburned(double caloriesburned) {
-        this.caloriesburned = caloriesburned;
-    }
-
-    public Training getTraining() {
-        return training;
-    }
-
-    public void setTraining(Training training) {
-        this.training = training;
-    }
 }

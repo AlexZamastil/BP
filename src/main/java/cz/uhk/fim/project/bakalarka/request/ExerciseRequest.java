@@ -1,9 +1,10 @@
 package cz.uhk.fim.project.bakalarka.request;
 
+import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
+@Data
 public class ExerciseRequest {
     String name;
     String name_eng;
@@ -160,122 +161,4 @@ public class ExerciseRequest {
         this.tagsJSON = tagsJSON;
     }
 
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName_eng() {
-        return name_eng;
-    }
-
-    public void setName_eng(String name_eng) {
-        this.name_eng = name_eng;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDescription_eng() {
-        return description_eng;
-    }
-
-    public void setDescription_eng(String description_eng) {
-        this.description_eng = description_eng;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getStyle() {
-        return style;
-    }
-
-    public void setStyle(String style) {
-        this.style = style;
-    }
-
-    public int getRepetitions() {
-        return repetitions;
-    }
-
-    public void setRepetitions(int repetitions) {
-        this.repetitions = repetitions;
-    }
-
-    public int getSeries() {
-        return series;
-    }
-
-    public void setSeries(int series) {
-        this.series = series;
-    }
-
-    public MultipartFile getPictureData() {
-        return pictureData;
-    }
-
-    public void setPictureData(MultipartFile pictureData) {
-        this.pictureData = pictureData;
-    }
-
-
-    @Override
-    public String toString() {
-        return "ExerciseRequest{" +
-                "name='" + name + '\'' +
-                ", name_eng='" + name_eng + '\'' +
-                ", description='" + description + '\'' +
-                ", description_eng='" + description_eng + '\'' +
-                ", type='" + type + '\'' +
-                ", category='" + category + '\'' +
-                ", style='" + style + '\'' +
-                ", length=" + length +
-                ", repetitions=" + repetitions +
-                ", series=" + series +
-                ", pictureData=" + pictureData +
-                ", tagsJSON='" + tagsJSON + '\'' +
-                ", tags=" + tags +
-                '}';
-    }
 }

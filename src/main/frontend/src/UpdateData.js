@@ -5,7 +5,6 @@ import { Paper } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import {useNavigate} from "react-router-dom"
 import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import {FormHelperText} from '@mui/material';
@@ -23,6 +22,7 @@ export default function UpdateData() {
   const [height, setHeight] = useState("");
   const [bodyType, setBodyType] = useState("");
   const [sex,setSex] = useState("");
+  const [role, setRole] = useState("");
   const [token, setToken] = useState("");
   const [csrfToken,setCsrfToken] = useState("") 
 
@@ -34,7 +34,7 @@ export default function UpdateData() {
   
 
   useEffect(() => {
-    fetch("https://localhost:8443/api/authorized/user/getuserdata", {
+    fetch(process.env.REACT_APP_BACKEND_API_URL+"/authorized/user/getUserData", {
       method: "GET",
       headers: {
         'Authorization': localStorage.getItem("token")
@@ -51,15 +51,13 @@ export default function UpdateData() {
       setHeight(response.user.height);
       setBodyType(response.user.bodyType);
       setSex(response.user.sex);
+      setRole(response.user.role);
       setToken(response.user.token);
     
     });
 
   }, []);
 
-
-  
-  const date = useState("");
   const formattedBirthdate = birthdate ? birthdate.toISOString().split('T')[0] : '';
 
   const handleUpdate = (e) => {
@@ -82,13 +80,14 @@ export default function UpdateData() {
         height: height,
         bodyType: bodyType,
         sex : sex,
+        role : role,
         token : token
       }),
     };
 
     console.log(user.body);
 
-    fetch('https://localhost:8443/api/authorized/user/updateData', user)
+    fetch(process.env.REACT_APP_BACKEND_API_URL+"/authorized/user/updateData", user)
       .then(async (response) => {
         if (response.status === 200) {
                 console.log("DATA UPDATED SUCCESSFULLY");

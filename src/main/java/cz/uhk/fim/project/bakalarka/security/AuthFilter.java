@@ -2,21 +2,23 @@ package cz.uhk.fim.project.bakalarka.security;
 
 import com.auth0.jwt.interfaces.Claim;
 import cz.uhk.fim.project.bakalarka.DAO.UserRepository;
+import cz.uhk.fim.project.bakalarka.enumerations.Role;
 import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Objects;
-
+@Log4j2
 @Component
 public class AuthFilter extends OncePerRequestFilter {
     JWTUtils jwtUtils;
@@ -29,50 +31,46 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,@NonNull FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        boolean isPrivileged = request.getServletPath().startsWith("/api/privileged/");
-        boolean isAuthorized = request.getServletPath().startsWith("/api/authorized/");
-        boolean isNonauthorized = request.getServletPath().startsWith("/api/nonauthorized/");
-        System.out.println("AUTH FILTER");
 
-        if(Objects.equals(request.getMethod(), "POST")){
-            System.out.println("POST request");
-        }
-        if(Objects.equals(request.getMethod(), "GET")){
-            System.out.println("GET request");
-        }
+        boolean isPrivileged = request.getRequestURI().startsWith("api/privileged");
+        log.info(request.getRequestURI());
 
-        if (isNonauthorized) {
+        if (!StringUtils.hasText(request.getHeader("Authorization"))) {
             filterChain.doFilter(request, response);
-        } else {
-            if (isAuthorized || isPrivileged) {
-                try {
-                    String token = request.getHeader("Authorization").replace("Bearer ", "");
-                    if (token.equals("")) {
+            return;
+        }
+
+        try {
+            log.info(request.getHeader("Authorization"));
+            System.out.println(request.getHeader("Authorization"));
+            String token = request.getHeader("Authorization").replace("Bearer ", "");
+            if (token.equals("")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
+            if (!jwtUtils.isTokenLegitimate(token)){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
+            Claim userIDClaim = jwtUtils.getID(token);
+            log.info(userIDClaim + " = User ID from jwtToken");
+            User user = userRepository.findUserById(userIDClaim.asLong());
+            if (user == null) return;
+            if (Objects.equals(user.getToken(), token)) {
+                if (isPrivileged) {
+                    if (user.getRole() == Role.ADMIN) {
+                        filterChain.doFilter(request, response);
+                    } else {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     }
-                    Claim userIDClaim = jwtUtils.getID(token);
-                    System.out.println(userIDClaim + "   CLAIM");
-                    User user = userRepository.findUserById(userIDClaim.asLong());
-                    if (Objects.equals(user.getToken(), token)) {
-                        if (isPrivileged) {
-                            if (user.isAdminPrivileges()) {
-                                filterChain.doFilter(request, response);
-                            } else {
-                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            }
-                        } else filterChain.doFilter(request, response);
-                    }
-                } catch (IOException | ServletException e) {
-                    e.printStackTrace();
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                }
-
-            } else response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
-
+                } else filterChain.doFilter(request, response);
+            }
+        } catch (IOException | ServletException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
     }
 
 }
+

@@ -2,6 +2,7 @@ package cz.uhk.fim.project.bakalarka.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "exercise")
-
+@Data
 public class Exercise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,53 +73,6 @@ public class Exercise {
         this.description_eng = description_eng;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName_eng() {
-        return name_eng;
-    }
-
-    public void setName_eng(String name_eng) {
-        this.name_eng = name_eng;
-    }
-
-    public String getDescription_eng() {
-        return description_eng;
-    }
-
-    public void setDescription_eng(String description_eng) {
-        this.description_eng = description_eng;
-    }
-
-    public Picture getPicture() {
-        return picture;
-    }
-
-    public void setPicture(Picture picture) {
-        this.picture = picture;
-    }
     public void addTagexercise(Tag t) {
         this.tagexercise.add(t);
     }

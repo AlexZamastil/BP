@@ -12,13 +12,11 @@ import MenuItem from '@mui/material/MenuItem';
 export default function Registration() {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
-  const today = new Date();
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [sex, setSex] = useState(null);
   const [birthdate, setBirthdate] = useState(null);
-  const date = useState("");
   const formattedBirthdate = birthdate ? birthdate.toISOString().split('T')[0] : '';
 
   const [csrfToken,setCsrfToken] = useState("") 
@@ -51,10 +49,10 @@ export default function Registration() {
 
     console.log(user.body);
 
-    fetch('https://localhost:8443/api/nonauthorized/user/register', user)
+    fetch(process.env.REACT_APP_BACKEND_API_URL+'/unauthorized/user/register', user)
       .then(async (response) => {
         if (response.status === 200) {
-          fetch("https://localhost:8443/api/nonauthorized/user/login",{
+          fetch(process.env.REACT_APP_BACKEND_API_URL+"/unauthorized/user/login",{
         method:"POST",
         headers:{
           'Authorization': 'No Auth',

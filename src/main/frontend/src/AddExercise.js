@@ -4,6 +4,7 @@ import { Container} from '@mui/system';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import axios from 'axios';
 
 export default function AddExercise(){
   const [name,setName] = useState(null);
@@ -41,24 +42,23 @@ export default function AddExercise(){
   },[])
   
     useEffect(() => {
-        fetch("https://localhost:8443/api/authorized/user/getuserdata", {
-            method: "GET",
-            headers: {
-                'Authorization': localStorage.getItem("token")
-            }
-        })
-        .then(async (response) => {
-            const userData = await response.json();
-            //setUserStats(userData);
-            setIsAdmin(userData.user.adminPrivileges);
-        })
-        .catch(error => {
-            console.error(error);
-        });
+      axios.get(process.env.REACT_APP_BACKEND_API_URL+"/authorized/user/getUserData", {
+        headers: {
+            'Authorization': localStorage.getItem("token")
+        }
+    })
+    .then(async (response) => {
+        const userData = response.data;
+        // setUserStats(userData);
+        setIsAdmin((userData.user.role == "ADMIN"));
+    })
+    .catch(error => {
+        console.error(error);
+    });
     }, []);
 
     useEffect(() => {
-      fetch("https://localhost:8443/api/nonauthorized/getExerciseTags", {
+      fetch(process.env.REACT_APP_BACKEND_API_URL+"/unauthorized/getExerciseTags", {
         method: "GET",
         headers: {
           'Authorization': ""
@@ -132,7 +132,7 @@ export default function AddExercise(){
       formData.append('imageData', selectedFile);
     
       try {
-        const response = await fetch("https://localhost:8443/api/privileged/addExercise", {
+        const response = await fetch(process.env.REACT_APP_BACKEND_API_URL+"/privileged/addExercise", {
           method: "POST",
           headers: {
             'Authorization': localStorage.getItem("token"),

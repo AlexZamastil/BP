@@ -2,9 +2,12 @@ package cz.uhk.fim.project.bakalarka.service;
 
 import cz.uhk.fim.project.bakalarka.DAO.TrainingRepository;
 import cz.uhk.fim.project.bakalarka.DAO.UserRepository;
+import cz.uhk.fim.project.bakalarka.DAO.UserStatsRepository;
 import cz.uhk.fim.project.bakalarka.enumerations.Goal;
 import cz.uhk.fim.project.bakalarka.model.Training;
 import cz.uhk.fim.project.bakalarka.model.User;
+import cz.uhk.fim.project.bakalarka.model.UserStats;
+import cz.uhk.fim.project.bakalarka.request.CreateTrainingRequest;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +21,9 @@ import weka.core.*;
 import weka.core.converters.ConverterUtils;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -33,14 +38,17 @@ public class TrainingService {
     private Instances data;
     UserRepository userRepository;
     TrainingRepository trainingRepository;
+
+    private final UserStatsRepository userStatsRepository;
     public final double MAX_PERCENTAGE_INCREASE = 2.5;
 
-    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository) {
+    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, UserStatsRepository userStatsRepository) {
         this.userRepository = userRepository;
         this.trainingRepository = trainingRepository;
+        this.userStatsRepository = userStatsRepository;
     }
 
-    public void trainModel () throws Exception{
+    public void trainModel() throws Exception {
         ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(dataset);
         Instances data = dataSource.getDataSet();
         data.setClassIndex(data.numAttributes() - 1);
@@ -57,6 +65,71 @@ public class TrainingService {
         classifier = j48;
     }
 
+    public ResponseEntity<?> generateTraining(CreateTrainingRequest createTrainingRequest, HttpServletRequest httpServletRequest) {
+        System.out.println(createTrainingRequest);
+        Instant wantedTime = Instant.parse(createTrainingRequest.getWantedTime());
+        Instant actualTime = Instant.parse(createTrainingRequest.getActualTime());
+
+        LocalDate today = LocalDate.now();
+
+        Instant startOfDay = today.atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        Duration wantedTimeDuration = Duration.between(startOfDay, wantedTime);
+        Duration actualTimeDuration = Duration.between(startOfDay, actualTime);
+
+        System.out.println("WANTED TIME: " + wantedTimeDuration);
+        System.out.println("ACTUAL TIME: " + actualTimeDuration);
+
+        String token = httpServletRequest.getHeader("Authorization");
+        User user = userRepository.findUserByToken(token);
+        UserStats userStats = userStatsRepository.findUserStatsByUser(user);
+
+        float minutesOfActualTime = actualTimeDuration.toMinutes();
+        double actualPace = minutesOfActualTime / createTrainingRequest.getActualRunLength();
+
+        float minutesOfWantedTime = wantedTimeDuration.toMinutes();
+        double wantedPace = minutesOfWantedTime / createTrainingRequest.getActualRunLength();
+
+
+        int trainingDays = (int) ChronoUnit.DAYS.between(createTrainingRequest.getStartDay(), createTrainingRequest.getRaceDay());
+//temp
+        String firstLetter = user.getBodyType().toString().substring(0, 1).toUpperCase();
+        String restLetters = user.getBodyType().toString().substring(1).toLowerCase();
+        String adjustedBodyType = firstLetter + restLetters;
+        String firstLetter1 = createTrainingRequest.getGoal().toString().substring(0, 1).toUpperCase();
+        String restLetters1 = createTrainingRequest.getGoal().toString().substring(1).toLowerCase();
+        String adjustedRun;
+        if (createTrainingRequest.getGoal().toString().equals("RUN"))
+            adjustedRun = firstLetter1 + restLetters1;
+        else adjustedRun = createTrainingRequest.getGoal().toString();
+//
+
+        generateTrainingPlan(
+                user.getWeight(),
+                user.getHeight(),
+                userStats.getBmi(),
+                user.getSex().toString(),
+                adjustedBodyType,
+                1,
+                trainingDays,
+                createTrainingRequest.getActualRunLength(),
+                actualPace,
+                createTrainingRequest.getLengthOfRaceInMeters(),
+                wantedPace,
+                adjustedRun,
+                createTrainingRequest.getElevationProfile().toString()
+        );
+
+        testTrainingPossibility(
+                createTrainingRequest.getStartDay(),
+                createTrainingRequest.getRaceDay(),
+                createTrainingRequest.getLengthOfRaceInMeters(),
+                wantedTimeDuration, createTrainingRequest.getActualRunLength(),
+                actualTimeDuration);
+
+        return MessageHandler.success("Training generated");
+    }
+
     public ResponseEntity<?> generateTrainingPlan(double weight,
                                                   double height,
                                                   double bmi,
@@ -70,44 +143,43 @@ public class TrainingService {
                                                   double racePaceToAchieve,
                                                   String raceType,
                                                   String raceElevation
-    ){
+    ) {
 
-        try{
-            int[] attributeIndices = {13,14};
+        try {
+            int[] attributeIndices = {13, 14};
             for (int attributeIndex : attributeIndices) {
 
                 Instance instance = new DenseInstance(16);
 
                 instance.setDataset(data);
 
-                instance.setValue(0,weight);
-                instance.setValue(1,height);
-                instance.setValue(2,bmi);
-                instance.setValue(3,sex);
-                instance.setValue(4,bodyType);
-                instance.setValue(5,availableTrainingDays);
-                instance.setValue(6,trainingLengthInDays);
-                instance.setValue(7,trainingLengthInMeters);
-                instance.setValue(8,trainingPace);
-                instance.setValue(9,raceLength);
-                instance.setValue(10,racePaceToAchieve);
-                instance.setValue(11,raceType);
-                instance.setValue(12,raceElevation);
+                instance.setValue(0, weight);
+                instance.setValue(1, height);
+                instance.setValue(2, bmi);
+                instance.setValue(3, sex);
+                instance.setValue(4, bodyType);
+                instance.setValue(5, availableTrainingDays);
+                instance.setValue(6, trainingLengthInDays);
+                instance.setValue(7, trainingLengthInMeters);
+                instance.setValue(8, trainingPace);
+                instance.setValue(9, raceLength);
+                instance.setValue(10, racePaceToAchieve);
+                instance.setValue(11, raceType);
+                instance.setValue(12, raceElevation);
 
                 data.setClassIndex(attributeIndex);
 
                 double[] predictions = classifier.distributionForInstance(instance);
 
-                int type= data.attribute(attributeIndex).type();
-                System.out.println("attribue type is " + type);
+                int type = data.attribute(attributeIndex).type();
+                System.out.println("attribute type is " + type);
 
-                if (type == Attribute.NUMERIC){
+                if (type == Attribute.NUMERIC) {
                     // get numeric data
                     double predictedNumericValue = classifier.classifyInstance(instance);
                     System.out.println("Predicted Numeric Value for Attribute " + attributeIndex + ": " + predictedNumericValue);
 
-                }
-                else if (type == Attribute.NOMINAL){
+                } else if (type == Attribute.NOMINAL) {
                     // get nominal data
 
                     int predictedClassIndex = -1;
@@ -125,8 +197,7 @@ public class TrainingService {
                 }
             }
             return ResponseEntity.ok("training plan generated");
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok("training generation failed");
         }
@@ -155,7 +226,7 @@ public class TrainingService {
                 return test;
             }
         } else {
-            return MessageHandler.error("comming soon");
+            return MessageHandler.error("coming soon");
         }
 
     }
@@ -175,7 +246,7 @@ public class TrainingService {
         System.out.println("number of days " + numberOfDays);
         double numberOfWeeks = numberOfDays / 7;
         System.out.println("number of weeks " + numberOfWeeks);
-        double x = weeklyPercentageIncreaseInLength(numberOfWeeks,actualRunLength,lengthOfRaceInMeters);
+        double x = weeklyPercentageIncreaseInLength(numberOfWeeks, actualRunLength, lengthOfRaceInMeters);
         System.out.println(x);
 
 
@@ -194,58 +265,10 @@ public class TrainingService {
         return MessageHandler.success("This goal is achievable");
     }
 
-
-    /*
-
-    public Boolean isGoalAchievable(LocalDate startDay,
-                                    LocalDate raceDay,
-                                    Integer lengthOfRaceInMeters,
-                                    Integer wantedTimeInSeconds,
-                                    Integer actualRunLength,
-                                    Integer actualTimeInSeconds) {
-
-        double numberOfDays = ChronoUnit.DAYS.between(startDay, raceDay);
-        System.out.println("number of days " + numberOfDays);
-
-        double numberOfWeeks = numberOfDays / 7;
-        System.out.println("number of weeks " + numberOfWeeks);
-
-        double weeksOfVolumeExtension = numberOfWeeks / 2; //This value might change based on further research
-        System.out.println("weeks of volume extension " + weeksOfVolumeExtension);
-
-        double weeksOfIntensityExtension = numberOfWeeks - weeksOfVolumeExtension;
-        if (lengthOfRaceInMeters > 10000) {
-            weeksOfIntensityExtension = numberOfWeeks - weeksOfVolumeExtension - 2; // 2 weeks of taper phase
-        }
-        System.out.println("weeks of intensity extrension " + weeksOfIntensityExtension);
-
-        double lengthDifference = lengthOfRaceInMeters - actualRunLength;
-        System.out.println("length difference " + lengthDifference);
-
-        double weeklyVolumeIncrease = lengthDifference / weeksOfVolumeExtension;
-        System.out.println("weekly volume increase" + weeklyVolumeIncrease);
-
-        double percentageWeeklyVolumeIncrease = weeklyVolumeIncrease / actualRunLength * 100;
-        System.out.println("percentage weekly volume increase " + percentageWeeklyVolumeIncrease);
-
-        double timeDifference = wantedTimeInSeconds - actualTimeInSeconds;
-        System.out.println("time difference " + timeDifference);
-        double weeklyIntensityIncrease = timeDifference / weeksOfIntensityExtension;
-        System.out.println("weekly intensity increase " + weeklyIntensityIncrease);
-        double percentageWeeklyIntensityIncrease = weeklyIntensityIncrease / actualTimeInSeconds * 100;
-        System.out.println("percentage weekly intensity increase " + percentageWeeklyIntensityIncrease);
-        //TODO DODELAT, VYRESIT % A VZIT V UVAHU TEMPO
-        return percentageWeeklyVolumeIncrease >= 0 &&
-                !(percentageWeeklyVolumeIncrease > MAX_PERCENTAGE_INCREASE) &&
-                percentageWeeklyIntensityIncrease >= 0 &&
-                !(percentageWeeklyIntensityIncrease > MAX_PERCENTAGE_INCREASE);
-    }
-
-    */
-    public double weeklyPercentageIncreaseInLength(double numberOfWeeks, int currentRunLength, int raceLength){
+    public double weeklyPercentageIncreaseInLength(double numberOfWeeks, int currentRunLength, int raceLength) {
         int metersDifference = raceLength - currentRunLength;
-        double weeklyDifference = metersDifference/numberOfWeeks;
-        return weeklyDifference/currentRunLength*100;
+        double weeklyDifference = metersDifference / numberOfWeeks;
+        return weeklyDifference / currentRunLength * 100;
 
     }
 
@@ -258,12 +281,11 @@ public class TrainingService {
         List<Training> t = trainingRepository.findTrainingsContainingUser(id);
         for (Training training : t
         ) {
-            if (today.isBefore(training.getFinalday()))
+            if (today.isBefore(training.getRaceday()))
                 return true;
         }
         return false;
     }
-
 
 
 }
