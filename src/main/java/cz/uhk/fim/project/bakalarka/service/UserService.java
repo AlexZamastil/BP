@@ -2,10 +2,12 @@ package cz.uhk.fim.project.bakalarka.service;
 
 
 import cz.uhk.fim.project.bakalarka.DAO.UserStatsRepository;
+import cz.uhk.fim.project.bakalarka.dto.UserDto;
 import cz.uhk.fim.project.bakalarka.enumerations.Sex;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Log4j2
 @Service
 public class UserService {
     private final JWTUtils jwtUtils;
@@ -67,9 +70,17 @@ public class UserService {
     }
 
     public ResponseEntity<?> register(String email, String nickname, String password, LocalDate birthdate, Sex sex) {
+        // FIXME Analogicky dle komentářů lze doplnit i ostatní business logiku
+
+        // FIXME Místo předávání jednotlivých parametrů je lepší již v kontroléru předávat hodnoty v JSONu a mapovat je na vlastní DTO (vlastní třídy) a po validaci z nich vytvořit entity v DB
+
+        // FIXME Validaci vstupních údajů by měl být jeden z první kroků!
+        // Například, když by email obsahoval nějaký script pro DB typu SQL injection, mohl byste zde (například) přijít o data
         if (userRepository.findUserByEmail(email) != null) {
             return MessageHandler.error("Account using this email already exist");
+            // FIXME Nic proti tomuto typu validace, ale raději bych šel (například) cestou regulárních výrazů a validoval tak veškeré atributy
         } else if (!emailValidator.isValid(email)) {
+//            FIXME Bylo by dobré uživateli vrátit informaci o tom, proč email není validní?
             return MessageHandler.error("The entered text is not a valid email address");
         } else {
             String encryptedPassword = passwordEncoder.encode(password);
@@ -77,6 +88,28 @@ public class UserService {
             userRepository.save(user);
             return MessageHandler.success("Account created successfully");
         }
+    }
+
+    public ResponseEntity<?> registerExample(UserDto dto) {
+        log.info("");// FIXME
+
+        if (!emailValidator.isValid(dto.getEmail())) {
+            return MessageHandler.error("The entered text is not a valid email address");
+        } else if (userRepository.findUserByEmail(dto.getEmail()) != null) {
+            return MessageHandler.error("Account using this email already exist");
+            // FIXME Nic proti tomuto typu validace, ale raději bych šel (například) cestou regulárních výrazů a validoval tak veškeré atributy
+        }
+
+        String encryptedPassword = passwordEncoder.encode(dto.getPassword());
+        // FIXME Alternativě lze místo volání konstruktoru využít ModelMapper či ObjectMapper
+        User user = new User(dto.getEmail(), dto.getNickname(), encryptedPassword, dto.getBirthdate(), dto.getSex());
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error("An error occurred while trying to save (/register) a new user.", e);
+            return MessageHandler.error("An error occurred while trying to save (/register) a new user.");
+        }
+        return MessageHandler.success("Account created successfully");
     }
 
     public ResponseEntity<?> getUserData(String header) {

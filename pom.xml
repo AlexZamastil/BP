@@ -12,6 +12,9 @@
     <groupId>org.example</groupId>
     <artifactId>BP</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>be</name>
+
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
@@ -19,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <!--    FIXME Pro závislosti níže je vhodné doplnit i jejich verzi, se kterými je Vaše aplikace schopna pracovat. Až si to někdo pustí (například) při kontrola Vaší práce, může se jednat o jiné verze knihoven)-->
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -83,9 +87,6 @@
             <scope>provided</scope>
         </dependency>
 
-
-
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
@@ -94,10 +95,16 @@
     </dependencies>
 
     <build>
+        <finalName>${project.name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
             </plugin>
         </plugins>
     </build>

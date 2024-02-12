@@ -28,11 +28,11 @@ public class SecurityConfig {
 
     private final List<String> allowedMethods = Arrays.asList("GET", "POST","OPTIONS","DELETE","PUT");
     private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization","XSRF-TOKEN");
-    @Value("${spring.security.fe-url}")
-    private String FE_url;
+//    @Value("${spring.security.fe-url}")
+//    private String FE_url;
     // system variable is dynamic data, therefore it cannot be used as allowed origin
-    @Value("${spring.security.be-url}")
-    private String BE_url;
+//    @Value("${spring.security.be-url}")
+//    private String BE_url;
     private final List<String> allowedOrigins = Arrays.asList("https://192.168.1.106:3000","https://localhost:3000");
     AuthFilter authFilter;
 

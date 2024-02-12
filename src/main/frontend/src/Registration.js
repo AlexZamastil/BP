@@ -49,6 +49,34 @@ export default function Registration() {
 
     console.log(user.body);
 
+      //   FIXME    Bylo by dobré, aby pro všechna API volání existovala pouze jedna třída/komponenta, kde by mohly být definovány veškeré API volání s potřebnými parametry, například, jako jsem dříve na konzultaci zmínil axios
+      // Mohlo by vypadat například:
+      // async callApi(method, url, dtoIn) {
+      //     return axios({
+      //         method: method,
+      //         url: url,
+      //         data: dtoIn,
+      //         withCredentials: true,
+      //         headers: {
+      //             "Content-Type": "application/json; charset=utf-8",
+      //             "Accept": "application/json",
+      //             "Authorization": ...,
+      //             "X-XSRF-TOKEN": ...
+      //         }
+      //     })
+      // },
+
+      //   Pak zavolat API:
+      //   async register(dtoIn) {
+      //       const url = process.env.REACT_APP_BE_URL + ...
+      //       return this.callApi(POST, url, dtoIn)
+      //   },
+
+      // async getUserData(dtoIn) {
+      //     const url = ...
+      //     return this.callApi(GET, url, dtoIn)
+      // },
+
     fetch(process.env.REACT_APP_BACKEND_API_URL+'/unauthorized/user/register', user)
       .then(async (response) => {
         if (response.status === 200) {

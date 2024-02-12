@@ -3,23 +3,34 @@ package cz.uhk.fim.project.bakalarka.model;
 import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
 import cz.uhk.fim.project.bakalarka.enumerations.Role;
 import cz.uhk.fim.project.bakalarka.enumerations.Sex;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-
 
 @Entity
 @Table(name = "user", schema = "public")
 @Data
 @NoArgsConstructor
 public class User {
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-@Column(name = "pk_userid")
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "pk_userid")
     private long id;
 
     @Column(name = "customindex")
@@ -28,7 +39,7 @@ public class User {
     @Column(name = "dateofbirth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "email",unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "height")
@@ -61,9 +72,10 @@ public class User {
             inverseJoinColumns = {
                     @JoinColumn(name = "fk_foodid", referencedColumnName = "pk_foodid")}
     )
+    @ToString.Exclude
     private Set<Food> bannedFood = new HashSet<>();
 
-    public User(String email, String nickname, String password, LocalDate dateOfBirth, Sex sex){
+    public User(String email, String nickname, String password, LocalDate dateOfBirth, Sex sex) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
