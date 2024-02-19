@@ -1,4 +1,4 @@
-package cz.uhk.fim.project.bakalarka.request;
+package cz.uhk.fim.project.bakalarka.DTO;
 
 import cz.uhk.fim.project.bakalarka.enumerations.ElevationProfile;
 import cz.uhk.fim.project.bakalarka.enumerations.Goal;
@@ -6,7 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 @Data
-public class CreateTrainingRequest {
+public class CreateTrainingDTO {
     LocalDate startDay;
     LocalDate raceDay;
     Goal goal;
@@ -16,7 +16,7 @@ public class CreateTrainingRequest {
     String actualTime;
     ElevationProfile elevationProfile;
 
-    public CreateTrainingRequest(LocalDate startDay, LocalDate raceDay, Goal goal, Integer lengthOfRaceInMeters, String wantedTime, Integer actualRunLength, String actualTime) {
+    public CreateTrainingDTO(LocalDate startDay, LocalDate raceDay, Goal goal, Integer lengthOfRaceInMeters, String wantedTime, Integer actualRunLength, String actualTime) {
         this.startDay = startDay;
         this.raceDay = raceDay;
         this.goal = goal;

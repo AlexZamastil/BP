@@ -1,172 +1,142 @@
-import React, { useState, useEffect } from 'react';
-import { Container} from '@mui/system';
-import {TextField,Button} from '@mui/material';
+import React, { useState } from 'react';
+import { Container } from '@mui/system';
+import { TextField, Button } from '@mui/material';
 import { Paper } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import {useNavigate} from "react-router-dom";
-import {FormHelperText} from '@mui/material';
+import { useNavigate } from "react-router-dom";
+import { FormHelperText } from '@mui/material';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { callAPINoAuth } from './CallAPI';
+import getXSRFtoken from './XSRF_token';
 
 
 export default function Registration() {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [sex, setSex] = useState(null);
-  const [birthdate, setBirthdate] = useState(null);
-  const formattedBirthdate = birthdate ? birthdate.toISOString().split('T')[0] : '';
 
-  const [csrfToken,setCsrfToken] = useState("") 
+  const  [user,setUser] = useState({
+    email: "",
+    nickname: "",
+    password: "",
+    dateOfBirth: null,
+    sex: null
+  });
+  const formattedBirthdate = user.birthdate ? user.birthdate.toISOString().split('T')[0] : '';
+  const xsrfToken = getXSRFtoken();
 
-  useEffect((csrfToken) => {
-    const xsrfToken = getCookie('XSRF-TOKEN');
-    setCsrfToken(xsrfToken);
-    console.log(csrfToken);
-  },[])
-  
-
-  const handleClick = (e) => {
+  const handleRegistration = (e) => {
     e.preventDefault();
 
-    const user = {
-      method: 'POST',
-      headers:{
-        'Authorization': 'No Auth',
-          "Content-Type":"application/json",
-          'X-XSRF-TOKEN': csrfToken 
-        },credentials : "include",
-      body: JSON.stringify({
-        email: email,
-        nickname: nickname,
-        password: password,
-        dateOfBirth: formattedBirthdate,
-        sex : sex
-      })
-    };
+    console.log(user);
 
-    console.log(user.body);
-
-    fetch(process.env.REACT_APP_BACKEND_API_URL+'/unauthorized/user/register', user)
-      .then(async (response) => {
-        if (response.status === 200) {
-          fetch(process.env.REACT_APP_BACKEND_API_URL+"/unauthorized/user/login",{
-        method:"POST",
-        headers:{
-          'Authorization': 'No Auth',
-            "Content-Type":"application/json",
-            'X-XSRF-TOKEN': csrfToken 
-          },credentials : "include",
-            body : JSON.stringify({
-                email : email,
-                password : password
-            })
-        }).then(async(response)=>{
-          
-          if (response.status === 200){
+    callAPINoAuth("POST", "user/register", user, xsrfToken)
+      .then(response => {
+        console.log("registered");
+        callAPINoAuth("POST", "user/login", user, xsrfToken)
+          .then((response) => {
             console.log('Logged in successfully')
-            const token = await response.text();
+            const token = response.data;
             localStorage.setItem('token', token);
-            localStorage.setItem('user', email);
+            localStorage.setItem('user', user.email);
             console.log("redirect to profile");
-          navigate("/profile");
-          }})
-        } else {const errorResponse = await response.text();
-          setErrorMessage(errorResponse);
-          console.error('Registration failed:', errorResponse);
-        }}).catch(error => {
-        console.error('Error occurred during login:', error);
-        setErrorMessage('An error occurred during login');
-      });
+            navigate("/profile");
+          })
+          .catch((error)=>{
+            console.log(error.data)
+          })
+         
+      })
+      .catch(error => {
+        let errorMessage = 'An error occurred during registration';
+        if (error.response) {
+            errorMessage = error.response.data || errorMessage;
+            console.error('Registration failed:', errorMessage);
+        } else if (error.request) {
+            console.error('No response received:', error.request);
+        } else {
+            console.error('Error occurred during registration:', error.message);
+        }
+        setErrorMessage(errorMessage);
+        console.error("Login failed", error);
+    });
   };
+
 
   return (
     <div className='loginBG'>
-    <Container>
-       <Paper elevation={3} className='paper'>
-      <form noValidate autoComplete="off">
-        <h1>Registration form</h1>
+      <Container>
+        <Paper elevation={3} className='paper'>
+          <form noValidate autoComplete="off">
+            <h1>Registration form</h1>
 
-        <TextField
-          style={{ margin: '10px auto' }}
-          sx={{ m: 1, width: '25ch' }}
-          id="outlined-basic"
-          label="Nickname"
-          variant="outlined"
-          fullWidth
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-        />
+            <TextField
+              style={{ margin: '10px auto' }}
+              sx={{ m: 1, width: '25ch' }}
+              id="outlined-basic"
+              label="Nickname"
+              variant="outlined"
+              fullWidth
+              value={user.nickname}
+              onChange={(e) => setUser({ ...user, nickname: e.target.value })}
+            />
 
-        <TextField
-          style={{ margin: '10px auto' }}
-          sx={{ m: 1, width: '25ch' }}
-          id="outlined-basic"
-          label="Email"
-          variant="outlined"
-          fullWidth
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+            <TextField
+              style={{ margin: '10px auto' }}
+              sx={{ m: 1, width: '25ch' }}
+              id="outlined-basic"
+              label="Email"
+              variant="outlined"
+              fullWidth
+              value={user.email}
+              onChange={(e) => setUser({ ...user, email: e.target.value })}
+            />
 
-        <TextField
-          type="password"
-          style={{ margin: '10px auto' }}
-          sx={{ m: 1, width: '25ch' }}
-          id="outlined-basic"
-          label="Password"
-          variant="outlined"
-          fullWidth
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+            <TextField
+              type="password"
+              style={{ margin: '10px auto' }}
+              sx={{ m: 1, width: '25ch' }}
+              id="outlined-basic"
+              label="Password"
+              variant="outlined"
+              fullWidth
+              value={user.password}
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
+            />
 
-<FormHelperText>Select your biological sex</FormHelperText>
-<Select
-  labelId="demo-simple-select-label"
-  id="demo-simple-select"
-  value={sex}
-  label="Sex"
-  sx={{ m: 1, width: '25ch' }}
-  onChange={(e) => setSex(e.target.value)}
->
-  <MenuItem value={"MALE"}>Male</MenuItem>
-  <MenuItem value={"FEMALE"}>Female</MenuItem>
-</Select>
+            <FormHelperText>Select your biological sex</FormHelperText>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={user.sex}
+              label="Sex"
+              sx={{ m: 1, width: '25ch' }}
+              onChange={(e) => setUser({ ...user,sex: e.target.value})}
+            >
+              <MenuItem value={"MALE"}>Male</MenuItem>
+              <MenuItem value={"FEMALE"}>Female</MenuItem>
+            </Select>
 
 
-        <DatePicker 
-        className='datepicker'
-        sx={{ m: 1, width: '25ch' }}
-        style={{ margin: '10px auto' }}
-         format="YYYY-MM-DD"
-         label="Birthdate"
-         onChange={(newDate) => setBirthdate(newDate)}
-         />
+            <DatePicker
+              className='datepicker'
+              sx={{ m: 1, width: '25ch' }}
+              style={{ margin: '10px auto' }}
+              format="YYYY-MM-DD"
+              label="Birthdate"
+              onChange={(newDate) => setUser({ ...user, dateOfBirth: newDate})}
+            />
 
-        <Button variant="contained" onClick={handleClick}> Submit </Button>
+            <Button variant="contained" onClick={handleRegistration}> Submit </Button>
 
-        {errorMessage && (
+            {errorMessage && (
               <div style={{ color: 'red', marginTop: '10px' }}>
                 {errorMessage}
               </div>
             )}
-      </form>
-      </Paper>
-    </Container>
+          </form>
+        </Paper>
+      </Container>
     </div>
   );
-
-  function getCookie(name) {
-    const cookies = document.cookie.split(';');
-    for (const cookie of cookies) {
-        const [cookieName, cookieValue] = cookie.trim().split('=');
-        if (cookieName === name) {
-            return cookieValue;
-        }
-    }
-    return null;
-}
 }

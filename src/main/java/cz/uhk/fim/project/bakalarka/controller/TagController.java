@@ -17,15 +17,15 @@ public class TagController {
 
     @Autowired
 
-    @GetMapping(value = "unauthorized/getExerciseTags")
+    @GetMapping(value = "tag/getExerciseTags")
     public ResponseEntity<?> getExerciseTags(){
         return tagService.getExerciseTags();
     }
-    @GetMapping(value = "unauthorized/getFoodTags")
+    @GetMapping(value = "tag/getFoodTags")
     public ResponseEntity<?> getFoodTags(){
         return tagService.getFoodTags();
     }
-    @GetMapping(value = "unauthorized/getTimingTags")
+    @GetMapping(value = "tag/getTimingTags")
     public ResponseEntity<?> getTimingTags(){
         return tagService.getTimingTags();
     }

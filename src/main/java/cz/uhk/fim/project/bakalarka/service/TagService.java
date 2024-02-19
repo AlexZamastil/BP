@@ -17,6 +17,7 @@ public class TagService {
     }
 
     public ResponseEntity<?> getExerciseTags(){
+
         return MessageHandler.success(Arrays.toString(Tag_Exercise.values()));
     }
     public ResponseEntity<?> getFoodTags(){

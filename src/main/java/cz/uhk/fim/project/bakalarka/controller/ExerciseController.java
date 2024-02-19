@@ -1,7 +1,10 @@
 package cz.uhk.fim.project.bakalarka.controller;
 
-import cz.uhk.fim.project.bakalarka.request.ExerciseRequest;
+import cz.uhk.fim.project.bakalarka.DTO.ExerciseDTO;
 import cz.uhk.fim.project.bakalarka.service.ExerciseService;
+import cz.uhk.fim.project.bakalarka.util.AuthorizationCheck;
+import cz.uhk.fim.project.bakalarka.util.MessageHandler;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +24,17 @@ public class ExerciseController {
         this.exerciseService = exerciseService;
     }
 
-    @PostMapping(value = "privileged/addExercise", consumes = "multipart/form-data")
+    @PostMapping(value = "exercise/addExercise", consumes = "multipart/form-data")
     public ResponseEntity<?> addExercise(
-            @RequestPart(name = "exerciseRequest") ExerciseRequest exerciseRequest,
-            @RequestPart(name = "imageData", required = false) MultipartFile imageData
+            @RequestPart(name = "exerciseRequest") ExerciseDTO exerciseRequest,
+            @RequestPart(name = "imageData") MultipartFile imageData,
+            HttpServletRequest request
     ) {
+        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
         return exerciseService.addNewExercise(exerciseRequest, imageData);
     }
 
-    @GetMapping(value = "/unauthorized/getExercise/{id}")
+    @GetMapping(value = "exercise/getExercise/{id}")
     public ResponseEntity<?> getExercise(@PathVariable Long id) throws IOException {
         return exerciseService.getExercise(id);
     }

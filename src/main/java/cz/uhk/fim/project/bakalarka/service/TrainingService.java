@@ -7,10 +7,12 @@ import cz.uhk.fim.project.bakalarka.enumerations.Goal;
 import cz.uhk.fim.project.bakalarka.model.Training;
 import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
-import cz.uhk.fim.project.bakalarka.request.CreateTrainingRequest;
+import cz.uhk.fim.project.bakalarka.DTO.CreateTrainingDTO;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,16 +38,17 @@ public class TrainingService {
     private J48 trainedModel;
     private Classifier classifier;
     private Instances data;
-    UserRepository userRepository;
-    TrainingRepository trainingRepository;
-
+    private final UserRepository userRepository;
+    private final TrainingRepository trainingRepository;
+    private final MessageSource messageSource;
     private final UserStatsRepository userStatsRepository;
     public final double MAX_PERCENTAGE_INCREASE = 2.5;
 
-    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, UserStatsRepository userStatsRepository) {
+    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, UserStatsRepository userStatsRepository, MessageSource messageSource) {
         this.userRepository = userRepository;
         this.trainingRepository = trainingRepository;
         this.userStatsRepository = userStatsRepository;
+        this.messageSource = messageSource;
     }
 
     public void trainModel() throws Exception {
@@ -65,7 +68,7 @@ public class TrainingService {
         classifier = j48;
     }
 
-    public ResponseEntity<?> generateTraining(CreateTrainingRequest createTrainingRequest, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> generateTraining(CreateTrainingDTO createTrainingRequest, HttpServletRequest httpServletRequest) {
         System.out.println(createTrainingRequest);
         Instant wantedTime = Instant.parse(createTrainingRequest.getWantedTime());
         Instant actualTime = Instant.parse(createTrainingRequest.getActualTime());
@@ -127,7 +130,7 @@ public class TrainingService {
                 wantedTimeDuration, createTrainingRequest.getActualRunLength(),
                 actualTimeDuration);
 
-        return MessageHandler.success("Training generated");
+        return MessageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> generateTrainingPlan(double weight,
@@ -196,10 +199,10 @@ public class TrainingService {
                     System.out.println("Predicted Nominal Value for Attribute " + attributeIndex + ": " + predictedClass);
                 }
             }
-            return ResponseEntity.ok("training plan generated");
+            return ResponseEntity.ok(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.ok("training generation failed");
+            return ResponseEntity.ok(messageSource.getMessage("error.training.failed", null, LocaleContextHolder.getLocale()));
         }
     }
 
@@ -221,7 +224,7 @@ public class TrainingService {
                 User user = userRepository.findUserById(jwtUtils.getID(token).asLong());
                 Training training = new Training(raceDay, goal, startDay, lengthOfRaceInMeters, user);
                 trainingRepository.save(training);
-                return MessageHandler.success("Training saved successfully");
+                return MessageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
             } else {
                 return test;
             }
@@ -262,7 +265,7 @@ public class TrainingService {
         }
  */
 
-        return MessageHandler.success("This goal is achievable");
+        return MessageHandler.success(messageSource.getMessage("success.training.isAchievable", null, LocaleContextHolder.getLocale()));
     }
 
     public double weeklyPercentageIncreaseInLength(double numberOfWeeks, int currentRunLength, int raceLength) {

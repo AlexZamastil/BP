@@ -4,7 +4,7 @@ import {Container} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import  {Button} from "@mui/material";
-import axios from 'axios';
+import { callAPI } from './CallAPI';
 
 export default function AdminTools(){
 
@@ -19,11 +19,7 @@ export default function AdminTools(){
       }
       
       useEffect(() => {
-        axios.get(process.env.REACT_APP_BACKEND_API_URL+"/authorized/user/getUserData", {
-            headers: {
-                'Authorization': localStorage.getItem("token")
-            }
-        })
+        callAPI("GET","user/getUserData",null,null)
         .then(response => {
             setIsAdmin((response.data.user.role="ADMIN"));
         })
@@ -31,6 +27,7 @@ export default function AdminTools(){
             console.error('Error fetching data:', error);
         });
     }, []);
+    
 
         return (
             <div>

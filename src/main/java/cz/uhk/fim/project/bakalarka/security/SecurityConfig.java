@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -27,13 +28,10 @@ import java.util.List;
 public class SecurityConfig {
 
     private final List<String> allowedMethods = Arrays.asList("GET", "POST","OPTIONS","DELETE","PUT");
-    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization","XSRF-TOKEN");
-    @Value("${spring.security.fe-url}")
-    private String FE_url;
-    // system variable is dynamic data, therefore it cannot be used as allowed origin
-    @Value("${spring.security.be-url}")
-    private String BE_url;
-    private final List<String> allowedOrigins = Arrays.asList("https://192.168.1.106:3000","https://localhost:3000");
+    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization","XSRF-TOKEN", "Accept");
+    @Value("${security.cors.origins}")
+    private final List<String> allowedOrigins = Collections.emptyList();
+
     AuthFilter authFilter;
 
     @Autowired
@@ -54,19 +52,20 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers(HttpMethod.POST,"/authorized/user/passwordReset").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/authorized/user/updateData").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/authorized/user/getUserData").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/authorized/generateTraining").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/authorized/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/unauthorized/trainJ48").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/unauthorized/getExerciseTags").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/unauthorized/getFoodTags").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/unauthorized/getTimingTags").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/unauthorized/getExercise/{id}").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/privileged/addExercise").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/unauthorized/user/login").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/unauthorized/user/register").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/user/passwordReset").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/user/updateData").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/user/getUserData").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/generateTraining").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/utrainJ48").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/getExerciseTags").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/getFoodTags").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/getTimingTags").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/getExercise/{id}").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/addExercise").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/user/register").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/language/switch").permitAll()
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(authFilter, BasicAuthenticationFilter.class);

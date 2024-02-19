@@ -6,9 +6,11 @@ import cz.uhk.fim.project.bakalarka.enumerations.RunCategory;
 import cz.uhk.fim.project.bakalarka.enumerations.SwimmingStyle;
 import cz.uhk.fim.project.bakalarka.enumerations.Tag_Exercise;
 import cz.uhk.fim.project.bakalarka.model.*;
-import cz.uhk.fim.project.bakalarka.request.ExerciseRequest;
+import cz.uhk.fim.project.bakalarka.DTO.ExerciseDTO;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import cz.uhk.fim.project.bakalarka.util.MultiPartFileConverter;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,25 +20,27 @@ import java.util.*;
 
 @Service
 public class ExerciseService {
-    ExerciseRepository exerciseRepository;
-    GymWorkoutRepository gymWorkoutRepository;
-    RunRepository runRepository;
-    SwimmingRepository swimmingRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final GymWorkoutRepository gymWorkoutRepository;
+    private final RunRepository runRepository;
+    private final SwimmingRepository swimmingRepository;
 
-    PictureRepository pictureRepository;
-    TagRepository tagRepository;
+    private final PictureRepository pictureRepository;
+    private final TagRepository tagRepository;
+    private final MessageSource messageSource;
     MultiPartFileConverter multiPartFileConverter = new MultiPartFileConverter();
 
-    public ExerciseService(ExerciseRepository exerciseRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, PictureRepository pictureRepository, TagRepository tagRepository) {
+    public ExerciseService(ExerciseRepository exerciseRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, PictureRepository pictureRepository, TagRepository tagRepository, MessageSource messageSource) {
         this.exerciseRepository = exerciseRepository;
         this.gymWorkoutRepository = gymWorkoutRepository;
         this.runRepository = runRepository;
         this.swimmingRepository = swimmingRepository;
         this.pictureRepository = pictureRepository;
         this.tagRepository = tagRepository;
+        this.messageSource = messageSource;
     }
 
-    public ResponseEntity<?> addNewExercise(ExerciseRequest exerciseRequest, MultipartFile multipartFile) {
+    public ResponseEntity<?> addNewExercise(ExerciseDTO exerciseRequest, MultipartFile multipartFile) {
         try {
             System.out.println(Arrays.toString(multipartFile.getBytes()));
         } catch (IOException e) {
@@ -80,7 +84,7 @@ public class ExerciseService {
                         multipartFile);
             }
         }
-        return MessageHandler.error("Failed to add a new exercise");
+        return MessageHandler.error(messageSource.getMessage("error.exercise.failedToAdd", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> getExercise(long id) throws IOException {
@@ -105,7 +109,7 @@ public class ExerciseService {
 
             if (g.isPresent()) {
                 GymWorkout gymWorkout = g.get();
-                ExerciseRequest exerciseRequest = new ExerciseRequest(
+                ExerciseDTO exerciseRequest = new ExerciseDTO(
                         exercise.getName(),
                         exercise.getName_eng(),
                         exercise.getDescription(),
@@ -118,7 +122,7 @@ public class ExerciseService {
                 return MessageHandler.success(exerciseRequest.toString());
             } else if (r.isPresent()) {
                 Run run = r.get();
-                ExerciseRequest exerciseRequest = new ExerciseRequest(
+                ExerciseDTO exerciseRequest = new ExerciseDTO(
                         exercise.getName(),
                         exercise.getName_eng(),
                         exercise.getDescription(),
@@ -131,7 +135,7 @@ public class ExerciseService {
                 return MessageHandler.success(exerciseRequest.toString());
             } else if (s.isPresent()) {
                 Swimming swimming = s.get();
-                ExerciseRequest exerciseRequest = new ExerciseRequest(
+                ExerciseDTO exerciseRequest = new ExerciseDTO(
                         exercise.getName(),
                         exercise.getName_eng(),
                         exercise.getDescription(),
@@ -144,27 +148,28 @@ public class ExerciseService {
             }
 
         }
-        return MessageHandler.error("invalid exercise ID");
+        return MessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
-        Exercise exercise = createExercise(multipartFile,name,description,name_eng,description_eng,tags);
+        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
         runRepository.save(run);
-        return MessageHandler.success("Exercise saved successfully");
+        return MessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
     }
+
     public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
-        Exercise exercise = createExercise(multipartFile,name,description,name_eng,description_eng,tags);
+        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         gymWorkoutRepository.save(gymWorkout);
-        return MessageHandler.success("Exercise saved successfully");
+        return MessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
-        Exercise exercise = createExercise(multipartFile,name,description,name_eng,description_eng,tags);
+        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
         swimmingRepository.save(swimming);
-        return MessageHandler.success("Exercise saved successfully");
+        return MessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
     }
 
     public void handleTags(List<String> tags, Exercise exercise) {
@@ -204,7 +209,7 @@ public class ExerciseService {
         }
     }
 
-    public Exercise createExercise(MultipartFile multipartFile, String name, String description, String name_eng, String description_eng, List<String> tags){
+    public Exercise createExercise(MultipartFile multipartFile, String name, String description, String name_eng, String description_eng, List<String> tags) {
         byte[] pictureData = handlePicture(multipartFile);
         Picture picture = new Picture(pictureData);
         pictureRepository.save(picture);

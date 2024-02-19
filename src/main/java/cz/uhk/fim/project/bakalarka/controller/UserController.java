@@ -1,7 +1,10 @@
 package cz.uhk.fim.project.bakalarka.controller;
 
+import cz.uhk.fim.project.bakalarka.DTO.UserDTO;
 import cz.uhk.fim.project.bakalarka.model.User;
-import cz.uhk.fim.project.bakalarka.request.ChangePasswordRequest;
+import cz.uhk.fim.project.bakalarka.DTO.ChangePasswordDTO;
+import cz.uhk.fim.project.bakalarka.util.AuthorizationCheck;
+import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "unauthorized/user/login", consumes = {"application/json"})
+    @PostMapping(value = "user/login", consumes = {"application/json"})
     public ResponseEntity<?> loginUser(@RequestBody User user) {
         return userService.login(
                 user.getEmail(),
@@ -30,20 +33,14 @@ public class UserController {
         );
     }
 
-    @PostMapping(value = "unauthorized/user/register", consumes = {"application/json"})
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
+    @PostMapping(value = "user/register", consumes = {"application/json"})
+    public ResponseEntity<?> registerUser(@RequestBody UserDTO user) {
         log.info(user);
-        userService.generateUserStats(user);
-        return userService.register(
-                user.getEmail(),
-                user.getNickname(),
-                user.getPassword(),
-                user.getDateOfBirth(),
-                user.getSex()
-        );
+        return userService.register(user);
     }
-    @PostMapping(value = "authorized/user/passwordReset", consumes = {"application/json"})
-    public ResponseEntity<?> newPassword(@RequestBody ChangePasswordRequest changePasswordRequest){
+    @PostMapping(value = "user/passwordReset", consumes = {"application/json"})
+    public ResponseEntity<?> newPassword(@RequestBody ChangePasswordDTO changePasswordRequest, HttpServletRequest request){
+        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
         return userService.changePassword(
                 changePasswordRequest.getUserId(),
                 changePasswordRequest.getOldPassword(),
@@ -51,19 +48,22 @@ public class UserController {
         );
     }
 
-    @PostMapping(value = "authorized/user/generateStats")
-    public ResponseEntity<?> generateStats(HttpServletRequest httpServletRequest){
-        String header = httpServletRequest.getHeader("Authorization");
+    @PostMapping(value = "user/generateStats")
+    public ResponseEntity<?> generateStats(HttpServletRequest request){
+        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        String header = request.getHeader("Authorization");
         return userService.generateUserStats(header);
     }
-    @PostMapping(value = "authorized/user/updateData",consumes = {"application/json"})
-    public ResponseEntity<?> updateData(@RequestBody User user, HttpServletRequest httpServletRequest){
-        return userService.updateData(user, httpServletRequest);
+    @PostMapping(value = "user/updateData",consumes = {"application/json"})
+    public ResponseEntity<?> updateData(@RequestBody User user, HttpServletRequest request){
+        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        return userService.updateData(user, request);
 
     }
-    @GetMapping(value= "authorized/user/getUserData")
-    public ResponseEntity<?> getUserData(HttpServletRequest httpServletRequest){
-        String header = httpServletRequest.getHeader("Authorization");
+    @GetMapping(value= "user/getUserData")
+    public ResponseEntity<?> getUserData(HttpServletRequest request){
+        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        String header = request.getHeader("Authorization");
         return userService.getUserData(header);
     }
 

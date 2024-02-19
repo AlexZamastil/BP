@@ -1,58 +1,58 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Container} from '@mui/system';
 import { Paper } from '@mui/material';
 import {TextField,Button} from '@mui/material';
 import {useNavigate} from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import {callAPINoAuth} from './CallAPI';
+import getXSRFtoken from './XSRF_token';
 
 export default function Login(){
 
   const navigate = useNavigate();
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState(null);
+  const [email, setEmail] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const [csrfToken,setCsrfToken] = useState("") 
 
   const {t} = useTranslation();
 
-  useEffect(() => {
-    const xsrfToken = getCookie('XSRF-TOKEN');
-    setCsrfToken(xsrfToken);
-    console.log(csrfToken);
-  },[])
+ const xsrfToken = getXSRFtoken();
 
-
-    
   const logInRequest =(e)=>{
     e.preventDefault();
-  
-   fetch(process.env.REACT_APP_BACKEND_API_URL+"/unauthorized/user/login",{
-        method:"POST",
-        headers:{
-           'X-XSRF-TOKEN': csrfToken ,
-            "Content-Type":"application/json"},credentials : "include",
-            
-            body : JSON.stringify({
-                email : email,
-                password : password
-            })
-        }).then(async(response)=>{
-          
-          if (response.status === 200){
-            console.log('Logged in successfully')
-            const token = await response.text();
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', email);
-            console.log("redirect to profile");
+
+    const data = JSON.stringify({
+      email : email,
+      password : password
+  })
+
+    callAPINoAuth("POST","user/login",data,xsrfToken)
+    .then(response => {
+      if (response.status === 200) {
+          console.log('Logged in successfully');
+          const token = response.data;
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', email);
+          console.log("redirect to profile");
           navigate("/profile");
-          } else{const errorResponse = await response.text();
-            setErrorMessage(errorResponse);
-            console.error('Login failed:', errorResponse);
-            console.log(csrfToken);
-          }}).catch(error => {
-          console.error('Error occurred during login:', error);
-          setErrorMessage('An error occurred during login');
-        })
+      } else {
+          throw new Error('Login failed');
+      }
+  })
+  .catch(error => {
+      let errorMessage = 'An error occurred during login';
+      if (error.response) {
+          errorMessage = error.response.data || errorMessage;
+          console.error('Login failed:', errorMessage);
+      } else if (error.request) {
+          console.error('No response received:', error.request);
+      } else {
+          console.error('Error occurred during login:', error.message);
+      }
+      setErrorMessage(errorMessage);
+      console.error("Login failed", error);
+  });
+    
    }
 
     
@@ -85,16 +85,6 @@ export default function Login(){
       </div>
      
     )
-    function getCookie(name) {
-      const cookies = document.cookie.split(';');
-      for (const cookie of cookies) {
-          const [cookieName, cookieValue] = cookie.trim().split('=');
-          if (cookieName === name) {
-              return cookieValue;
-          }
-      }
-      return null;
-  }
 }
 
 

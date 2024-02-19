@@ -2,11 +2,14 @@ package cz.uhk.fim.project.bakalarka.service;
 
 
 import cz.uhk.fim.project.bakalarka.DAO.UserStatsRepository;
-import cz.uhk.fim.project.bakalarka.enumerations.Sex;
+import cz.uhk.fim.project.bakalarka.DTO.UserDTO;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,7 +18,6 @@ import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.DAO.UserRepository;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -27,56 +29,82 @@ public class UserService {
     private final UserStatsRepository userStatsRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailValidator emailValidator;
+    private final MessageSource messageSource;
 
-    public UserService(UserRepository userRepository, UserStatsRepository userStatsRepository, JWTUtils jwtUtils, PasswordEncoder passwordEncoder) {
+    private boolean isValidNickname(String nickname) {
+        return nickname.matches("^[a-zA-Z0-9]{5,20}$");
+    }
+
+    public UserService(UserRepository userRepository, UserStatsRepository userStatsRepository, JWTUtils jwtUtils, PasswordEncoder passwordEncoder, MessageSource messageSource) {
         this.userRepository = userRepository;
         this.jwtUtils = jwtUtils;
         this.userStatsRepository = userStatsRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailValidator = EmailValidator.getInstance();
+        this.messageSource = messageSource;
     }
 
     public ResponseEntity<?> login(String email, String password) {
-        System.out.println("X");
-        User authUser = userRepository.findUserByEmail(email);
-        System.out.println(email);
-        if (authUser == null) {
-            return MessageHandler.error("User not found");
-        }
-
-        if (passwordEncoder.matches(password, authUser.getPassword())) {
-            String jwtToken = jwtUtils.generateJWToken(authUser.getId());
-            authUser.setToken(jwtToken);
-            userRepository.save(authUser);
-
-            return MessageHandler.success(jwtToken);
-        } else return MessageHandler.error("Wrong password");
-
+        System.out.println(LocaleContextHolder.getLocale());
+        if (email == null || email.equals("") || password == null || password.equals(""))
+            return MessageHandler.error(messageSource.getMessage("error.login.null", null, LocaleContextHolder.getLocale()));
+        if (userRepository.findUserByEmail(email) != null) {
+            User authUser = userRepository.findUserByEmail(email);
+            if (passwordEncoder.matches(password, authUser.getPassword())) {
+                String jwtToken = jwtUtils.generateJWToken(authUser.getId());
+                authUser.setToken(jwtToken);
+                userRepository.save(authUser);
+                return MessageHandler.success(jwtToken);
+            } else
+                return MessageHandler.error(messageSource.getMessage("error.password.wrong", null, LocaleContextHolder.getLocale()));
+        } else
+            return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> changePassword(Long ID, String oldPassword, String newPassword) {
         User user = userRepository.findUserById(ID);
         if (Objects.equals(oldPassword, newPassword)) {
-            return MessageHandler.error("New password must be different");
+            return MessageHandler.error(messageSource.getMessage("error.password.same", null, LocaleContextHolder.getLocale()));
         }
         if (Objects.equals(user.getPassword(), oldPassword)) {
             user.setPassword(newPassword);
             userRepository.save(user);
-            return MessageHandler.success("Password was successfully changed");
-        } else return MessageHandler.error("Wrong password");
+            return MessageHandler.success(messageSource.getMessage("success.password.changed", null, LocaleContextHolder.getLocale()));
+        } else
+            return MessageHandler.error(messageSource.getMessage("error.password.wrong", null, LocaleContextHolder.getLocale()));
     }
 
-    public ResponseEntity<?> register(String email, String nickname, String password, LocalDate birthdate, Sex sex) {
-        if (userRepository.findUserByEmail(email) != null) {
-            return MessageHandler.error("Account using this email already exist");
-        } else if (!emailValidator.isValid(email)) {
-            return MessageHandler.error("The entered text is not a valid email address");
-        } else {
-            String encryptedPassword = passwordEncoder.encode(password);
-            User user = new User(email, nickname, encryptedPassword, birthdate, sex);
-            userRepository.save(user);
-            return MessageHandler.success("Account created successfully");
+    public ResponseEntity<?> register(UserDTO userDTO) {
+        if (StringUtils.isBlank(userDTO.getEmail()) ||
+                StringUtils.isBlank(userDTO.getNickname()) ||
+                StringUtils.isBlank(userDTO.getPassword()) ||
+                userDTO.getDateOfBirth() == null ||
+                userDTO.getSex() == null)
+            return MessageHandler.error(messageSource.getMessage("error.register.nullValue", null, LocaleContextHolder.getLocale()));
+
+        if (!emailValidator.isValid(userDTO.getEmail())) {
+            return MessageHandler.error(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
         }
+        if (userRepository.findUserByEmail(userDTO.getEmail()) != null) {
+            return MessageHandler.error(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
+        }
+        if (!isValidNickname(userDTO.getNickname())) {
+            return MessageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
+        }
+        if(userDTO.getPassword().length() < 8) return MessageHandler.error(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
+
+        String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
+        User user = new User(userDTO.getEmail(), userDTO.getNickname(), encryptedPassword, userDTO.getDateOfBirth(), userDTO.getSex());
+        user.setPassword(encryptedPassword);
+        try {
+            userRepository.save(user);
+            generateUserStats(user);
+        } catch (Exception e) {
+            return MessageHandler.error(messageSource.getMessage("error.register.dbs.failed", null, LocaleContextHolder.getLocale()));
+
+        }
+        return MessageHandler.success(messageSource.getMessage("success.register.done", null, LocaleContextHolder.getLocale()));
+
     }
 
     public ResponseEntity<?> getUserData(String header) {
@@ -89,29 +117,17 @@ public class UserService {
                 userWithStats.put("userstats", userStats);
 
                 return ResponseEntity.ok(userWithStats);
-            } else return MessageHandler.error("no user found");
-        } else return MessageHandler.error("invalid header");
+            } else
+                return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+        } else
+            return MessageHandler.error(messageSource.getMessage("error.header.invalid", null, LocaleContextHolder.getLocale()));
 
 
     }
 
     public ResponseEntity<?> generateUserStats(String header) {
         User user = userRepository.findUserById(jwtUtils.getID(header).asLong());
-        if (user != null) {
-            UserStats userStats = userStatsRepository.findUserStatsByUser(user);
-            if (userStats != null) {
-                userStats.setBmi(user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100));
-                userStats.setWaterneeded(0.033 * user.getWeight());
-                userStatsRepository.save(userStats);
-                System.out.println("USER UPDATED" + userStats.getUser());
-                return MessageHandler.success("values updated into database");
-            } else {
-                UserStats userStats2 = new UserStats(user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100), 0.033 * user.getWeight(), user);
-                userStatsRepository.save(userStats2);
-                System.out.println("USER UPDATED" + userStats2.getUser());
-                return MessageHandler.success("values inserted into database");
-            }
-        } else return MessageHandler.error("invalid user ID");
+        return generateUserStats(user);
     }
 
     public ResponseEntity<?> generateUserStats(User user) {
@@ -121,17 +137,14 @@ public class UserService {
                 userStats.setBmi(user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100));
                 userStats.setWaterneeded(0.033 * user.getWeight());
                 userStatsRepository.save(userStats);
-                System.out.println("USER UPDATED" + userStats.getUser());
                 return MessageHandler.success("values updated into database");
             } else {
                 UserStats userStats2 = new UserStats(user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100), 0.033 * user.getWeight(), user);
                 userStatsRepository.save(userStats2);
-                System.out.println("USER UPDATED" + userStats2.getUser());
                 return MessageHandler.success("values inserted into database");
             }
         } else return MessageHandler.error("invalid user ID");
     }
-
 
 
     public ResponseEntity<?> updateData(User user, HttpServletRequest httpServletRequest) {
@@ -139,15 +152,13 @@ public class UserService {
             User user2 = userRepository.findUserById(user.getId());
             user.setId(user2.getId());
             userRepository.save(user);
-            System.out.println("Updated user: " + user);
 
             generateUserStats(httpServletRequest.getHeader("Authorization"));
 
-            return MessageHandler.success("User updated");
+            return MessageHandler.success(messageSource.getMessage("success.user.updated", null, LocaleContextHolder.getLocale()));
         }
-        return MessageHandler.error("user not found");
+        return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
 
     }
-
 
 }

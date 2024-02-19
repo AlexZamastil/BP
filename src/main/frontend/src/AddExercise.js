@@ -1,206 +1,178 @@
-import { Paper, Button, TextField} from '@mui/material';
+import { Paper, Button, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Container} from '@mui/system';
-import InputLabel from '@mui/material/InputLabel';
+import { Container } from '@mui/system';
+import { FormHelperText } from '@mui/material';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import axios from 'axios';
+import getXSRFtoken from './XSRF_token';
+import { callAPI, callAPIMultipartFile, callAPINoAuth } from './CallAPI';
 
-export default function AddExercise(){
-  const [name,setName] = useState(null);
-  const [name_eng,setName_eng] = useState(null);
-  const [description,setDescription] = useState(null);
-  const [description_eng,setDescription_eng] = useState(null);
-  const [type,setType] = useState(null);
-  const [category,setCategory] = useState(null);
-  const [style,setStyle] = useState(null);
-  const [length,setLength] = useState(null);
-  const [series,setSeries] = useState(null);
-  const [repetitions,setRepetitions] = useState(null);
-  const [tags,setTags] = useState([]);
+export default function AddExercise() {
+  const [name, setName] = useState(null);
+  const [name_eng, setName_eng] = useState(null);
+  const [description, setDescription] = useState(null);
+  const [description_eng, setDescription_eng] = useState(null);
+  const [type, setType] = useState(null);
+  const [category, setCategory] = useState(null);
+  const [style, setStyle] = useState(null);
+  const [length, setLength] = useState(null);
+  const [series, setSeries] = useState(null);
+  const [repetitions, setRepetitions] = useState(null);
+  const [tags, setTags] = useState([]);
   const [picture, setPicture] = useState(null);
   const [exerciseType, setExerciseType] = useState('');
 
-  //const [userStats,setUserStats] = useState([]);
-
-  const [selectedFile,setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const [exerciseTags, setExerciseTags] = useState([]); 
-
-  const [csrfToken,setCsrfToken] = useState("");
+  const [exerciseTags, setExerciseTags] = useState([]);
 
   const handleExerciseTypeChange = (selectedType) => {
     setExerciseType(selectedType);
   };
 
-  useEffect((csrfToken) => {
-    const xsrfToken = getCookie('XSRF-TOKEN');
-    setCsrfToken(xsrfToken);
-    console.log(csrfToken);
-  },[])
-  
-    useEffect(() => {
-      axios.get(process.env.REACT_APP_BACKEND_API_URL+"/authorized/user/getUserData", {
-        headers: {
-            'Authorization': localStorage.getItem("token")
-        }
-    })
-    .then(async (response) => {
-        const userData = response.data;
-        // setUserStats(userData);
-        setIsAdmin((userData.user.role == "ADMIN"));
-    })
+  const xsrfToken = getXSRFtoken();
+
+  callAPI("GET", "user/getUserData", null, null)
+    .then(async response => {
+      const userData = response.data;
+      setIsAdmin((userData.user.role === "ADMIN"));
+    }
+    )
     .catch(error => {
-        console.error(error);
-    });
-    }, []);
+      console.log(error);
+    })
 
-    useEffect(() => {
-      fetch(process.env.REACT_APP_BACKEND_API_URL+"/unauthorized/getExerciseTags", {
-        method: "GET",
-        headers: {
-          'Authorization': ""
-        }
-      })
+  useEffect(() => {
+    callAPINoAuth("GET", "tag/getExerciseTags", null, null)
       .then(async (response) => {
-        if (response.ok) {
-          const exerciseTagsText = await response.text();
-          const exerciseTagsArray = exerciseTagsText
-            .slice(1, -1) 
-            .split(', ')
-            .map((item) => item.trim()); 
-  
-          console.log(exerciseTagsArray);
-          setExerciseTags(exerciseTagsArray);
-        } else {
-          console.error("Failed to fetch exercise tags");
-        }
+        const exerciseTagsText = response.data;
+        const exerciseTagsArray = exerciseTagsText
+          .slice(1, -1)
+          .split(', ')
+          .map((item) => item.trim());
+        console.log(exerciseTagsArray);
+        setExerciseTags(exerciseTagsArray);
       })
-      .catch(error => {
+      .catch(async (error) => {
+        console.error("Failed to fetch exercise tags");
         console.error(error);
-      });
-    }, []);
+      })
+  }, [])
 
-    const addExercise = async (e) => {
-      e.preventDefault();
-    
- 
-      const formData = new FormData();
+  const addExercise = async (e) => {
+    e.preventDefault();
 
-      if (exerciseType == "RUN") {
-        formData.append('exerciseRequest', new Blob([JSON.stringify({
+    const formData = new FormData();
 
-          name: name,
-          name_eng: name_eng,
-          description: description,
-          description_eng: description_eng,
-          type: exerciseType,
-          length: length,
-          category: category,
-          tags: tags
-        })], { type: 'application/json' }));
+    if (exerciseType === "RUN") {
+      formData.append('exerciseRequest', new Blob([JSON.stringify({
 
-      } else if (exerciseType == "GYM") {
-        formData.append('exerciseRequest', new Blob([JSON.stringify({
+        name: name,
+        name_eng: name_eng,
+        description: description,
+        description_eng: description_eng,
+        type: exerciseType,
+        length: length,
+        category: category,
+        tags: tags
+      })], { type: 'application/json' }));
 
-          name: name,
-          name_eng: name_eng,
-          description: description,
-          description_eng: description_eng,
-          type: exerciseType,
-          series: series,
-          repetitions: repetitions,
-          tags: tags
-        })], { type: 'application/json' }));
+    } else if (exerciseType === "GYM") {
+      formData.append('exerciseRequest', new Blob([JSON.stringify({
 
-      } else if (exerciseType == "SWIMMING") {
-        formData.append('exerciseRequest', new Blob([JSON.stringify({
+        name: name,
+        name_eng: name_eng,
+        description: description,
+        description_eng: description_eng,
+        type: exerciseType,
+        series: series,
+        repetitions: repetitions,
+        tags: tags
+      })], { type: 'application/json' }));
 
-          name: name,
-          name_eng: name_eng,
-          description: description,
-          description_eng: description_eng,
-          type: exerciseType,
-          length: length,
-          style: style,
-          tags: tags
-        })], { type: 'application/json' }));
-      }
+    } else if (exerciseType === "SWIMMING") {
+      formData.append('exerciseRequest', new Blob([JSON.stringify({
 
-      formData.append('imageData', selectedFile);
-    
-      try {
-        const response = await fetch(process.env.REACT_APP_BACKEND_API_URL+"/privileged/addExercise", {
-          method: "POST",
-          headers: {
-            'Authorization': localStorage.getItem("token"),
-            'X-XSRF-TOKEN': csrfToken 
-          },credentials : "include",
-          body: formData 
-        });
-    
-        if (response.ok) {
-          const responseBody = await response.text();
+        name: name,
+        name_eng: name_eng,
+        description: description,
+        description_eng: description_eng,
+        type: exerciseType,
+        length: length,
+        style: style,
+        tags: tags
+      })], { type: 'multipart' }));
+    }
+
+    formData.append('imageData', selectedFile, {type: 'multipart/form-data'});
+
+    try {
+      callAPIMultipartFile("POST", "exercise/addExercise", formData, xsrfToken)
+        .then((response) => {
+          const responseBody = response.data;
           console.log(responseBody);
-        } else {
-          console.error("Request failed with status:", response.status);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-    const handleImageChange = (e) => {
-       setSelectedFile(e.target.files[0])    
-      if (selectedFile) {
-        const reader = new FileReader();
-    
-        reader.onload = (e) => {
-          const base64Data = e.target.result;
-          setPicture(base64Data);
-  
-          addExercise(e, base64Data);
-        };
-    
-        reader.readAsDataURL(selectedFile);
-      }
-    };
+        })
+        .catch((error) => {
+          console.error("Request failed with status:", error);
+        })
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
+  const handleImageChange = (e) => {
+    setSelectedFile(e.target.files[0])
+    if (selectedFile) {
+      const reader = new FileReader();
 
+      reader.onload = (e) => {
+        const base64Data = e.target.result;
+        setPicture(base64Data);
+      };
 
+      reader.readAsDataURL(selectedFile);
+    }
+  };
 
-    const renderExerciseForm = () => {
-      switch (exerciseType) {
-        case 'RUN':
-          return ( 
+  const renderExerciseForm = () => {
+    switch (exerciseType) {
+      case 'RUN':
+        return (
           <>
             <TextField
-            style={{ margin: '10px auto' }}
-            sx={{ m: 1, width: '25ch' }}
-            id="outlined-basic"
-            label="length (m)"
-            variant="outlined"
-            fullWidth
-            value={length}
-            onChange={(e) => setLength(e.target.value)}
-          />
-          <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="category_style"
-                   variant="outlined"
-                   fullWidth
-                   value={category}
-                   onChange={(e) => setCategory(e.target.value)}
-                 />
+              style={{ margin: '10px auto' }}
+              sx={{ m: 1, width: '25ch' }}
+              id="outlined-basic"
+              label="length (m)"
+              variant="outlined"
+              fullWidth
+              value={length}
+              onChange={(e) => setLength(e.target.value)}
+            />
+            <FormHelperText>Run category</FormHelperText>
+            <Select
+              style={{ margin: '10px auto' }}
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={category}
+              label="category"
+              sx={{ m: 1, width: '25ch' }}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <MenuItem value={"INTERVALS"}>Intervals</MenuItem>
+              <MenuItem value={"TEMPO"}>tempo</MenuItem>
+              <MenuItem value={"UPHILL"}>uphill</MenuItem>
+              <MenuItem value={"ENDURANCE"}>endurance</MenuItem>
+              <MenuItem value={"SPRINT"}>sprint</MenuItem>
+            </Select>
 
-            </>
-          );
-        case 'GYM':
-          return (
-            <> <TextField
+          </>
+        );
+      case 'GYM':
+        return (
+          <> <TextField
             style={{ margin: '10px auto' }}
             sx={{ m: 1, width: '25ch' }}
             id="outlined-basic"
@@ -210,104 +182,114 @@ export default function AddExercise(){
             value={repetitions}
             onChange={(e) => setRepetitions(e.target.value)}
           />
-           <TextField
-            style={{ margin: '10px auto' }}
-            sx={{ m: 1, width: '25ch' }}
-            id="outlined-basic"
-            label="series"
-            variant="outlined"
-            fullWidth
-            value={series}
-            onChange={(e) => setSeries(e.target.value)}
-          /></>
-          );
-        case 'SWIMMING':
-          return (
-            <>
-             <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="category_style"
-                   variant="outlined"
-                   fullWidth
-                   value={style}
-                   onChange={(e) => setStyle(e.target.value)}
-                 />
-            
             <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="length (m)"
-                   variant="outlined"
-                   fullWidth
-                   value={length}
-                   onChange={(e) => setLength(e.target.value)}
-                 />
-            </>
-          );
-        default:
-          return null;
-      }
-    };
+              style={{ margin: '10px auto' }}
+              sx={{ m: 1, width: '25ch' }}
+              id="outlined-basic"
+              label="series"
+              variant="outlined"
+              fullWidth
+              value={series}
+              onChange={(e) => setSeries(e.target.value)}
+            /></>
+        );
+      case 'SWIMMING':
+        return (
+          <>
 
-    return (
-        <div>
-          {isAdmin !== undefined ? ( 
-            isAdmin ? (
-                <Container>
-                <Paper elevation={3} className='paper'>
-               <form noValidate autoComplete="off">
-                 <h1>Add exercise</h1>
-           
-                 <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="Name"
-                   variant="outlined"
-                   fullWidth
-                   value={name}
-                   onChange={(e) => setName(e.target.value)}
-                 />
-           
-                 <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="Name_eng"
-                   variant="outlined"
-                   fullWidth
-                   value={name_eng}
-                   onChange={(e) => setName_eng(e.target.value)}
-                 />
-           
-                 <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="description"
-                   variant="outlined"
-                   fullWidth
-                   value={description}
-                   onChange={(e) => setDescription(e.target.value)}
-                 />
-           
-                  <TextField
-                   style={{ margin: '10px auto' }}
-                   sx={{ m: 1, width: '25ch' }}
-                   id="outlined-basic"
-                   label="description_eng"
-                   variant="outlined"
-                   fullWidth
-                   value={description_eng}
-                   onChange={(e) => setDescription_eng(e.target.value)}
-                 />
+            <TextField
+              style={{ margin: '10px auto' }}
+              sx={{ m: 1, width: '25ch' }}
+              id="outlined-basic"
+              label="length (m)"
+              variant="outlined"
+              fullWidth
+              value={length}
+              onChange={(e) => setLength(e.target.value)}
+            />
+
+            <FormHelperText>Swimming style</FormHelperText>
+            <Select
+              style={{ margin: '10px auto' }}
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={style}
+              label="style"
+              sx={{ m: 1, width: '25ch' }}
+              onChange={(e) => setStyle(e.target.value)}
+            >
+              <MenuItem value={"BREASTSSTROKE"}>breasts stroke</MenuItem>
+              <MenuItem value={"BUTTERFLYSTROKE"}>butterfly stroke</MenuItem>
+              <MenuItem value={"BACKSTROKE"}>back stroke</MenuItem>
+              <MenuItem value={"FRONTCRAWLSTROKE"}>front crawl stroke</MenuItem>
+            </Select>
 
 
-                <InputLabel id="demo-simple-select-label"> Exercise type </InputLabel>
-                  <Select
+
+
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      {isAdmin !== undefined ? (
+        isAdmin ? (
+          <Container>
+            <Paper elevation={3} className='paper'>
+              <form noValidate autoComplete="off">
+                <h1>Add exercise</h1>
+
+                <TextField
+                  style={{ margin: '10px auto' }}
+                  sx={{ m: 1, width: '25ch' }}
+                  id="outlined-basic"
+                  label="Name"
+                  variant="outlined"
+                  fullWidth
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+
+                <TextField
+                  style={{ margin: '10px auto' }}
+                  sx={{ m: 1, width: '25ch' }}
+                  id="outlined-basic"
+                  label="Name_eng"
+                  variant="outlined"
+                  fullWidth
+                  value={name_eng}
+                  onChange={(e) => setName_eng(e.target.value)}
+                />
+
+                <TextField
+                  style={{ margin: '10px auto' }}
+                  sx={{ m: 1, width: '25ch' }}
+                  id="outlined-basic"
+                  label="description"
+                  variant="outlined"
+                  fullWidth
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+
+                <TextField
+                  style={{ margin: '10px auto' }}
+                  sx={{ m: 1, width: '25ch' }}
+                  id="outlined-basic"
+                  label="description_eng"
+                  variant="outlined"
+                  fullWidth
+                  value={description_eng}
+                  onChange={(e) => setDescription_eng(e.target.value)}
+                />
+
+
+                <FormHelperText>Exercise type</FormHelperText>
+                <Select
                   style={{ margin: '10px auto' }}
                   sx={{ m: 1, width: '25ch' }}
                   select
@@ -324,85 +306,75 @@ export default function AddExercise(){
 
                 {renderExerciseForm()}
 
-                  <TagSelection pool={exerciseTags} maxSelection={2}/>
-                  <br/>
+                <TagSelection pool={exerciseTags} maxSelection={2} />
+                <br />
 
                 <input
-                 type="file"
-                 accept="image/*" 
-                 enctype='multipart/form-data'
-                 onChange={handleImageChange}
-                 />
+                  type="file"
+                  accept="image/*"
+                  enctype='multipart/form-data'
+                  onChange={handleImageChange}
+                />
 
-                   {picture && (
+                {picture && (
                   <div>
-                  <h3>Preview:</h3>
-                  <img src={picture} alt="Selected" style={{ maxWidth: '100%' }} />
-                </div>
-              )}
-   
+                    <h3>Preview:</h3>
+                    <img src={picture} alt="Selected" style={{ maxWidth: '100%' }} />
+                  </div>
+                )}
 
-                 <Button variant="contained" onClick={addExercise}> Submit </Button>
-               </form>
-               </Paper>
-             </Container>
-            ) : (
-              <p>Admin only</p>
-            )
-          ) : (
-            <p>Loading...</p>
-          )}
-        </div>
-      );
 
-      function TagSelection({pool}) {
-      
-        const handleTagSelection = (tag) => {
-          setTags((prevSelectedTags) => {
-            if (prevSelectedTags.includes(tag)) {
-              return prevSelectedTags.filter((item) => item !== tag);
-            } else {
-              return [...prevSelectedTags, tag];
-            }
-          });
-        };
-      
-        console.log(tags);
-      
-        return (
-          <div>
-            <h1>Tag Selection</h1> <br/>
-            <ul>
-              {pool.map((tag) => (
-                <li className='listStyleTypeNone' key={tag}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={tags.includes(tag)}
-                      onChange={() => handleTagSelection(tag)}
-                    />
-                    {tag}
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      }
-      function getCookie(name) {
-        const cookies = document.cookie.split(';');
-        for (const cookie of cookies) {
-            const [cookieName, cookieValue] = cookie.trim().split('=');
-            if (cookieName === name) {
-                return cookieValue;
-            }
+                <Button variant="contained" onClick={addExercise}> Submit </Button>
+              </form>
+            </Paper>
+          </Container>
+        ) : (
+          <p>Admin only</p>
+        )
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
+  );
+
+  function TagSelection({ pool }) {
+
+    const handleTagSelection = (tag) => {
+      setTags((prevSelectedTags) => {
+        if (prevSelectedTags.includes(tag)) {
+          return prevSelectedTags.filter((item) => item !== tag);
+        } else {
+          return [...prevSelectedTags, tag];
         }
-        return null;
-    }
-    }
-    
-    
-    
-    
-    
- 
+      });
+    };
+
+    console.log(tags);
+
+    return (
+      <div>
+        <h1>Tag Selection</h1> <br />
+        <ul>
+          {pool.map((tag) => (
+            <li className='listStyleTypeNone' key={tag}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={tags.includes(tag)}
+                  onChange={() => handleTagSelection(tag)}
+                />
+                {tag}
+              </label>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+}
+
+
+
+
+

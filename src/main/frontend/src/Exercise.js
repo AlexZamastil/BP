@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
+import { callAPI } from './CallAPI';
 
-export default function Exercise(){
+export default function Exercise() {
     const { exerciseID } = useParams();
     const [exerciseData, setExerciseData] = useState([]);
-    useEffect(()=> {
-        fetch(process.env.REACT_APP_BACKEND_API_URL+"/unauthorized/getExercise/"+exerciseID, {
-            method: "GET"
-        }).then(async(response)=> {
-            setExerciseData(await response.text())
-        }).then(console.log(exerciseData))
-    },[])
+    useEffect(() => {
+        callAPI("GET", "exercise/getExercise/" + exerciseID, null, null)
+            .then(async (response) => {
+                setExerciseData(await response.text())
+            }).then(console.log(exerciseData))
+    }, [])
     return null
 }
