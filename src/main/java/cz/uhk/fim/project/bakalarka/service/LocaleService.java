@@ -25,8 +25,6 @@ public class LocaleService {
 
     public ResponseEntity<?> switchLanguage(String language, HttpServletRequest request, HttpServletResponse response) {
         if (language.contains("cs")) {
-            LocaleContextHolder.setLocale(Locale.FRANCE);
-            localeResolver.setLocale(request, response, Locale.FRANCE);
             Locale czech = new Locale.Builder().setLanguage("cs").setRegion("CZ").build();
             LocaleContextHolder.setLocale(czech);
             localeResolver.setLocale(request, response, czech);
