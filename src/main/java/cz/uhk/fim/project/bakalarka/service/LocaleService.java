@@ -27,6 +27,9 @@ public class LocaleService {
         if (language.contains("cs")) {
             LocaleContextHolder.setLocale(Locale.FRANCE);
             localeResolver.setLocale(request, response, Locale.FRANCE);
+            Locale czech = new Locale.Builder().setLanguage("cs").setRegion("CZ").build();
+            LocaleContextHolder.setLocale(czech);
+            localeResolver.setLocale(request, response, czech);
         } else
 
         if (language.contains("en")) {
