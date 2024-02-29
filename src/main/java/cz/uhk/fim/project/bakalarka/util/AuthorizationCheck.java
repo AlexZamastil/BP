@@ -6,6 +6,6 @@ import org.springframework.util.StringUtils;
 public class AuthorizationCheck {
     public static boolean hasAuthorization(HttpServletRequest request){
         String authorizationHeader = request.getHeader("Authorization");
-        return (!StringUtils.hasText(authorizationHeader));
+        return (StringUtils.hasText(authorizationHeader));
     }
 }
