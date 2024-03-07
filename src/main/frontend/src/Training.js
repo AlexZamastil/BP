@@ -44,6 +44,11 @@ export default function Training() {
                     );
             })
         })
+        .catch((error)=>{
+            if(error.response && error.response.data === "Token expired"){
+                navigate("/tokenExpired")
+           }
+        })
     }, [])
 
     function generateTraining(trainingType) {

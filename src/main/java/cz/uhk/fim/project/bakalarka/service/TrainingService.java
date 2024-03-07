@@ -42,13 +42,16 @@ public class TrainingService {
     private final TrainingRepository trainingRepository;
     private final MessageSource messageSource;
     private final UserStatsRepository userStatsRepository;
+
+    private final JWTUtils jwtUtils;
     public final double MAX_PERCENTAGE_INCREASE = 2.5;
 
-    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, UserStatsRepository userStatsRepository, MessageSource messageSource) {
+    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, UserStatsRepository userStatsRepository, MessageSource messageSource, JWTUtils jwtUtils) {
         this.userRepository = userRepository;
         this.trainingRepository = trainingRepository;
         this.userStatsRepository = userStatsRepository;
         this.messageSource = messageSource;
+        this.jwtUtils = jwtUtils;
     }
 
     public void trainModel() throws Exception {
@@ -220,7 +223,7 @@ public class TrainingService {
             System.out.println(test.getStatusCode() + " STATUS CODE");
             if (test.getStatusCode() == HttpStatus.OK) {
                 String token = httpServletRequest.getHeader("Authorization");
-                JWTUtils jwtUtils = new JWTUtils();
+
                 User user = userRepository.findUserById(jwtUtils.getID(token).asLong());
                 Training training = new Training(raceDay, goal, startDay, lengthOfRaceInMeters, user);
                 trainingRepository.save(training);

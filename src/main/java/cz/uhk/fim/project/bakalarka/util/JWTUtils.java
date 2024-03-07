@@ -6,12 +6,15 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Component
+@Log4j2
 public class JWTUtils {
 
     private final String secret = "SECRET";
@@ -20,10 +23,13 @@ public class JWTUtils {
     @Value("${spring.security.secret-var}")
     String secretVar;
 
+    public JWTUtils() {
+    }
+
 
     public String generateJWToken(Long userID) {
         String var = hashHandler.hashString(secretVar);
-        long expirationTimeMillis = 14400000;
+        long expirationTimeMillis =  604800000;
         Date expirationDate = new Date(System.currentTimeMillis() + expirationTimeMillis);
 
         JWTCreator.Builder jwtBuilder = JWT
@@ -80,14 +86,41 @@ public class JWTUtils {
 
         int claimSize = claims.size();
 
-        int numberOfClaims = 3;
-        return hashHandler.verifyHash(JWT
+        int numberOfClaims = 4;
+
+        if (!((claimSize == numberOfClaims) && (getOrg(token).asString().equals("UHK-FIM") && decodedJWT.getAlgorithm().equals("HS256")))) {
+            log.info("Token is invalid");
+            log.info("Claims: " + claimSize);
+            log.info(claims);
+            log.info("ORG: " + getOrg(token).asString());
+            log.info("algorhitm: " + decodedJWT.getAlgorithm());
+            return false;
+        }
+        if(!(hashHandler.verifyHash(JWT
                 .require(Algorithm.HMAC256(secret))
                 .build()
                 .verify(token)
                 .getClaim("var")
-                .asString(),secretVar) && (claimSize == numberOfClaims) && (getOrg(token).asString().equals("UHK-FIM") && decodedJWT.getAlgorithm().equals("HS256"));
+                .asString(),secretVar))){
+
+            log.info("Hash handler output: " + hashHandler.verifyHash(JWT
+                    .require(Algorithm.HMAC256(secret))
+                    .build()
+                    .verify(token)
+                    .getClaim("var")
+                    .asString(),secretVar));
+
+            log.info(JWT
+                    .require(Algorithm.HMAC256(secret))
+                    .build()
+                    .verify(token)
+                    .getClaim("var")
+                    .asString());
+            log.info(secretVar);
+
+            log.info("hash not matching");
+            return false;
+        }
+        return true;
     }
-
-
 }

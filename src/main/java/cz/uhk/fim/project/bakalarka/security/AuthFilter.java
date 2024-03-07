@@ -34,26 +34,33 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        log.info(request.getRequestURI());
-
         if (!StringUtils.hasText(request.getHeader("Authorization"))) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        try {
-            log.info(request.getHeader("Authorization"));
-            System.out.println(request.getHeader("Authorization"));
-            String token = request.getHeader("Authorization").replace("Bearer ", "");
+            log.info("JWT TOKEN " + request.getHeader("Authorization"));
+            String token = request.getHeader("Authorization");
             if (token.equals("")) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token empty");
+                log.info("Token empty");
+                return;
             }
             if (jwtUtils.isTokenExpired(token)) {
+
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expired");
+                log.info("Token expired");
+                return;
             }
             if (!jwtUtils.isTokenLegitimate(token)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token is not valid");
+                log.info("Token is not valid: " + token);
+                return;
             }
+        try {
             Claim userIDClaim = jwtUtils.getID(token);
             log.info(userIDClaim + " = User ID from jwtToken");
             User user = userRepository.findUserById(userIDClaim.asLong());

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { callAPI } from './CallAPI';
 
 export default function Exercise() {
+    const navigate = useNavigate()
     const { exerciseID } = useParams();
     const [exerciseData, setExerciseData] = useState([]);
     useEffect(() => {
@@ -10,6 +11,12 @@ export default function Exercise() {
             .then(async (response) => {
                 setExerciseData(await response.text())
             }).then(console.log(exerciseData))
+            .catch((error) => {
+                if(error.response && error.response.data === "Token expired"){
+                    navigate("/tokenExpired")
+               }
+            }
+            )
     }, [])
     return null
 }

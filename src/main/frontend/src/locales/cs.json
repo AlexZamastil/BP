@@ -10,7 +10,7 @@
     "welcomepage_text1" : "Bezplatná aplikace pro přípravu na závod",
     "welcomepage_text2" : "Překonej sám sebe, vytvoř si tréninkový plán na míru. Dostaň své tělo do životní formy",
     "welcomepage_text3" : "Vítej na webu. Jsme rádi, že jste si vybrali naší bezplatnou službu pro realizaci sportovní přípravy. Ať už jsi úplný nováček, nebo zaběhlý sportovec, naše aplikace ti pomůže v dosažení tvých cílu a zlepšení sportovního výkonu. Připrav se na parádní výkony a začni svou cestu k úspěchu právě teď! ",
-    "footertext1" : "Tento projekt je bakalářská práce. Poskytované informace jsou založeny na relevantních knihách a výzkumech. Vždy upřednostňujte své zdraví a bezpečí při konání aktivit. Tento projekt není určen pro osoby mladší 18 let nebo těhotné, či kojící ženy.",
+    "footertext1" : "Poskytované informace jsou založeny na relevantních knihách a výzkumech. Vždy upřednostňujte své zdraví a bezpečí při konání aktivit. Tento projekt není určen pro osoby mladší 18 let nebo těhotné, či kojící ženy.",
     "welcomepage_inspiration" : "EXCELUJ",
     "welcomepage_inspiration2" : "PŘEKONEJ",
     "welcomepage_inspiration3" : "ZLEPŠI",
@@ -22,5 +22,8 @@
     "submit" : "Potvrdit",
     "login_form" : "Přihlášení",
     "password" : "Heslo",
-    "admin_button" : "Nástroje administrátora"
+    "admin_button" : "Nástroje administrátora",
+    "copyright" : "©2024 Alex Zamastil - ",
+    "copyright2" : "Tento web slouží jako bakalářská práce a semestrální projekt předmětu TNPW2",
+    "token_expired" : "Platnost relace vypršela, přihlašte se prosím znovu"
     }

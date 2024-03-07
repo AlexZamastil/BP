@@ -4,18 +4,13 @@ import logo_transparent from "./sources/logo_transparent.png";
 import { Button } from "@mui/material";
 import { ButtonGroup } from "@mui/material";
 import i18next from "i18next";
-import { callAPINoAuth } from './CallAPI';
-import getXSRFtoken from './XSRF_token';
 
-export default function Navbar(props) {
+export default function Navbar() {
   const { t } = useTranslation();
-
-  const xsrfToken = getXSRFtoken();
 
   function changeLanguage(lng) {
     i18next.changeLanguage(lng);
-    localStorage.setItem("locale", lng);
-    callAPINoAuth("POST","language/switch",lng,xsrfToken)  
+    localStorage.setItem("Localization", lng); 
   }
 
  return (
@@ -35,7 +30,7 @@ export default function Navbar(props) {
 
           ) : (<>
             <CustomLink className="c-link" to="/training"> <p> {t("training")}</p> </CustomLink>
-            <CustomLink className="c-link" to="/profile"> <p>{props}</p> </CustomLink>
+            <CustomLink className="c-link" to="/profile"> <p>{t("profile")}</p> </CustomLink>
           </>
           )
           }

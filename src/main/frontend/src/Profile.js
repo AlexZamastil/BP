@@ -31,7 +31,7 @@ export default function Profile() {
 
   useEffect(() => {
     callAPI("GET", "user/getUserData", null, null)
-      .then(async (response) => response.data)
+      .then((response =>response.data))
       .then((userStats) => {
         setUserStats(userStats);
         console.log(userStats);
@@ -42,6 +42,14 @@ export default function Profile() {
             </Button>
           );
         }
+      })
+      .catch((error)=>{
+        console.log(error)
+        console.log(error.response)
+        console.log(error.response.data)
+        if(error.response && error.response.data === "Token expired"){
+          navigate("/tokenExpired")
+     }
       })
   }, [])
 

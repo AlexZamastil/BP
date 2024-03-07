@@ -6,8 +6,11 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import getXSRFtoken from './XSRF_token';
 import { callAPI, callAPIMultipartFile, callAPINoAuth } from './CallAPI';
+import { useNavigate } from 'react-router-dom';
 
 export default function AddExercise() {
+
+  const navigate = useNavigate()
   const [name, setName] = useState(null);
   const [name_eng, setName_eng] = useState(null);
   const [description, setDescription] = useState(null);
@@ -42,6 +45,9 @@ export default function AddExercise() {
     )
     .catch(error => {
       console.log(error);
+      if(error.response && error.response.data === "Token expired"){
+        navigate("/tokenExpired")
+   }
     })
 
   useEffect(() => {
@@ -58,6 +64,9 @@ export default function AddExercise() {
       .catch(async (error) => {
         console.error("Failed to fetch exercise tags");
         console.error(error);
+        if(error.response && error.response.data === "Token expired"){
+          navigate("/tokenExpired")
+     }
       })
   }, [])
 
@@ -119,6 +128,9 @@ export default function AddExercise() {
         })
     } catch (error) {
       console.error("Error:", error);
+      if(error.response && error.response.data === "Token expired"){
+              navigate("/tokenExpired")
+         }
     }
   };
 

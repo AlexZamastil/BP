@@ -25,6 +25,9 @@ export default function AdminTools(){
         })
         .catch(error => {
             console.error('Error fetching data:', error);
+            if(error.response && error.response.data === "Token expired"){
+              navigate("/tokenExpired")
+         }
         });
     }, []);
     

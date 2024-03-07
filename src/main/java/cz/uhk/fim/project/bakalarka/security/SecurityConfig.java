@@ -28,7 +28,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final List<String> allowedMethods = Arrays.asList("GET", "POST","OPTIONS","DELETE","PUT");
-    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization","XSRF-TOKEN", "Accept");
+    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization","XSRF-TOKEN", "Accept","Localization");
     @Value("${security.cors.origins}")
     private final List<String> allowedOrigins = Collections.emptyList();
 

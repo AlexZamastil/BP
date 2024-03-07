@@ -4,7 +4,7 @@ import { TextField, Button } from '@mui/material';
 import { Paper } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import InputAdornment from '@mui/material/InputAdornment';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -20,6 +20,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export default function GenerateTraining() {
+    const navigate = useNavigate()
     const { trainingType } = useParams();
     const timeZone = "UTC";
 
@@ -48,6 +49,11 @@ export default function GenerateTraining() {
 
     function generateTraining() {
         callAPI("POST", "training/generateTraining", JSON.stringify(trainingData), xsrfToken)
+        .catch((error)=>{
+            if(error.response && error.response.data === "Token expired"){
+                navigate("/tokenExpired")
+           }
+        })
         console.log(trainingData);
         console.log(xsrfToken);
         console.log("Actual Time:", trainingData.actualTime);

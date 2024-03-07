@@ -75,7 +75,12 @@ export default function UpdateData() {
       } else {
         throw response;
       }
-    });
+    })
+    .catch((error)=>{
+      if(error.response && error.response.data === "Token expired"){
+        navigate("/tokenExpired")
+   }
+    })
 
   };
   return (
