@@ -40,7 +40,7 @@ export default function AdminTools(){
                     <Paper elevation={3} className='paper'>
                         <h1>Admin tools </h1>
                         <br/>
-                        <Button color="dark" variant="contained" onClick={handleAddExercise}> Add Exercise </Button>
+                        <Button color="dark"  variant="contained" onClick={handleAddExercise}> Add Exercise </Button>
                    </Paper>
                  </Container>
                 ) : (

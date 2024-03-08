@@ -9,21 +9,33 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { callAPINoAuth } from './CallAPI';
 import getXSRFtoken from './XSRF_token';
+import { useTranslation } from 'react-i18next';
+import InputAdornment from '@mui/material/InputAdornment';
 
 
 export default function Registration() {
   const navigate = useNavigate();
+  const { t } = useTranslation()
   const [errorMessage, setErrorMessage] = useState('');
 
   const  [user,setUser] = useState({
     email: "",
     nickname: "",
     password: "",
+    weight: null,
+    height: null,
     dateOfBirth: null,
-    sex: null
+    sex: null,
+    bodyType: null
   });
   const formattedBirthdate = user.birthdate ? user.birthdate.toISOString().split('T')[0] : '';
   const xsrfToken = getXSRFtoken();
+
+  const onlyNumbers = (e) => {
+    const inputValue = e.target.value.replace(/[^0-9]/g, '');
+    e.target.value = inputValue;
+};
+
 
   const handleRegistration = (e) => {
     e.preventDefault();
@@ -68,13 +80,13 @@ export default function Registration() {
       <Container>
         <Paper elevation={3} className='paper'>
           <form noValidate autoComplete="off">
-            <h1>Registration form</h1>
+            <h1>{t('registration_form')}</h1>
 
             <TextField
               style={{ margin: '10px auto' }}
               sx={{ m: 1, width: '25ch' }}
               id="outlined-basic"
-              label="Nickname"
+              label={t('username')}
               variant="outlined"
               fullWidth
               value={user.nickname}
@@ -85,7 +97,7 @@ export default function Registration() {
               style={{ margin: '10px auto' }}
               sx={{ m: 1, width: '25ch' }}
               id="outlined-basic"
-              label="Email"
+              label={t('email')}
               variant="outlined"
               fullWidth
               value={user.email}
@@ -97,24 +109,25 @@ export default function Registration() {
               style={{ margin: '10px auto' }}
               sx={{ m: 1, width: '25ch' }}
               id="outlined-basic"
-              label="Password"
+              label={t('password')}
               variant="outlined"
               fullWidth
               value={user.password}
               onChange={(e) => setUser({ ...user, password: e.target.value })}
             />
 
-            <FormHelperText>Select your biological sex</FormHelperText>
+            <FormHelperText>{t('select_sex')}</FormHelperText>
             <Select
               labelId="demo-simple-select-label"
+              style={{ margin: '10px auto' }}
               id="demo-simple-select"
               value={user.sex}
-              label="Sex"
-              sx={{ m: 1, width: '25ch' }}
+              label={t('sex')}
+              sx={{ m: 1, width: '30ch' }}
               onChange={(e) => setUser({ ...user,sex: e.target.value})}
             >
-              <MenuItem value={"MALE"}>Male</MenuItem>
-              <MenuItem value={"FEMALE"}>Female</MenuItem>
+              <MenuItem value={"MALE"}>{t('man')}</MenuItem>
+              <MenuItem value={"FEMALE"}>{t('women')}</MenuItem>
             </Select>
 
 
@@ -122,12 +135,56 @@ export default function Registration() {
               className='datepicker'
               sx={{ m: 1, width: '25ch' }}
               style={{ margin: '10px auto' }}
+              
               format="YYYY-MM-DD"
-              label="Birthdate"
+              label={t('birthdate')}
               onChange={(newDate) => setUser({ ...user, dateOfBirth: newDate})}
             />
 
-            <Button variant="contained" onClick={handleRegistration}> Submit </Button>
+          <TextField
+                            style={{ margin: '10px auto', padding: "10px" }}
+                            label={t('weight')}
+                            id="outlined-start-adornment"
+                            sx={{ m: 1, width: '13ch' }}
+                            InputProps={{
+                                inputMode: 'numeric',
+                                pattern: '[0-9]*',
+                                startAdornment: <InputAdornment position="start">kg</InputAdornment>,
+                            }}
+                            onInput={onlyNumbers}
+                            onChange={(e) => setUser({ ...user, weight: e.target.value })}
+                        />
+
+          <TextField
+                            style={{ margin: '10px auto', padding: "10px" }}
+                            label={t('height')}
+                            id="outlined-start-adornment"
+                            sx={{ m: 1, width: '13ch' }}
+                            InputProps={{
+                                inputMode: 'numeric',
+                                pattern: '[0-9]*',
+                                startAdornment: <InputAdornment position="start">cm</InputAdornment>,
+                            }}
+                            onInput={onlyNumbers}
+                            onChange={(e) => setUser({ ...user, height: e.target.value })}
+                        />  
+
+            <FormHelperText>{t('select_bodytype')}</FormHelperText>
+            <Select
+              labelId="demo-simple-select-label"
+              style={{ margin: '10px auto' }}
+              id="demo-simple-select"
+              value={user.bodyType}
+              label={t('body_type')}
+              sx={{ m: 1, width: '30ch' }}
+              onChange={(e) => setUser({ ...user, bodyType: e.target.value })}
+            >
+              <MenuItem value={"AVERAGE"}>{t('average')}</MenuItem>
+              <MenuItem value={"ATHLETIC"}>{t('athletic')}</MenuItem>
+              <MenuItem value={"OBESE"}>{t('obese')}</MenuItem>
+            </Select>
+
+            <Button variant="contained" onClick={handleRegistration}> {t('submit')} </Button>
 
             {errorMessage && (
               <div style={{ color: 'red', marginTop: '10px' }}>

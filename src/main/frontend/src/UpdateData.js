@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { FormHelperText } from '@mui/material';
 import { callAPI } from './CallAPI';
 import getXSRFtoken from './XSRF_token';
+import { useTranslation } from 'react-i18next';
 
 export default function UpdateData() {
   const navigate = useNavigate();
@@ -28,11 +29,13 @@ export default function UpdateData() {
   const [token, setToken] = useState("");
 
   const xsrfToken = getXSRFtoken();
+  const { t } = useTranslation();
+  const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(()=>{
-    callAPI("GET","user/getUserData",null,null)
-    .then(response => {
-      setId(response.data.user.id);
+  useEffect(() => {
+    callAPI("GET", "user/getUserData", null, null)
+      .then(response => {
+        setId(response.data.user.id);
         setEmail(response.data.user.email);
         setNickname(response.data.user.nickname);
         setPassword(response.data.user.password);
@@ -43,45 +46,57 @@ export default function UpdateData() {
         setSex(response.data.user.sex);
         setRole(response.data.user.role);
         setToken(response.data.user.token);
-    })
-  },[])
-  
+      })
+  }, [])
+
   const formattedBirthdate = birthdate ? birthdate.toISOString().split('T')[0] : '';
+
+  const onlyNumbers = (e) => {
+    const inputValue = e.target.value.replace(/[^0-9]/g, '');
+    e.target.value = inputValue;
+  };
 
   const handleUpdate = (e) => {
     e.preventDefault();
 
     const data = {
-        id: id,
-        email: email,
-        nickname: nickname,
-        password: password,
-        dateOfBirth: formattedBirthdate,
-        weight: weight,
-        height: height,
-        bodyType: bodyType,
-        sex: sex,
-        role: role,
-        token: token
+      id: id,
+      email: email,
+      nickname: nickname,
+      password: password,
+      dateOfBirth: formattedBirthdate,
+      weight: weight,
+      height: height,
+      bodyType: bodyType,
+      sex: sex,
+      role: role,
+      token: token
     };
 
     console.log(data);
 
-    callAPI("POST","user/updateData",data,xsrfToken)
-    .then(response => {
-      if (response.status === 200) {
+    callAPI("POST", "user/updateData", data, xsrfToken)
+      .then(response => {
         console.log("DATA UPDATED SUCCESSFULLY");
         navigate("/Profile")
-      } else {
-        throw response;
-      }
-    })
-    .catch((error)=>{
-      if(error.response && error.response.data === "Token expired"){
-        navigate("/tokenExpired")
-   }
-    })
-
+      })
+      .catch((error) => {
+        console.log(error)
+        if (error.response && error.response.data === "Token expired") {
+          navigate("/tokenExpired")
+        }
+        let errorMessage = 'An error occurred during registration';
+        if (error.response) {
+          errorMessage = error.response.data || errorMessage;
+          console.error('Registration failed:', errorMessage);
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+        } else {
+          console.error('Error occurred during registration:', error.message);
+        }
+        setErrorMessage(errorMessage);
+        console.error("Login failed", error);
+      })
   };
   return (
     <div className='divupdate'>
@@ -93,7 +108,7 @@ export default function UpdateData() {
             <TextField
               style={{ margin: '10px auto' }}
               id="outlined-basic"
-              label="Nickname"
+              label={t('username')}
               variant="outlined"
               sx={{ m: 1, width: '25ch' }}
               fullWidth
@@ -103,7 +118,7 @@ export default function UpdateData() {
             <TextField
               style={{ margin: '10px auto' }}
               id="outlined-basic"
-              label="Email"
+              label={t('email')}
               variant="outlined"
               fullWidth
               sx={{ m: 1, width: '25ch' }}
@@ -113,9 +128,11 @@ export default function UpdateData() {
 
             <TextField
               style={{ margin: '10px auto' }}
-              label="Weight"
+              label={t('weight')}
+              value={weight}
               id="outlined-start-adornment"
               sx={{ m: 1, width: '25ch' }}
+              onInput={onlyNumbers}
               InputProps={{
                 startAdornment: <InputAdornment position="start">kg</InputAdornment>,
               }}
@@ -123,40 +140,43 @@ export default function UpdateData() {
             />
             <TextField
               style={{ margin: '10px auto' }}
-              label="Height"
+              label={t('height')}
+              value={height}
               id="outlined-start-adornment"
               sx={{ m: 1, width: '25ch' }}
+              onInput={onlyNumbers}
               InputProps={{
                 startAdornment: <InputAdornment position="start">M</InputAdornment>,
               }}
               onChange={(e) => setHeight(e.target.value)}
             />
 
-            <FormHelperText>Select what body type describes you best</FormHelperText>
+            <FormHelperText>{t('select_bodytype')}</FormHelperText>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={bodyType}
-              label="Body Type"
+              label={t('body_type')}
               sx={{ m: 1, width: '25ch' }}
               onChange={(e) => setBodyType(e.target.value)}
             >
-              <MenuItem value={"AVERAGE"}>Average</MenuItem>
-              <MenuItem value={"ATHLETIC"}>Athletic</MenuItem>
-              <MenuItem value={"OBESE"}>Obese</MenuItem>
+              <MenuItem value={"AVERAGE"}>{t('average')}</MenuItem>
+              <MenuItem value={"ATHLETIC"}>{t('athletic')}</MenuItem>
+              <MenuItem value={"OBESE"}>{t('obese')}</MenuItem>
             </Select>
 
-            <FormHelperText>Select your biological sex</FormHelperText>
+            <FormHelperText>{t('select_sex')}</FormHelperText>
             <Select
               labelId="demo-simple-select-label"
+              style={{ margin: '10px auto' }}
               id="demo-simple-select"
               value={sex}
-              label="Sex"
-              sx={{ m: 1, width: '25ch' }}
+              label={t('sex')}
+              sx={{ m: 1, width: '30ch' }}
               onChange={(e) => setSex(e.target.value)}
             >
-              <MenuItem value={"MALE"}>Male</MenuItem>
-              <MenuItem value={"FEMALE"}>Female</MenuItem>
+              <MenuItem value={"MALE"}>{t('man')}</MenuItem>
+              <MenuItem value={"FEMALE"}>{t('women')}</MenuItem>
             </Select>
 
             <DatePicker
@@ -167,7 +187,13 @@ export default function UpdateData() {
               onChange={(newDate) => setBirthdate(newDate)}
             />
 
-            <Button variant="contained" onClick={handleUpdate}> Submit change </Button>
+            <Button variant="contained" onClick={handleUpdate}> {t('submit')} </Button>
+
+            {errorMessage && (
+              <div style={{ color: 'red', marginTop: '10px' }}>
+                {errorMessage}
+              </div>
+            )}
           </form>
         </Paper>
       </Container>

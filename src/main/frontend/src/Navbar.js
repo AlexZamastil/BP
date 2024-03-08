@@ -5,6 +5,7 @@ import { Button } from "@mui/material";
 import { ButtonGroup } from "@mui/material";
 import i18next from "i18next";
 
+
 export default function Navbar() {
   const { t } = useTranslation();
 

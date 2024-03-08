@@ -18,8 +18,6 @@ import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.DAO.UserRepository;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -32,7 +30,7 @@ public class UserService {
     private final MessageSource messageSource;
 
     private boolean isValidNickname(String nickname) {
-        return nickname.matches("^[a-zA-Z0-9]{5,20}$");
+        return nickname.matches("^[a-zA-Z0-9_ ]{5,20}$");
     }
 
     public UserService(UserRepository userRepository, UserStatsRepository userStatsRepository, JWTUtils jwtUtils, PasswordEncoder passwordEncoder, MessageSource messageSource) {
@@ -79,6 +77,8 @@ public class UserService {
                 StringUtils.isBlank(userDTO.getNickname()) ||
                 StringUtils.isBlank(userDTO.getPassword()) ||
                 userDTO.getDateOfBirth() == null ||
+                userDTO.getHeight() == 0 ||
+                userDTO.getWeight() == 0 ||
                 userDTO.getSex() == null)
             return MessageHandler.error(messageSource.getMessage("error.register.nullValue", null, LocaleContextHolder.getLocale()));
 
@@ -94,7 +94,7 @@ public class UserService {
         if(userDTO.getPassword().length() < 8) return MessageHandler.error(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
 
         String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
-        User user = new User(userDTO.getEmail(), userDTO.getNickname(), encryptedPassword, userDTO.getDateOfBirth(), userDTO.getSex());
+        User user = new User(userDTO.getEmail(), userDTO.getNickname(), encryptedPassword, userDTO.getDateOfBirth(), userDTO.getSex(), userDTO.getWeight(), userDTO.getHeight(),userDTO.getBodyType());
         user.setPassword(encryptedPassword);
         try {
             userRepository.save(user);
@@ -112,11 +112,8 @@ public class UserService {
             User user = userRepository.findUserById(jwtUtils.getID(header).asLong());
             if (user != null) {
                 UserStats userStats = userStatsRepository.findUserStatsByUser(user);
-                Map<String, Object> userWithStats = new HashMap<>();
-                userWithStats.put("user", user);
-                userWithStats.put("userstats", userStats);
 
-                return ResponseEntity.ok(userWithStats);
+                return ResponseEntity.ok(userStats);
             } else
                 return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
         } else
@@ -134,8 +131,15 @@ public class UserService {
         if (user != null) {
             UserStats userStats = userStatsRepository.findUserStatsByUser(user);
             if (userStats != null) {
-                userStats.setBmi(user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100));
-                userStats.setWaterneeded(0.033 * user.getWeight());
+                double bmi = user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100);
+                bmi = Math.round(bmi * 1000.0) / 1000.0;
+
+                double waterIntake = 0.033 * user.getWeight();
+                waterIntake = Math.round(waterIntake * 1000.0) / 1000.0;
+
+                userStats.setBmi(bmi);
+                userStats.setWaterintake(waterIntake);
+
                 userStatsRepository.save(userStats);
                 return MessageHandler.success("values updated into database");
             } else {
@@ -149,6 +153,18 @@ public class UserService {
 
     public ResponseEntity<?> updateData(User user, HttpServletRequest httpServletRequest) {
         if (user != null) {
+
+            if (!isValidNickname(user.getNickname())) {
+                return MessageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
+            }
+
+            if (!emailValidator.isValid(user.getEmail())) {
+                return MessageHandler.error(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
+            }
+            if (userRepository.findUserByEmail(user.getEmail()) != null && userRepository.findUserByEmail(user.getEmail()).getId() != user.getId()) {
+                return MessageHandler.error(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
+            }
+
             User user2 = userRepository.findUserById(user.getId());
             user.setId(user2.getId());
             userRepository.save(user);

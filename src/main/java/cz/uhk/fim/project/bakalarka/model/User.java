@@ -21,10 +21,6 @@ public class User {
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Column(name = "pk_userid")
     private long id;
-
-    @Column(name = "customindex")
-    private float customIndex;
-
     @Column(name = "dateofbirth")
     private LocalDate dateOfBirth;
 
@@ -70,5 +66,16 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.sex = sex;
         this.role = Role.USER;
+    }
+    public User(String email, String nickname, String password, LocalDate dateOfBirth, Sex sex, int weight, int height, BodyType bodyType){
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.dateOfBirth = dateOfBirth;
+        this.sex = sex;
+        this.role = Role.USER;
+        this.weight = weight;
+        this.height = height;
+        this.bodyType = bodyType;
     }
 }

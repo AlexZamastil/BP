@@ -1,6 +1,9 @@
 {
     "site-name" : "Site Name",
     "profile" : "Profile",
+    "email" : "Email",
+    "username" : "Username",
+    "birthdate" : "Birthdate",
     "about-project" : "About Project",
     "training":"Training",
     "log-in" : "Log In",
@@ -24,6 +27,23 @@
     "password" : "Password",
     "admin_button" : "Admin tools",
     "copyright" : "©2024 Alex Zamastil - ",
-    "copyriight2" : "This website serves as bachelor degree work and a semestral project for subject TNPW2",
-    "token_expired" : "Your session has expired, please log in again"
+    "copyright2" : "This website serves as bachelor degree work and a semestral project for subject TNPW2",
+    "token_expired" : "Your session has expired, please log in again",
+    "personal_info" : "Personal information",
+    "registration_form" : "Registration",
+    "select_sex" : "Enter your biological sex",
+    "man" : "Male",
+    "women" : "Female",
+    "sex" :"Sex",
+    "weight" : "Weight",
+    "height" : "Height",
+    "select_bodytype" : "Please select which body type describes you",
+    "average" : "Average",
+    "athletic" : "Athletic",
+    "obese" : "Overweight",
+    "body_type" : "Body type",
+    "personal_stats" : "Personal stats",
+    "water_intake" : "Reccomended daily water intake",
+    "bmi" : "Body Mass Index"
+
 }

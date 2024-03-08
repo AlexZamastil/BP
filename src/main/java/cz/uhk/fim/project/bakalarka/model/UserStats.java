@@ -1,6 +1,6 @@
 package cz.uhk.fim.project.bakalarka.model;
 
-import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,8 +17,8 @@ public class UserStats {
     @Column(name = "bmi")
     private double bmi;
 
-    @Column(name = "waterneeded")
-    private double waterneeded;
+    @Column(name = "waterintake")
+    private double waterintake;
 
     @OneToOne
     @JoinColumn(name = "fk_userid")
@@ -27,9 +27,9 @@ public class UserStats {
     public UserStats() {
     }
 
-    public UserStats(double bmi,  double waterneeded, User user) {
+    public UserStats(double bmi,  double waterintake, User user) {
         this.bmi = bmi;
-        this.waterneeded = waterneeded;
+        this.waterintake = waterintake;
         this.user = user;
     }
 

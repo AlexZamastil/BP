@@ -7,6 +7,7 @@ import { callAPI } from './CallAPI';
 
 export default function Profile() {
   const [userStats, setUserStats] = useState([]);
+  const [bmiColor, setBmiColor] = useState(null);
 
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -31,55 +32,93 @@ export default function Profile() {
 
   useEffect(() => {
     callAPI("GET", "user/getUserData", null, null)
-      .then((response =>response.data))
+      .then((response => response.data))
       .then((userStats) => {
         setUserStats(userStats);
         console.log(userStats);
         if (userStats.user && userStats.user.role === "ADMIN") {
           setAdminTools(
-            <Button color="dark" variant="contained" onClick={handleAdminTools}>
+            <Button color="dark" style={{ margin: '10px' }} variant="contained" onClick={handleAdminTools}>
               {t('admin_button')}
             </Button>
           );
         }
+        if (userStats.bmi) {
+          const bmiValue = parseFloat(userStats.bmi);
+          if (bmiValue >= 30) {
+            setBmiColor('#FF3333');
+          } else if (bmiValue >= 25 && bmiValue < 30) {
+            setBmiColor('#FFFF66');
+          } else if (bmiValue >= 18.5 && bmiValue < 25) {
+            setBmiColor('#66FF66');
+          }
+        }
       })
-      .catch((error)=>{
+      .catch((error) => {
         console.log(error)
         console.log(error.response)
         console.log(error.response.data)
-        if(error.response && error.response.data === "Token expired"){
+        if (error.response && error.response.data === "Token expired") {
           navigate("/tokenExpired")
-     }
+        }
       })
-  }, [])
+  }, [localStorage.getItem("Localization")])
 
-  return (<div>
-    {userStats.user ? (
-      <Paper elevation={3} className='paperProfile'>
-        <div>
+  return (
+    <>
+      <div className='profile_bg'>
+        <div className='profile'>
+          <div className='profile_info'>
+            {userStats.user ? (
+              <Paper elevation={3} className='paperProfile'>
+                <div>
+                  <h2 className='header'>{t('personal_info')}</h2>
 
-          Nickname <b> {userStats.user.nickname}</b> <br />
-          Email <b>{userStats.user.email}</b><br />
-          Height <b>{userStats.user.height}</b><br />
-          Weight <b>{userStats.user.weight}</b><br />
-          Date of birth<b>{userStats.user.dateOfBirth}</b><br />
-          BodyType<b>{userStats.user.bodyType}</b><br />
-          Sex <b>{userStats.user.sex}</b>
-          <br />
-          <Button color='primary' variant='contained' onClick={handleChange}> {t('change_data')} </Button>
+                  {t('username')} <b> {userStats.user.nickname}</b> <br />
+                  {t('email')}<b>{userStats.user.email}</b><br />
+                  {t('birthdate')}<b>{userStats.user.dateOfBirth}</b><br />
+                  {t('sex')}<b>{userStats.user.sex}</b><br />
+                  {t('height')}<b>{userStats.user.height}</b><br />
+                  {t('weight')}<b>{userStats.user.weight}</b><br />
+                  {t('body_type')}<b>{userStats.user.bodyType}</b><br />
+                  <br />
+                  <Button color='primary' variant='contained' onClick={handleChange}> {t('change_data')} </Button>
+                </div>
+              </Paper>
+            ) : null}
+
+
+          </div>
+
+          <div className='profile_stats'> <Paper elevation={3} className='paperProfile'>
+            <div>
+              <h2 className='header'>{t('personal_stats')}</h2>
+              <div style={{ margin: "5px", padding: "5px" }}>
+                {t('water_intake')} <b style={{ padding: "10px" }}><br />
+                  {userStats.waterintake} L </b> <br />
+              </div>
+
+              <div style={{ margin: "5px", padding: "5px", borderRadius: "10px", backgroundColor: bmiColor }}>
+                {t('bmi')} <br />
+                {userStats.bmi} <br />
+              </div>
+              <br />
+            </div>
+          </Paper></div>
         </div>
-      </Paper>
-    ) : null}
-    <div className='Logout'>
-      <Link to="/WelcomePage">
-        <Button color='secondary' variant='contained' onClick={handleLogout}> {t('log-out')} </Button>
-      </Link>
-      <br />
-      <br />
-      {adminTools}
-    </div>
 
-  </div>)
+
+        <div className='Logout'>
+          <Link to="/WelcomePage">
+            <Button color='secondary' style={{ margin: '10px' }} variant='contained' onClick={handleLogout}> {t('log-out')} </Button>
+          </Link>
+
+          {adminTools}
+        </div>
+      </div>
+    </>
+  )
+
 }
 
 

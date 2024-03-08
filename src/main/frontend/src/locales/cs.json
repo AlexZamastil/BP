@@ -1,6 +1,9 @@
 {
     "site-name" : "Název stránky",
     "profile" : "Profil",
+    "email" : "Email",
+    "username" : "Uživatelské jméno",
+    "birthdate" : "Datum narození",
     "about-project" : "O Projektu",
     "training":"Trénink",
     "log-in" : "Přihlásit",
@@ -25,5 +28,21 @@
     "admin_button" : "Nástroje administrátora",
     "copyright" : "©2024 Alex Zamastil - ",
     "copyright2" : "Tento web slouží jako bakalářská práce a semestrální projekt předmětu TNPW2",
-    "token_expired" : "Platnost relace vypršela, přihlašte se prosím znovu"
+    "token_expired" : "Platnost relace vypršela, přihlašte se prosím znovu",
+    "personal_info" : "Osobní informace",
+    "registration_form" : "Registrace",
+    "select_sex" : "Zadejte své biologické pohlaví",
+    "man" : "Muž",
+    "women" : "Žena",
+    "sex" :"Pohlaví",
+    "weight" : "Váha",
+    "height" : "Výška",
+    "select_bodytype" : "Zadejte, jaká úroveň postavy vás nejlépe charakterizuje",
+    "average" : "Průměrná",
+    "athletic" : "Atletická",
+    "obese" : "S nadváhou",
+    "body_type" : "Typ postavy",
+    "personal_stats" : "Osobní statistiky",
+    "water_intake" : "Doporučený denní příjem vody",
+    "bmi" : "Body Mass Index"
     }
