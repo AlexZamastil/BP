@@ -19,6 +19,7 @@
     "welcomepage_inspiration3" : "EXCEL",
     "welcomepage_inspiration4" : "WIN",
     "change_data" : "Change user data",
+    "change_password" : "Change password",
     "about_project" : "Comming soon",
     "about_project_text1:":"",
     "page_not_found" : "404 - Page not found",
@@ -44,6 +45,17 @@
     "body_type" : "Body type",
     "personal_stats" : "Personal stats",
     "water_intake" : "Reccomended daily water intake",
-    "bmi" : "Body Mass Index"
+    "bmi" : "Body Mass Index",
+    "old_password" : "Actual password",
+    "new_password" : "New password",
+    "user_data" : "User data",
+    "exercise_name" : "Name",
+    "description" : "Description",
+    "category" : "Category",
+    "style" : "Style",
+    "length" : "Lenght",
+    "repetitions" : "Repetitions",
+    "series" : "Series",
+    "tags" : "Targeted muscle groups"
 
 }

@@ -18,7 +18,7 @@ public class ExerciseDTO {
     int length;
     int repetitions;
     int series;
-    MultipartFile pictureData;
+    String pictureData;
     String tagsJSON;
     List<String> tags;
 
@@ -45,7 +45,7 @@ public class ExerciseDTO {
     }
 
  */
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, String category, int length, MultipartFile pictureData, String tagsJSON) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, String category, int length, String pictureData, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -57,7 +57,7 @@ public class ExerciseDTO {
         this.tagsJSON = tagsJSON;
     }
 
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String category, int length, MultipartFile pictureData, String tagsJSON) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String category, int length, String pictureData, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -92,7 +92,7 @@ public class ExerciseDTO {
 
  */
 
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, int repetitions, int series, String tagsJSON, MultipartFile multipartFile) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, int repetitions, int series, String tagsJSON, String multipartFile) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -103,7 +103,7 @@ public class ExerciseDTO {
         this.pictureData = multipartFile;
     }
 
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, int repetitions, int series, String tagsJSON, MultipartFile multipartFile) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, int repetitions, int series, String tagsJSON, String multipartFile) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -138,7 +138,7 @@ public class ExerciseDTO {
     }
 
  */
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, int length, String style, MultipartFile pictureData, String tagsJSON) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, int length, String style, String pictureData, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -150,7 +150,7 @@ public class ExerciseDTO {
         this.tagsJSON = tagsJSON;
     }
 
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, int length, String style, MultipartFile pictureData, String tagsJSON) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, int length, String style, String pictureData, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;

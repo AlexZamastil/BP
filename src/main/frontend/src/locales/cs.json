@@ -19,6 +19,7 @@
     "welcomepage_inspiration3" : "ZLEPŠI",
     "welcomepage_inspiration4" : "ZVÍTĚZ",
     "change_data" : "Změnit uživatelská data",
+    "change_password" : "Změnit heslo",
     "about_project" : "Již brzy",
     "about_project_text1:":"",
     "page_not_found" : "404 - Stránka nenalezena",
@@ -44,5 +45,16 @@
     "body_type" : "Typ postavy",
     "personal_stats" : "Osobní statistiky",
     "water_intake" : "Doporučený denní příjem vody",
-    "bmi" : "Body Mass Index"
+    "bmi" : "Body Mass Index",
+    "old_password" : "Aktuální heslo",
+    "new_password" : "Nové heslo",
+    "user_data" : "Uživatelská data",
+    "exercise_name" : "Název",
+    "description" : "Popis",
+    "category" : "Kategorie",
+    "style" : "Styl",
+    "length" : "Délka",
+    "repetitions" : "Počet opakování",
+    "series" : "Počet sérií",
+    "tags" : "Trénované partie"
     }

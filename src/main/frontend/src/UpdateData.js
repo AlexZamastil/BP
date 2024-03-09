@@ -56,6 +56,10 @@ export default function UpdateData() {
     e.target.value = inputValue;
   };
 
+  const handleNavigate = () => {
+    navigate("/changePassword")
+  }
+
   const handleUpdate = (e) => {
     e.preventDefault();
 
@@ -103,7 +107,7 @@ export default function UpdateData() {
       <Container>
         <Paper elevation={3} className='paper'>
           <form noValidate autoComplete="off">
-            <h1>Update form</h1>
+            <h1>{t('user_data')}</h1>
 
             <TextField
               style={{ margin: '10px auto' }}
@@ -187,7 +191,7 @@ export default function UpdateData() {
               onChange={(newDate) => setBirthdate(newDate)}
             />
 
-            <Button variant="contained" onClick={handleUpdate}> {t('submit')} </Button>
+            <Button variant="contained" style={{margin : "10px"}} onClick={handleUpdate}> {t('submit')} </Button>
 
             {errorMessage && (
               <div style={{ color: 'red', marginTop: '10px' }}>
@@ -197,6 +201,8 @@ export default function UpdateData() {
           </form>
         </Paper>
       </Container>
+
+      <Button variant="contained" color='dark' style={{margin : "10px"}} onClick={handleNavigate}> {t('change_password')} </Button>
     </div>
   );
 }

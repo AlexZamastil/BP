@@ -16,6 +16,7 @@ import GenerateTraining from './GenerateTraining';
 import Exercise from './Exercise';
 import AdminTools from './AdminTools';
 import TokenExpired from './TokenExpired';
+import ChangePassword from './ChangePassword';
 import i18next from 'i18next';
 
 function App() {
@@ -55,9 +56,10 @@ function App() {
           <Route path="/generateTraining/:trainingType" element={<GenerateTraining />} />
           <Route path="/exercise/:exerciseID" element={<Exercise />} />
           <Route path="/adminTools" element={<AdminTools />} />
+          <Route path="/tokenExpired" element={<TokenExpired/>} />
+          <Route path="/changePassword" element={<ChangePassword/>} />
           <Route path="*" element={<PageNotFound />} />
           <Route path="/" element={<WelcomePage />} />
-          <Route path="/tokenExpired" element={<TokenExpired/>} />
         </Routes>
       </div>
       <footer> {t('footertext1')} <br/><br/> {t('copyright')}<a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a> <br/>{t('copyright2')}</footer>

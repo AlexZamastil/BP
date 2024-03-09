@@ -49,10 +49,11 @@ export default function Profile() {
             setBmiColor('#FF3333');
           } else if (bmiValue >= 25 && bmiValue < 30) {
             setBmiColor('#FFFF66');
-          } else if (bmiValue >= 18.5 && bmiValue < 25) {
+          } else if (bmiValue > 18.5 && bmiValue < 25) {
             setBmiColor('#66FF66');
-          }
-        }
+          } else if (bmiValue <= 18.5 ) {
+            setBmiColor('#99CCFF');
+          }}
       })
       .catch((error) => {
         console.log(error)

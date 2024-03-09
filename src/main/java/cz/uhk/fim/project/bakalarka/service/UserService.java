@@ -59,17 +59,33 @@ public class UserService {
             return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
     }
 
-    public ResponseEntity<?> changePassword(Long ID, String oldPassword, String newPassword) {
-        User user = userRepository.findUserById(ID);
+    public ResponseEntity<?> changePassword(String token, String oldPassword, String newPassword) {
+
+        if(oldPassword == null || newPassword == null){
+            return MessageHandler.error(messageSource.getMessage("error.changePassword.null", null, LocaleContextHolder.getLocale()));
+        }
+        User user = null;
+        if (token != null) {
+            user = userRepository.findUserById(jwtUtils.getID(token).asLong());
+            if (user == null) {
+                return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+            }
+        }
+
+        if (!passwordEncoder.matches(oldPassword, Objects.requireNonNull(user).getPassword())) {
+            return MessageHandler.error(messageSource.getMessage("error.changePassword.invalid", null, LocaleContextHolder.getLocale()));
+        }
+
+        if(newPassword.length() < 8) return MessageHandler.error(messageSource.getMessage("error.changePassword.invalidNew", null, LocaleContextHolder.getLocale()));
+
         if (Objects.equals(oldPassword, newPassword)) {
             return MessageHandler.error(messageSource.getMessage("error.password.same", null, LocaleContextHolder.getLocale()));
         }
-        if (Objects.equals(user.getPassword(), oldPassword)) {
-            user.setPassword(newPassword);
+            String encryptedPassword = passwordEncoder.encode(newPassword);
+            Objects.requireNonNull(user).setPassword(encryptedPassword);
             userRepository.save(user);
             return MessageHandler.success(messageSource.getMessage("success.password.changed", null, LocaleContextHolder.getLocale()));
-        } else
-            return MessageHandler.error(messageSource.getMessage("error.password.wrong", null, LocaleContextHolder.getLocale()));
+
     }
 
     public ResponseEntity<?> register(UserDTO userDTO) {
@@ -130,12 +146,14 @@ public class UserService {
     public ResponseEntity<?> generateUserStats(User user) {
         if (user != null) {
             UserStats userStats = userStatsRepository.findUserStatsByUser(user);
-            if (userStats != null) {
-                double bmi = user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100);
-                bmi = Math.round(bmi * 1000.0) / 1000.0;
 
-                double waterIntake = 0.033 * user.getWeight();
-                waterIntake = Math.round(waterIntake * 1000.0) / 1000.0;
+            double bmi = user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100);
+            bmi = Math.round(bmi * 1000.0) / 1000.0;
+
+            double waterIntake = 0.033 * user.getWeight();
+            waterIntake = Math.round(waterIntake * 1000.0) / 1000.0;
+
+            if (userStats != null) {
 
                 userStats.setBmi(bmi);
                 userStats.setWaterintake(waterIntake);
@@ -143,7 +161,7 @@ public class UserService {
                 userStatsRepository.save(userStats);
                 return MessageHandler.success("values updated into database");
             } else {
-                UserStats userStats2 = new UserStats(user.getWeight() / (user.getHeight() / 100 * user.getHeight() / 100), 0.033 * user.getWeight(), user);
+                UserStats userStats2 = new UserStats(bmi, waterIntake, user);
                 userStatsRepository.save(userStats2);
                 return MessageHandler.success("values inserted into database");
             }

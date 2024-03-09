@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MessageHandler {
-    public static ResponseEntity<Object> error(String errorText){
-        return ResponseEntity.badRequest().body(errorText);
+    public static ResponseEntity<Object> error(Object o){
+        return ResponseEntity.badRequest().body(o);
     }
-    public static ResponseEntity<Object> success(String text){
-        return ResponseEntity.ok(text);
+    public static ResponseEntity<Object> success(Object o){
+        return ResponseEntity.ok(o);
     }
 
 

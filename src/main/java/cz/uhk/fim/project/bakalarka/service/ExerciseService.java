@@ -97,8 +97,9 @@ public class ExerciseService {
             Optional<Run> r = runRepository.findByExercise(exercise);
             Optional<Swimming> s = swimmingRepository.findByExercise(exercise);
             Set<Tag> tags = exerciseRepository.findTagsByExerciseId(id);
-            Picture picture = exercise.getPicture();
-            MultipartFile multipartFile = multiPartFileConverter.convert("FILENAME", picture.getPictureData());
+            byte[] picture = exercise.getPicture().getPictureData();
+            String pictureBytes = Base64.getEncoder().encodeToString(picture);
+            //MultipartFile multipartFile = multiPartFileConverter.convert("FILENAME", picture.getPictureData());
             List<String> tagList = new ArrayList<>();
             for (Tag t : tags) {
                 tagList.add(t.getText());
@@ -117,9 +118,9 @@ public class ExerciseService {
                         gymWorkout.getRepetitions(),
                         gymWorkout.getSeries(),
                         jsonList,
-                        multipartFile
+                        pictureBytes
                 );
-                return MessageHandler.success(exerciseRequest.toString());
+                return MessageHandler.success(exerciseRequest);
             } else if (r.isPresent()) {
                 Run run = r.get();
                 ExerciseDTO exerciseRequest = new ExerciseDTO(
@@ -129,10 +130,10 @@ public class ExerciseService {
                         exercise.getDescription_eng(),
                         run.getRuncategory().toString(),
                         run.getLenglhinmeters(),
-                        multipartFile,
+                        pictureBytes,
                         jsonList
                 );
-                return MessageHandler.success(exerciseRequest.toString());
+                return MessageHandler.success(exerciseRequest);
             } else if (s.isPresent()) {
                 Swimming swimming = s.get();
                 ExerciseDTO exerciseRequest = new ExerciseDTO(
@@ -142,9 +143,9 @@ public class ExerciseService {
                         exercise.getDescription_eng(),
                         swimming.getSwimmingstyle().toString(),
                         swimming.getLenglhinmeters(),
-                        multipartFile,
+                        pictureBytes,
                         jsonList);
-                return MessageHandler.success(exerciseRequest.toString());
+                return MessageHandler.success(exerciseRequest);
             }
 
         }

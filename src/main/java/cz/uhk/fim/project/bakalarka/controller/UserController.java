@@ -42,7 +42,7 @@ public class UserController {
     public ResponseEntity<?> newPassword(@RequestBody ChangePasswordDTO changePasswordRequest, HttpServletRequest request){
         if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
         return userService.changePassword(
-                changePasswordRequest.getUserId(),
+                request.getHeader("Authorization"),
                 changePasswordRequest.getOldPassword(),
                 changePasswordRequest.getNewPassword()
         );

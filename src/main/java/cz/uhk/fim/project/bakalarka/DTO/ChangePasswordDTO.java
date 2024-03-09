@@ -6,6 +6,5 @@ import lombok.Data;
 public class ChangePasswordDTO {
     private String oldPassword;
     private String newPassword;
-    private Long userId;
 
 }

@@ -26,7 +26,7 @@ export default function Login(){
       password : password
   })
 
-    callAPINoAuth("POST","user/login",data,xsrfToken,navigate)
+    callAPINoAuth("POST","user/login",data,xsrfToken)
     .then(response => {
       if (response.status === 200) {
           console.log('Logged in successfully');
