@@ -152,6 +152,19 @@ public class ExerciseService {
         return MessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
     }
 
+    public ResponseEntity<?> getExercisePicture(long id) {
+        Optional<Exercise> e = exerciseRepository.findExerciseById(id);
+        System.out.println(e + " EXERCISE");
+
+        if (e.isPresent()) {
+            Exercise exercise = e.get();
+            byte[] picture = exercise.getPicture().getPictureData();
+            String pictureBytes = Base64.getEncoder().encodeToString(picture);
+            return MessageHandler.success(pictureBytes);
+        }
+        return MessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
+    }
+
     public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
