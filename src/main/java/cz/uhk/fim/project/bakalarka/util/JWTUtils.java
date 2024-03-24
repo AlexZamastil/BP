@@ -8,9 +8,9 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
@@ -29,8 +29,10 @@ public class JWTUtils {
 
     public String generateJWToken(Long userID) {
         String var = hashHandler.hashString(secretVar);
-        long expirationTimeMillis =  604800000;
-        Date expirationDate = new Date(System.currentTimeMillis() + expirationTimeMillis);
+        // FIXME Návrh na vhodnější nastavování doby expirace/platnosti tokenu (spíše kosmetická změna pro lepší přehlednost)
+        long day = 7;// FIXME Doba expirace tokenu, v tomto případě ukazuji dny, ale můžete nastavit v řádu minut, hodin, dnů, týdnů, ...
+        // -> Bylo by vhodně načíst tuto hodnotu také z env proměnné, může se pak lišit pro testové/produkční prostředí
+        Date expirationDate = Date.from(new Date().toInstant().plus(day, ChronoUnit.DAYS));
 
         JWTCreator.Builder jwtBuilder = JWT
                 .create()
@@ -64,8 +66,8 @@ public class JWTUtils {
     public boolean isTokenExpired(String token) {
         try {
             DecodedJWT jwt = JWT.require(Algorithm.HMAC256(secret))
-                    .build()
-                    .verify(token);
+                                .build()
+                                .verify(token);
 
             Date expirationDate = jwt.getExpiresAt();
             return expirationDate != null && expirationDate.before(new Date());
@@ -78,7 +80,7 @@ public class JWTUtils {
         }
     }
 
-    public boolean isTokenLegitimate(String token){
+    public boolean isTokenLegitimate(String token) {
 
         DecodedJWT decodedJWT = JWT.decode(token);
 
@@ -96,19 +98,19 @@ public class JWTUtils {
             log.info("algorhitm: " + decodedJWT.getAlgorithm());
             return false;
         }
-        if(!(hashHandler.verifyHash(JWT
+        if (!(hashHandler.verifyHash(JWT
                 .require(Algorithm.HMAC256(secret))
                 .build()
                 .verify(token)
                 .getClaim("var")
-                .asString(),secretVar))){
+                .asString(), secretVar))) {
 
             log.info("Hash handler output: " + hashHandler.verifyHash(JWT
                     .require(Algorithm.HMAC256(secret))
                     .build()
                     .verify(token)
                     .getClaim("var")
-                    .asString(),secretVar));
+                    .asString(), secretVar));
 
             log.info(JWT
                     .require(Algorithm.HMAC256(secret))

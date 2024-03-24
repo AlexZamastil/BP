@@ -39,27 +39,26 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-            log.info("JWT TOKEN " + request.getHeader("Authorization"));
-            String token = request.getHeader("Authorization");
-            if (token.equals("")) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token empty");
-                log.info("Token empty");
-                return;
-            }
-            if (jwtUtils.isTokenExpired(token)) {
-
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token expired");
-                log.info("Token expired");
-                return;
-            }
-            if (!jwtUtils.isTokenLegitimate(token)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token is not valid");
-                log.info("Token is not valid: " + token);
-                return;
-            }
+        log.info("JWT TOKEN " + request.getHeader("Authorization"));
+        String token = request.getHeader("Authorization");
+        if (!StringUtils.hasText(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token empty");
+            log.info("Token empty");
+            return;
+        }
+        if (jwtUtils.isTokenExpired(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token expired");
+            log.info("Token expired");
+            return;
+        }
+        if (!jwtUtils.isTokenLegitimate(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token is not valid");
+            log.info("Token is not valid: " + token);
+            return;
+        }
         try {
             Claim userIDClaim = jwtUtils.getID(token);
             log.info(userIDClaim + " = User ID from jwtToken");
@@ -69,11 +68,10 @@ public class AuthFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
         } catch (IOException | ServletException e) {
-            e.printStackTrace();
+            log.error("An error occurred while trying to get data from the token.", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
     }
 
 }
