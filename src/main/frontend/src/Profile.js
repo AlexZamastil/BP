@@ -13,7 +13,7 @@ export default function Profile() {
   const { t } = useTranslation();
 
   const handleLogout = () => {
-    localStorage.clear("user");
+    localStorage.removeItem("token");
     navigate("/WelcomePage");
     window.location.reload(false);
   }

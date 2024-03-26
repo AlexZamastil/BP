@@ -89,17 +89,12 @@ public class ExerciseService {
 
     public ResponseEntity<?> getExercise(long id) throws IOException {
         Optional<Exercise> e = exerciseRepository.findExerciseById(id);
-        System.out.println(e + " EXERCISE");
-
         if (e.isPresent()) {
             Exercise exercise = e.get();
             Optional<GymWorkout> g = gymWorkoutRepository.findByExercise(exercise);
             Optional<Run> r = runRepository.findByExercise(exercise);
             Optional<Swimming> s = swimmingRepository.findByExercise(exercise);
             Set<Tag> tags = exerciseRepository.findTagsByExerciseId(id);
-            byte[] picture = exercise.getPicture().getPictureData();
-            String pictureBytes = Base64.getEncoder().encodeToString(picture);
-            //MultipartFile multipartFile = multiPartFileConverter.convert("FILENAME", picture.getPictureData());
             List<String> tagList = new ArrayList<>();
             for (Tag t : tags) {
                 tagList.add(t.getText());
@@ -117,8 +112,7 @@ public class ExerciseService {
                         exercise.getDescription_eng(),
                         gymWorkout.getRepetitions(),
                         gymWorkout.getSeries(),
-                        jsonList,
-                        pictureBytes
+                        jsonList
                 );
                 return MessageHandler.success(exerciseRequest);
             } else if (r.isPresent()) {
@@ -130,7 +124,6 @@ public class ExerciseService {
                         exercise.getDescription_eng(),
                         run.getRuncategory().toString(),
                         run.getLenglhinmeters(),
-                        pictureBytes,
                         jsonList
                 );
                 return MessageHandler.success(exerciseRequest);
@@ -143,11 +136,21 @@ public class ExerciseService {
                         exercise.getDescription_eng(),
                         swimming.getSwimmingstyle().toString(),
                         swimming.getLenglhinmeters(),
-                        pictureBytes,
                         jsonList);
                 return MessageHandler.success(exerciseRequest);
             }
 
+        }
+        return MessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
+    }
+
+    public ResponseEntity<?> getExercisePicture(long id) {
+        Optional<Exercise> e = exerciseRepository.findExerciseById(id);
+        if (e.isPresent()) {
+            Exercise exercise = e.get();
+            byte[] picture = exercise.getPicture().getPictureData();
+            String pictureBytes = Base64.getEncoder().encodeToString(picture);
+            return MessageHandler.success(pictureBytes);
         }
         return MessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
     }

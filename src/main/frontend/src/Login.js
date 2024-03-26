@@ -28,16 +28,12 @@ export default function Login(){
 
     callAPINoAuth("POST","user/login",data,xsrfToken)
     .then(response => {
-      if (response.status === 200) {
           console.log('Logged in successfully');
           const token = response.data;
           localStorage.setItem('token', token);
-          localStorage.setItem('user', email);
-          console.log("redirect to profile");
           navigate("/profile");
-      } else {
-          throw new Error('Login failed');
-      }
+          window.location.reload(false);
+
   })
   .catch(error => {
       let errorMessage = 'An error occurred during login';

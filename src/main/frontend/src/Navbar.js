@@ -24,7 +24,7 @@ export default function Navbar() {
         <ul>
           <CustomLink className="c-link" to="/aboutproject"> <p>{t('about-project')}</p> </CustomLink>
 
-          {localStorage.getItem("user") == null ? (
+          {localStorage.getItem("token") == null ? (
             <><CustomLink className="loginnav" to="/login"> <p>{t('log-in')}</p> </CustomLink>
               <CustomLink className="registernav" to="/register"> <p>{t('register')}</p> </CustomLink>
             </>

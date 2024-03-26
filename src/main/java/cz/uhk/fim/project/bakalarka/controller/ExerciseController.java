@@ -38,5 +38,10 @@ public class ExerciseController {
     public ResponseEntity<?> getExercise(@PathVariable Long id) throws IOException {
         return exerciseService.getExercise(id);
     }
+
+    @GetMapping(value = "exercise/getExercise/picture/{id}")
+    public ResponseEntity<?> getExercisePicture(@PathVariable Long id) {
+        return exerciseService.getExercisePicture(id);
+    }
 }
 

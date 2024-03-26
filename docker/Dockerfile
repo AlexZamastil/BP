@@ -1,3 +1,3 @@
-FROM openjdk:18
-COPY target/BP-1.0-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
+FROM openjdk:18.0.2
+COPY target/server.jar app.jar
+ENTRYPOINT ["java", "-jar", "/app.jar"]

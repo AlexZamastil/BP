@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from './Navbar';
@@ -21,7 +21,7 @@ import i18next from 'i18next';
 
 function App() {
   const { t } = useTranslation();
-
+  const [year] = useState(new Date().getFullYear());
   const locale = localStorage.getItem("Localization");
 
 
@@ -37,13 +37,10 @@ function App() {
     }
   }, [locale])
   
- 
-
   return (
     <>
-      {Navbar()}
+      <Navbar/>
       <div className='container'>
-        
         <Routes>
           <Route path="/aboutproject" element={<AboutProject />} />
           <Route path="/profile" element={<Profile />} />
@@ -62,7 +59,7 @@ function App() {
           <Route path="/" element={<WelcomePage />} />
         </Routes>
       </div>
-      <footer> {t('footertext1')} <br/><br/> {t('copyright')}<a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a> <br/>{t('copyright2')}</footer>
+      <footer> {t('footertext1')} <br/><br/> © {year} - <a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a> <br/>{t('copyright2')}</footer>
     </>
   );
 }

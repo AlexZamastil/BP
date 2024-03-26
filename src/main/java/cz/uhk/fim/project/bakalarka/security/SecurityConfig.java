@@ -57,7 +57,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET,"/user/getUserData").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.POST,"/generateTraining").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET,"/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/utrainJ48").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/trainJ48").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/getExerciseTags").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/getFoodTags").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/getTimingTags").permitAll()

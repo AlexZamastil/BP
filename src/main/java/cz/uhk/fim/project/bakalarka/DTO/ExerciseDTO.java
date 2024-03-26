@@ -18,7 +18,6 @@ public class ExerciseDTO {
     int length;
     int repetitions;
     int series;
-    String pictureData;
     String tagsJSON;
     List<String> tags;
 
@@ -45,7 +44,7 @@ public class ExerciseDTO {
     }
 
  */
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, String category, int length, String pictureData, String tagsJSON) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, String category, int length, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -53,18 +52,16 @@ public class ExerciseDTO {
         this.type = type;
         this.category = category;
         this.length = length;
-        this.pictureData = pictureData;
         this.tagsJSON = tagsJSON;
     }
 
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String category, int length, String pictureData, String tagsJSON) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String category, int length, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
         this.description_eng = description_eng;
         this.category = category;
         this.length = length;
-        this.pictureData = pictureData;
         this.tagsJSON = tagsJSON;
     }
     //gym
@@ -92,7 +89,7 @@ public class ExerciseDTO {
 
  */
 
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, int repetitions, int series, String tagsJSON, String multipartFile) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, int repetitions, int series, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -100,10 +97,9 @@ public class ExerciseDTO {
         this.repetitions = repetitions;
         this.series = series;
         this.tagsJSON = tagsJSON;
-        this.pictureData = multipartFile;
     }
 
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, int repetitions, int series, String tagsJSON, String multipartFile) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, int repetitions, int series, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -112,7 +108,6 @@ public class ExerciseDTO {
         this.repetitions = repetitions;
         this.series = series;
         this.tagsJSON = tagsJSON;
-        this.pictureData = multipartFile;
     }
 
     //swimming
@@ -138,7 +133,7 @@ public class ExerciseDTO {
     }
 
  */
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, int length, String style, String pictureData, String tagsJSON) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, String type, int length, String style, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
@@ -146,18 +141,16 @@ public class ExerciseDTO {
         this.type = type;
         this.style = style;
         this.length = length;
-        this.pictureData = pictureData;
         this.tagsJSON = tagsJSON;
     }
 
-    public ExerciseDTO(String name, String name_eng, String description, String description_eng, int length, String style, String pictureData, String tagsJSON) {
+    public ExerciseDTO(String name, String name_eng, String description, String description_eng, int length, String style, String tagsJSON) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
         this.description_eng = description_eng;
         this.style = style;
         this.length = length;
-        this.pictureData = pictureData;
         this.tagsJSON = tagsJSON;
     }
 

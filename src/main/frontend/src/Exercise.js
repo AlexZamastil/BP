@@ -1,13 +1,17 @@
-import { useEffect, useState, lazy } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom";
 import { callAPI } from './CallAPI';
 import { Paper } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function Exercise() {
     const navigate = useNavigate()
     const { exerciseID } = useParams();
     const [exerciseData, setExerciseData] = useState([]);
+
+    const [picture, setPicture] = useState(undefined)
+    const [isPictureLoading, setIsPictureLoading] = useState(false)
 
     const { t } = useTranslation();
 
@@ -23,11 +27,38 @@ export default function Exercise() {
             }
             )
     }, [])
-    console.log(exerciseData)
+
+    useEffect(() => {
+            setIsPictureLoading(true)
+            callAPI("GET", "exercise/getExercise/picture/" + exerciseID, null, null)
+            .then(response => {
+                console.log("Get excercise picture response", response)
+                setPicture(response.data)
+                setIsPictureLoading(false)
+            })
+            .catch(error => {
+                console.error("An error occurred while loading the image.", error)
+                setIsPictureLoading(false)
+                if (error.response && error.response.data === "Token expired") {
+                    navigate("/tokenExpired")
+                }
+            }
+            
+    )}, [])
+
     return (
         <>
         <div className="exerciseFlex">
-        <img src={`data:image/png;base64,${exerciseData.pictureData}`} alt="Exercise Picture"  style={{ height: "150px", marginTop : "20px", display: "flex"}}/>
+       <div style={{height: "150px", marginTop: "20px", display: "flex"}}>
+                    {isPictureLoading ?
+                        <CircularProgress/>
+                        :
+                          <img src={`data:image/png;base64,${picture}`}
+                             alt="Exercise Picture"
+                        />
+                    }
+                </div>
+           
             <Paper elevation={3} className='paperExercise'>
                 <div>
                     {exerciseData && (

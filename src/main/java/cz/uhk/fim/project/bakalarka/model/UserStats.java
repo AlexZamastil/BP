@@ -1,6 +1,5 @@
 package cz.uhk.fim.project.bakalarka.model;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 
