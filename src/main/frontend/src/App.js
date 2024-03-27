@@ -18,12 +18,27 @@ import AdminTools from './AdminTools';
 import TokenExpired from './TokenExpired';
 import ChangePassword from './ChangePassword';
 import i18next from 'i18next';
+import { callAPI } from './CallAPI';
+import getXSRFtoken from './XSRF_token';
 
 function App() {
   const { t } = useTranslation();
   const [year] = useState(new Date().getFullYear());
   const locale = localStorage.getItem("Localization");
+  const xsrfToken = getXSRFtoken();
+  const [loggedIn] = useState(1) 
 
+  useEffect(() => {
+    callAPI("POST","initConnection",null,xsrfToken)
+    .then(response => {
+      console.log(response.data);
+    })
+    .catch(error => {
+      console.error('Failed to establish communication with the backend.');
+        console.error('Error initiating communication:', error);
+        loggedIn +=1;
+    });
+}, [loggedIn]);
 
   useEffect(() => {
     i18next.changeLanguage(locale)

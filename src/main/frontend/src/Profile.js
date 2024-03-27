@@ -35,7 +35,6 @@ export default function Profile() {
       .then((response => response.data))
       .then((userStats) => {
         setUserStats(userStats);
-        console.log(userStats);
         if (userStats.user && userStats.user.role === "ADMIN") {
           setAdminTools(
             <Button color="dark" style={{ margin: '10px' }} variant="contained" onClick={handleAdminTools}>

@@ -7,6 +7,7 @@ import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -21,6 +22,7 @@ import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import java.util.Objects;
 
 @Service
+@Log4j2
 public class UserService {
     private final JWTUtils jwtUtils;
     private final UserRepository userRepository;
@@ -130,8 +132,10 @@ public class UserService {
                 UserStats userStats = userStatsRepository.findUserStatsByUser(user);
 
                 return ResponseEntity.ok(userStats);
-            } else
+            } else{
                 return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+            }
+
         } else
             return MessageHandler.error(messageSource.getMessage("error.header.invalid", null, LocaleContextHolder.getLocale()));
 

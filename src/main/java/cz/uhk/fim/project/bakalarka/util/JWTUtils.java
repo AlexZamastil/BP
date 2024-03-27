@@ -29,7 +29,6 @@ public class JWTUtils {
         String var = hashHandler.hashString(secretVar);
         long day = 7;
         Date expirationDate = Date.from(new Date().toInstant().plus(day, ChronoUnit.DAYS));
-
         JWTCreator.Builder jwtBuilder = JWT
                 .create()
                 .withClaim("PK", userID)
