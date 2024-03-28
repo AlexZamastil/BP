@@ -26,35 +26,39 @@ function App() {
   const [year] = useState(new Date().getFullYear());
   const locale = localStorage.getItem("Localization");
   const xsrfToken = getXSRFtoken();
-  const [loggedIn] = useState(1) 
+  const [loggedIn, setLoggedIn] = useState(1)
 
   useEffect(() => {
-    callAPI("POST","initConnection",null,xsrfToken)
-    .then(response => {
-      console.log(response.data);
-    })
-    .catch(error => {
-      console.error('Failed to establish communication with the backend.');
+    callAPI("POST", "initConnection", null, xsrfToken)
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error('Failed to establish communication with the backend.');
         console.error('Error initiating communication:', error);
-        loggedIn +=1;
-    });
-}, [loggedIn]);
+        setLoggedIn(loggedIn += 1);
+      });
+  }, [loggedIn]);
+
+  useEffect(() => {
+    document.title = 'Runora';
+  }, []);
 
   useEffect(() => {
     i18next.changeLanguage(locale)
     localStorage.setItem("Localization", locale)
 
-    if(locale === null) {
+    if (locale === null) {
       console.log("Changing language to czech");
       i18next.changeLanguage("cs")
       localStorage.setItem("Localization", "cs")
-     
+
     }
   }, [locale])
-  
+
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <div className='container'>
         <Routes>
           <Route path="/aboutproject" element={<AboutProject />} />
@@ -68,13 +72,13 @@ function App() {
           <Route path="/generateTraining/:trainingType" element={<GenerateTraining />} />
           <Route path="/exercise/:exerciseID" element={<Exercise />} />
           <Route path="/adminTools" element={<AdminTools />} />
-          <Route path="/tokenExpired" element={<TokenExpired/>} />
-          <Route path="/changePassword" element={<ChangePassword/>} />
+          <Route path="/tokenExpired" element={<TokenExpired />} />
+          <Route path="/changePassword" element={<ChangePassword />} />
           <Route path="*" element={<PageNotFound />} />
           <Route path="/" element={<WelcomePage />} />
         </Routes>
       </div>
-      <footer> {t('footertext1')} <br/><br/> © {year} - <a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a> <br/>{t('copyright2')}</footer>
+      <footer> {t('footertext1')} <br /><br /> © {year} - <a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a> <br />{t('copyright2')}</footer>
     </>
   );
 }
