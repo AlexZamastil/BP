@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class TrainingController {
-
+    MessageHandler<String> messageHandler;
     private final TrainingService trainingService;
     @Autowired
     public TrainingController(TrainingService trainingService) {
@@ -22,7 +22,7 @@ public class TrainingController {
 
     @PostMapping(value = "training/generateTraining", consumes = {"application/json"})
     public ResponseEntity<?> generateTraining(@RequestBody CreateTrainingDTO createTrainingRequest, HttpServletRequest request) throws Exception {
-        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
         trainingService.trainModel();
         return trainingService.generateTraining(createTrainingRequest, request);
     }

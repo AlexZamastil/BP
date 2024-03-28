@@ -182,6 +182,7 @@ export default function Registration() {
               <MenuItem value={"AVERAGE"}>{t('average')}</MenuItem>
               <MenuItem value={"ATHLETIC"}>{t('athletic')}</MenuItem>
               <MenuItem value={"OBESE"}>{t('obese')}</MenuItem>
+              <MenuItem value={"MUSCULAR"}>{t('muscular')}</MenuItem>
             </Select>
 
             <Button variant="contained" onClick={handleRegistration}> {t('submit')} </Button>

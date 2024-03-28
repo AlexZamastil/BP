@@ -18,6 +18,7 @@ import java.io.IOException;
 
 public class ExerciseController {
     private final ExerciseService exerciseService;
+    MessageHandler<String> messageHandler = new MessageHandler<>();
 
     @Autowired
     public ExerciseController(ExerciseService exerciseService) {
@@ -30,7 +31,7 @@ public class ExerciseController {
             @RequestPart(name = "imageData") MultipartFile imageData,
             HttpServletRequest request
     ) {
-        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
         return exerciseService.addNewExercise(exerciseRequest, imageData);
     }
 

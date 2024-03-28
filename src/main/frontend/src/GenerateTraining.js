@@ -55,7 +55,6 @@ export default function GenerateTraining() {
            }
         })
         console.log(trainingData);
-        console.log(xsrfToken);
         console.log("Actual Time:", trainingData.actualTime);
         console.log("Wanted Time:", trainingData.wantedTime);
     }

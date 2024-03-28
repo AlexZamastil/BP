@@ -30,9 +30,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailValidator emailValidator;
     private final MessageSource messageSource;
+    MessageHandler<String> messageHandler = new MessageHandler<>();
 
     private boolean isValidNickname(String nickname) {
-        return nickname.matches("^[a-zA-Z0-9_ ]{5,20}$");
+        return !nickname.matches("^[a-zA-Z0-9_ ]{5,20}$");
     }
 
     public UserService(UserRepository userRepository, UserStatsRepository userStatsRepository, JWTUtils jwtUtils, PasswordEncoder passwordEncoder, MessageSource messageSource) {
@@ -47,46 +48,46 @@ public class UserService {
     public ResponseEntity<?> login(String email, String password) {
         System.out.println(LocaleContextHolder.getLocale());
         if (email == null || email.equals("") || password == null || password.equals(""))
-            return MessageHandler.error(messageSource.getMessage("error.login.null", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.login.null", null, LocaleContextHolder.getLocale()));
         if (userRepository.findUserByEmail(email) != null) {
             User authUser = userRepository.findUserByEmail(email);
             if (passwordEncoder.matches(password, authUser.getPassword())) {
                 String jwtToken = jwtUtils.generateJWToken(authUser.getId());
                 authUser.setToken(jwtToken);
                 userRepository.save(authUser);
-                return MessageHandler.success(jwtToken);
+                return messageHandler.success(jwtToken);
             } else
-                return MessageHandler.error(messageSource.getMessage("error.password.wrong", null, LocaleContextHolder.getLocale()));
+                return messageHandler.error(messageSource.getMessage("error.password.wrong", null, LocaleContextHolder.getLocale()));
         } else
-            return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> changePassword(String token, String oldPassword, String newPassword) {
 
         if(oldPassword == null || newPassword == null){
-            return MessageHandler.error(messageSource.getMessage("error.changePassword.null", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.changePassword.null", null, LocaleContextHolder.getLocale()));
         }
         User user = null;
         if (token != null) {
             user = userRepository.findUserById(jwtUtils.getID(token).asLong());
             if (user == null) {
-                return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+                return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
             }
         }
 
         if (!passwordEncoder.matches(oldPassword, Objects.requireNonNull(user).getPassword())) {
-            return MessageHandler.error(messageSource.getMessage("error.changePassword.invalid", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.changePassword.invalid", null, LocaleContextHolder.getLocale()));
         }
 
-        if(newPassword.length() < 8) return MessageHandler.error(messageSource.getMessage("error.changePassword.invalidNew", null, LocaleContextHolder.getLocale()));
+        if(newPassword.length() < 8) return messageHandler.error(messageSource.getMessage("error.changePassword.invalidNew", null, LocaleContextHolder.getLocale()));
 
         if (Objects.equals(oldPassword, newPassword)) {
-            return MessageHandler.error(messageSource.getMessage("error.password.same", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.password.same", null, LocaleContextHolder.getLocale()));
         }
             String encryptedPassword = passwordEncoder.encode(newPassword);
             Objects.requireNonNull(user).setPassword(encryptedPassword);
             userRepository.save(user);
-            return MessageHandler.success(messageSource.getMessage("success.password.changed", null, LocaleContextHolder.getLocale()));
+            return messageHandler.success(messageSource.getMessage("success.password.changed", null, LocaleContextHolder.getLocale()));
 
     }
 
@@ -97,19 +98,20 @@ public class UserService {
                 userDTO.getDateOfBirth() == null ||
                 userDTO.getHeight() == 0 ||
                 userDTO.getWeight() == 0 ||
-                userDTO.getSex() == null)
-            return MessageHandler.error(messageSource.getMessage("error.register.nullValue", null, LocaleContextHolder.getLocale()));
+                userDTO.getSex() == null ||
+                userDTO.getBodyType() == null)
+            return messageHandler.error(messageSource.getMessage("error.register.nullValue", null, LocaleContextHolder.getLocale()));
 
         if (!emailValidator.isValid(userDTO.getEmail())) {
-            return MessageHandler.error(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
         }
         if (userRepository.findUserByEmail(userDTO.getEmail()) != null) {
-            return MessageHandler.error(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
         }
-        if (!isValidNickname(userDTO.getNickname())) {
-            return MessageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
+        if (isValidNickname(userDTO.getNickname())) {
+            return messageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
         }
-        if(userDTO.getPassword().length() < 8) return MessageHandler.error(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
+        if(userDTO.getPassword().length() < 8) return messageHandler.error(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
 
         String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
         User user = new User(userDTO.getEmail(), userDTO.getNickname(), encryptedPassword, userDTO.getDateOfBirth(), userDTO.getSex(), userDTO.getWeight(), userDTO.getHeight(),userDTO.getBodyType());
@@ -118,10 +120,10 @@ public class UserService {
             userRepository.save(user);
             generateUserStats(user);
         } catch (Exception e) {
-            return MessageHandler.error(messageSource.getMessage("error.register.dbs.failed", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.register.dbs.failed", null, LocaleContextHolder.getLocale()));
 
         }
-        return MessageHandler.success(messageSource.getMessage("success.register.done", null, LocaleContextHolder.getLocale()));
+        return messageHandler.success(messageSource.getMessage("success.register.done", null, LocaleContextHolder.getLocale()));
 
     }
 
@@ -133,11 +135,11 @@ public class UserService {
 
                 return ResponseEntity.ok(userStats);
             } else{
-                return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+                return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
             }
 
         } else
-            return MessageHandler.error(messageSource.getMessage("error.header.invalid", null, LocaleContextHolder.getLocale()));
+            return messageHandler.error(messageSource.getMessage("error.header.invalid", null, LocaleContextHolder.getLocale()));
 
 
     }
@@ -163,28 +165,28 @@ public class UserService {
                 userStats.setWaterintake(waterIntake);
 
                 userStatsRepository.save(userStats);
-                return MessageHandler.success("values updated into database");
+                return messageHandler.success("values updated into database");
             } else {
                 UserStats userStats2 = new UserStats(bmi, waterIntake, user);
                 userStatsRepository.save(userStats2);
-                return MessageHandler.success("values inserted into database");
+                return messageHandler.success("values inserted into database");
             }
-        } else return MessageHandler.error("invalid user ID");
+        } else return messageHandler.error("invalid user ID");
     }
 
 
     public ResponseEntity<?> updateData(User user, HttpServletRequest httpServletRequest) {
         if (user != null) {
 
-            if (!isValidNickname(user.getNickname())) {
-                return MessageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
+            if (isValidNickname(user.getNickname())) {
+                return messageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
             }
 
             if (!emailValidator.isValid(user.getEmail())) {
-                return MessageHandler.error(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
+                return messageHandler.error(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
             }
             if (userRepository.findUserByEmail(user.getEmail()) != null && userRepository.findUserByEmail(user.getEmail()).getId() != user.getId()) {
-                return MessageHandler.error(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
+                return messageHandler.error(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
             }
 
             User user2 = userRepository.findUserById(user.getId());
@@ -193,9 +195,9 @@ public class UserService {
 
             generateUserStats(httpServletRequest.getHeader("Authorization"));
 
-            return MessageHandler.success(messageSource.getMessage("success.user.updated", null, LocaleContextHolder.getLocale()));
+            return messageHandler.success(messageSource.getMessage("success.user.updated", null, LocaleContextHolder.getLocale()));
         }
-        return MessageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+        return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
 
     }
 

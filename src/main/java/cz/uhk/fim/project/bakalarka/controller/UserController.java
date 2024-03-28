@@ -18,7 +18,7 @@ import cz.uhk.fim.project.bakalarka.service.UserService;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-
+    MessageHandler<String> messageHandler = new MessageHandler<>();
 
     @Autowired
     public UserController(UserService userService) {
@@ -40,7 +40,7 @@ public class UserController {
     }
     @PostMapping(value = "user/passwordReset", consumes = {"application/json"})
     public ResponseEntity<?> newPassword(@RequestBody ChangePasswordDTO changePasswordRequest, HttpServletRequest request){
-        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
         return userService.changePassword(
                 request.getHeader("Authorization"),
                 changePasswordRequest.getOldPassword(),
@@ -50,19 +50,19 @@ public class UserController {
 
     @PostMapping(value = "user/generateStats")
     public ResponseEntity<?> generateStats(HttpServletRequest request){
-        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
         String header = request.getHeader("Authorization");
         return userService.generateUserStats(header);
     }
     @PostMapping(value = "user/updateData",consumes = {"application/json"})
     public ResponseEntity<?> updateData(@RequestBody User user, HttpServletRequest request){
-        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
         return userService.updateData(user, request);
 
     }
     @GetMapping(value= "user/getUserData")
     public ResponseEntity<?> getUserData(HttpServletRequest request){
-        if (!AuthorizationCheck.hasAuthorization(request)) return MessageHandler.error("Missing authorization");
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
         String header = request.getHeader("Authorization");
         return userService.getUserData(header);
     }

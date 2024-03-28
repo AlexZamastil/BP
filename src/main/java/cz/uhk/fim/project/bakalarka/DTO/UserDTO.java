@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 @Data
 public class UserDTO {
-
     private LocalDate dateOfBirth;
     private String email;
     private String nickname;
@@ -16,7 +15,6 @@ public class UserDTO {
     private Sex sex;
     private int weight;
     private int height;
-
     private BodyType bodyType;
 
 }

@@ -8,7 +8,6 @@ import cz.uhk.fim.project.bakalarka.enumerations.Tag_Exercise;
 import cz.uhk.fim.project.bakalarka.model.*;
 import cz.uhk.fim.project.bakalarka.DTO.ExerciseDTO;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
-import cz.uhk.fim.project.bakalarka.util.MultiPartFileConverter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,8 @@ public class ExerciseService {
     private final PictureRepository pictureRepository;
     private final TagRepository tagRepository;
     private final MessageSource messageSource;
-    MultiPartFileConverter multiPartFileConverter = new MultiPartFileConverter();
+    MessageHandler<String> stringMessageHandler = new MessageHandler<>();
+    MessageHandler<ExerciseDTO> exerciseMessageHandler = new MessageHandler<>();
 
     public ExerciseService(ExerciseRepository exerciseRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, PictureRepository pictureRepository, TagRepository tagRepository, MessageSource messageSource) {
         this.exerciseRepository = exerciseRepository;
@@ -84,7 +84,7 @@ public class ExerciseService {
                         multipartFile);
             }
         }
-        return MessageHandler.error(messageSource.getMessage("error.exercise.failedToAdd", null, LocaleContextHolder.getLocale()));
+        return stringMessageHandler.error(messageSource.getMessage("error.exercise.failedToAdd", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> getExercise(long id) throws IOException {
@@ -114,7 +114,7 @@ public class ExerciseService {
                         gymWorkout.getSeries(),
                         jsonList
                 );
-                return MessageHandler.success(exerciseRequest);
+                return exerciseMessageHandler.success(exerciseRequest);
             } else if (r.isPresent()) {
                 Run run = r.get();
                 ExerciseDTO exerciseRequest = new ExerciseDTO(
@@ -126,7 +126,7 @@ public class ExerciseService {
                         run.getLenglhinmeters(),
                         jsonList
                 );
-                return MessageHandler.success(exerciseRequest);
+                return exerciseMessageHandler.success(exerciseRequest);
             } else if (s.isPresent()) {
                 Swimming swimming = s.get();
                 ExerciseDTO exerciseRequest = new ExerciseDTO(
@@ -137,11 +137,11 @@ public class ExerciseService {
                         swimming.getSwimmingstyle().toString(),
                         swimming.getLenglhinmeters(),
                         jsonList);
-                return MessageHandler.success(exerciseRequest);
+                return exerciseMessageHandler.success(exerciseRequest);
             }
 
         }
-        return MessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
+        return stringMessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> getExercisePicture(long id) {
@@ -150,30 +150,30 @@ public class ExerciseService {
             Exercise exercise = e.get();
             byte[] picture = exercise.getPicture().getPictureData();
             String pictureBytes = Base64.getEncoder().encodeToString(picture);
-            return MessageHandler.success(pictureBytes);
+            return stringMessageHandler.success(pictureBytes);
         }
-        return MessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
+        return stringMessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
         runRepository.save(run);
-        return MessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
+        return stringMessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         gymWorkoutRepository.save(gymWorkout);
-        return MessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
+        return stringMessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
         swimmingRepository.save(swimming);
-        return MessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
+        return stringMessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
     }
 
     public void handleTags(List<String> tags, Exercise exercise) {

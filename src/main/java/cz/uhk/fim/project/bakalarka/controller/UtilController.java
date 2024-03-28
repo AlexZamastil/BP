@@ -12,15 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class UtilController {
     private final MessageSource messageSource;
+    MessageHandler<String> messageHandler = new MessageHandler<>();
     public UtilController(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
-
     @Autowired
-
     @PostMapping(value = "initConnection")
     public ResponseEntity<?> initConnection(){
-        return MessageHandler.success(messageSource.getMessage("success.init", null, LocaleContextHolder.getLocale()));
+        return messageHandler.success(messageSource.getMessage("success.init", null, LocaleContextHolder.getLocale()));
     }
 
 }

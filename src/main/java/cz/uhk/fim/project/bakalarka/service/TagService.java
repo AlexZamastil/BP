@@ -11,20 +11,18 @@ import java.util.Arrays;
 
 @Service
 public class TagService {
-
+    MessageHandler<String> messageHandler = new MessageHandler<>();
     public TagService() {
-
     }
-
     public ResponseEntity<?> getExerciseTags(){
 
-        return MessageHandler.success(Arrays.toString(Tag_Exercise.values()));
+        return messageHandler.success(Arrays.toString(Tag_Exercise.values()));
     }
     public ResponseEntity<?> getFoodTags(){
-        return MessageHandler.success(Arrays.toString(Tag_Food.values()));
+        return messageHandler.success(Arrays.toString(Tag_Food.values()));
     }
     public ResponseEntity<?> getTimingTags(){
-        return MessageHandler.success(Arrays.toString(Tag_Timing.values()));
+        return messageHandler.success(Arrays.toString(Tag_Timing.values()));
     }
 
 }

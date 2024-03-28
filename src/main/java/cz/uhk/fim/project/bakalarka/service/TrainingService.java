@@ -42,7 +42,7 @@ public class TrainingService {
     private final TrainingRepository trainingRepository;
     private final MessageSource messageSource;
     private final UserStatsRepository userStatsRepository;
-
+    MessageHandler<String> messageHandler = new MessageHandler<>();
     private final JWTUtils jwtUtils;
     public final double MAX_PERCENTAGE_INCREASE = 2.5;
 
@@ -133,7 +133,7 @@ public class TrainingService {
                 wantedTimeDuration, createTrainingRequest.getActualRunLength(),
                 actualTimeDuration);
 
-        return MessageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
+        return messageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<?> generateTrainingPlan(double weight,
@@ -227,12 +227,12 @@ public class TrainingService {
                 User user = userRepository.findUserById(jwtUtils.getID(token).asLong());
                 Training training = new Training(raceDay, goal, startDay, lengthOfRaceInMeters, user);
                 trainingRepository.save(training);
-                return MessageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
+                return messageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
             } else {
                 return test;
             }
         } else {
-            return MessageHandler.error("coming soon");
+            return messageHandler.error("coming soon");
         }
 
     }
@@ -246,7 +246,7 @@ public class TrainingService {
                                                      Duration actualTime) {
         System.out.println("A");
         if (!isGoalSuitable(lengthOfRaceInMeters)) {
-            return MessageHandler.error("Run length is not suitable. Please choose between 1 km an 42 km");
+            return messageHandler.error("Run length is not suitable. Please choose between 1 km an 42 km");
         }
         double numberOfDays = ChronoUnit.DAYS.between(startDay, raceDay);
         System.out.println("number of days " + numberOfDays);
@@ -268,7 +268,7 @@ public class TrainingService {
         }
  */
 
-        return MessageHandler.success(messageSource.getMessage("success.training.isAchievable", null, LocaleContextHolder.getLocale()));
+        return messageHandler.success(messageSource.getMessage("success.training.isAchievable", null, LocaleContextHolder.getLocale()));
     }
 
     public double weeklyPercentageIncreaseInLength(double numberOfWeeks, int currentRunLength, int raceLength) {
