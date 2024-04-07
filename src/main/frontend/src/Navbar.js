@@ -18,11 +18,10 @@ export default function Navbar() {
     <>
       <nav className="nav">
         <Link to="/welcomePage" className="logo">
-          <img src={logo_transparent} width={200} alt="temp" />
-
+          <img src={logo_transparent} className="logo_image" width={200} alt="temp" />
         </Link>
         <ul>
-          <CustomLink className="c-link" to="/aboutproject"> <p>{t('about-project')}</p> </CustomLink>
+         {/* <CustomLink className="c-link" to="/aboutproject"> <p>{t('about-project')}</p> </CustomLink>*/}
 
           {localStorage.getItem("token") == null ? (
             <><CustomLink className="loginnav" to="/login"> <p>{t('log-in')}</p> </CustomLink>
@@ -37,8 +36,8 @@ export default function Navbar() {
           }
 
         </ul>
-
-        <ButtonGroup
+          <div className="localizationButton">
+        <ButtonGroup 
           orientation="vertical"
           aria-label="Vertical button group"
           variant="outlined"
@@ -48,6 +47,7 @@ export default function Navbar() {
           <Button onClick={() => changeLanguage("cs")}>CZE</Button>
           <Button onClick={() => changeLanguage("en")}>ENG</Button>
         </ButtonGroup>
+        </div>
       </nav>
       <hr className="hr-line" />
     </>

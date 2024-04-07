@@ -8,6 +8,7 @@ import cz.uhk.fim.project.bakalarka.enumerations.Tag_Exercise;
 import cz.uhk.fim.project.bakalarka.model.*;
 import cz.uhk.fim.project.bakalarka.DTO.ExerciseDTO;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class ExerciseService {
     private final MessageSource messageSource;
     MessageHandler<String> stringMessageHandler = new MessageHandler<>();
     MessageHandler<ExerciseDTO> exerciseMessageHandler = new MessageHandler<>();
+    MessageHandler<Long> longMessageHandler = new MessageHandler<>();
 
     public ExerciseService(ExerciseRepository exerciseRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, PictureRepository pictureRepository, TagRepository tagRepository, MessageSource messageSource) {
         this.exerciseRepository = exerciseRepository;
@@ -41,14 +43,16 @@ public class ExerciseService {
     }
 
     public ResponseEntity<?> addNewExercise(ExerciseDTO exerciseRequest, MultipartFile multipartFile) {
-        try {
-            System.out.println(Arrays.toString(multipartFile.getBytes()));
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to read image data");
-        }
+        if(exerciseRequest == null) return stringMessageHandler.error(messageSource.getMessage("error.exercise.null", null, LocaleContextHolder.getLocale()));
+        if (StringUtils.isBlank(exerciseRequest.getName()) ||
+                StringUtils.isBlank(exerciseRequest.getName_eng()) ||
+                StringUtils.isBlank(exerciseRequest.getDescription()) ||
+                StringUtils.isBlank(exerciseRequest.getDescription_eng()) ||
+                multipartFile.isEmpty()
+        )  return stringMessageHandler.error(messageSource.getMessage("error.exercise.null", null, LocaleContextHolder.getLocale()));
+
         switch (exerciseRequest.getType()) {
             case "RUN" -> {
-                System.out.println("R");
                 return addNewRunExercise(
                         exerciseRequest.getName(),
                         exerciseRequest.getDescription(),
@@ -60,7 +64,6 @@ public class ExerciseService {
                         multipartFile);
             }
             case "GYM" -> {
-                System.out.println("G");
                 return addNewGymExercise(
                         exerciseRequest.getName(),
                         exerciseRequest.getDescription(),
@@ -72,7 +75,6 @@ public class ExerciseService {
                         multipartFile);
             }
             case "SWIMMING" -> {
-                System.out.println("S");
                 return addNewSwimmingExercise(
                         exerciseRequest.getName(),
                         exerciseRequest.getDescription(),
@@ -110,6 +112,7 @@ public class ExerciseService {
                         exercise.getName_eng(),
                         exercise.getDescription(),
                         exercise.getDescription_eng(),
+                        "GYM",
                         gymWorkout.getRepetitions(),
                         gymWorkout.getSeries(),
                         jsonList
@@ -122,6 +125,7 @@ public class ExerciseService {
                         exercise.getName_eng(),
                         exercise.getDescription(),
                         exercise.getDescription_eng(),
+                        "RUN",
                         run.getRuncategory().toString(),
                         run.getLenglhinmeters(),
                         jsonList
@@ -134,6 +138,7 @@ public class ExerciseService {
                         exercise.getName_eng(),
                         exercise.getDescription(),
                         exercise.getDescription_eng(),
+                        "SWIMMING",
                         swimming.getSwimmingstyle().toString(),
                         swimming.getLenglhinmeters(),
                         jsonList);
@@ -159,21 +164,21 @@ public class ExerciseService {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
         runRepository.save(run);
-        return stringMessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
+        return longMessageHandler.success(exercise.getId());
     }
 
     public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         gymWorkoutRepository.save(gymWorkout);
-        return stringMessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
+        return longMessageHandler.success(exercise.getId());
     }
 
     public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
         swimmingRepository.save(swimming);
-        return stringMessageHandler.success(messageSource.getMessage("success.exercise.added", null, LocaleContextHolder.getLocale()));
+        return longMessageHandler.success(exercise.getId());
     }
 
     public void handleTags(List<String> tags, Exercise exercise) {

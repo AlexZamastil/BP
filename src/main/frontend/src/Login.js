@@ -6,6 +6,8 @@ import {useNavigate} from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import {callAPINoAuth} from './CallAPI';
 import getXSRFtoken from './XSRF_token';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 export default function Login(){
 
@@ -15,6 +17,8 @@ export default function Login(){
   const [errorMessage, setErrorMessage] = useState('');
 
   const {t} = useTranslation();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
  const xsrfToken = getXSRFtoken();
 
@@ -56,15 +60,16 @@ export default function Login(){
       <div className='loginBG'>
       <Container >
         <Paper elevation={3} className='paper'>
-      <form noValidate autoComplete="off">
+        <form noValidate autoComplete="off" className='loginForm' >
+          
       
         <h1>{t("login_form")}</h1>
       
-      <TextField  style={{ margin: "10px auto", opacity: 1 }} id="outlined-basic" label="Email" variant="outlined" fullWidth sx={{ m: 1, width: '25ch' }}
+      <TextField  style={{ margin: "10px auto", opacity: 1 }} id="outlined-basic" label="Email" variant="outlined"  sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
         value={email}
         onChange={(e)=>setEmail(e.target.value)} />
       
-        <TextField   style={{ margin: "10px auto", opacity: 1 }} type="password"  id="outlined-basic" label={t("password")} variant="outlined" fullWidth sx={{ m: 1, width: '25ch' }}
+        <TextField   style={{ margin: "10px auto", opacity: 1 }} type="password"  id="outlined-basic" label={t("password")} variant="outlined"  sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
        value={password}
        onChange={(e)=>setPassword(e.target.value)} />
       

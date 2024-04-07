@@ -32,6 +32,11 @@ public class TrainingController {
         return trainingService.hasActiveTraining(id);
     }
 
+    @GetMapping(value = "training/getTrainings")
+    public ResponseEntity<?> getTrainings(HttpServletRequest request){
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
+        return trainingService.getTrainings(request.getHeader("Authorization"));}
+
     @PostMapping(value = "training/trainJ48")
     public void trainJ48() throws Exception {trainingService.trainModel();}
 }

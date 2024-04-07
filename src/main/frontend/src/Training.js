@@ -2,22 +2,24 @@ import { Paper, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { callAPI, callAPINoAuth } from "./CallAPI";
-
+import { useTranslation } from 'react-i18next';
 export default function Training() {
     const navigate = useNavigate();
-
+    const {t} = useTranslation();
     const paperRun = {
-        backgroundColor: `rgb(${255}, ${132}, ${132})`,
-        padding: '20px',
-        border: '2px solid red',
-        margin: "20px"
+        backgroundColor: `rgb(${125}, ${175}, ${255})`,
+        padding: '10px',
+        border: '2px solid blue',
+        margin: "10px",
+        maxWidth: "300px"
     };
 
     const paperOCR = {
-        backgroundColor: `rgb(${125}, ${175}, ${255})`,
-        padding: '20px',
-        border: '2px solid blue',
-        margin: "20px"
+        backgroundColor: `rgb(${255}, ${132}, ${132})`,
+        padding: '10px',
+        border: '2px solid red',
+        margin: "10px",
+        maxWidth: "300px"
     };
 
     const [pageContent, setPageContent] = useState(null);
@@ -33,12 +35,12 @@ export default function Training() {
                     setPageContent(
                         <div className="trainingDiv">
                             <Paper elevation={3} style={paperRun}>
-                                <h1> <b>Run</b> </h1> <br /> Suitable for beginners<br /> Get in shape <br /> <br />
-                                <Button variant="contained" onClick={() => generateTraining("RUN")}>Submit</Button>
+                                <h1> <b>{t("run")} </b> </h1> <br /> {t("run_text")} <br /><br />
+                                <Button variant="contained" onClick={() => generateTraining("RUN")}>{t("submit")}</Button>
                             </Paper>
                             <Paper elevation={3} style={paperOCR}>
-                                <h1> <b>Gladiator race</b> </h1> <br /> Suitable for experienced runner <br /> try a new challenge <br /> <br />
-                                <Button variant="contained" onClick={() => generateTraining("OCR")}>Submit</Button>
+                                <h1> <b>{t("gladiator_race")}</b> </h1> <br /> {t("gladiator_text")} <br /> <br />
+                                <Button variant="contained" onClick={() => generateTraining("OCR")}>{t("submit")}</Button>
                             </Paper>
                         </div>
                     );

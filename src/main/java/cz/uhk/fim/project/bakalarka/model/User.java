@@ -50,6 +50,12 @@ public class User {
     private Role role;
     @Column(name = "token")
     private String token;
+
+    @Column(name = "averagerunlength")
+    private Integer averageRunLength;
+
+    @Column(name = "averagerunpace")
+    private Double averageRunPace;
     @ManyToMany
     @JoinTable(name = "userbannedfood",
             joinColumns = {

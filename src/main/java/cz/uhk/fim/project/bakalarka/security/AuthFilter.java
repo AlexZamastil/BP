@@ -63,7 +63,12 @@ public class AuthFilter extends OncePerRequestFilter {
             Claim userIDClaim = jwtUtils.getID(token);
             log.info(userIDClaim + " = User ID from jwtToken");
             User user = userRepository.findUserById(userIDClaim.asLong());
-            if (user == null) return;
+            if (user == null){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("User from token not found");
+                log.info("User from token not found : " + token);
+                return;
+            }
             if (Objects.equals(user.getToken(), token)) {
                 filterChain.doFilter(request, response);
             }

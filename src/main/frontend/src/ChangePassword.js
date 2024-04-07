@@ -6,7 +6,8 @@ import { Paper } from '@mui/material';
 import { TextField, Button } from '@mui/material';
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 
 
@@ -16,7 +17,8 @@ export default function ChangePassword() {
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const xsrfToken = getXSRFtoken();
-
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -56,7 +58,7 @@ export default function ChangePassword() {
 
   return (
     <div>
-      <Container >
+      <Container style={{padding : "20px"}}>
         <Paper elevation={3} className='paper'>
           <form noValidate autoComplete="off">
 
@@ -67,7 +69,7 @@ export default function ChangePassword() {
               id="outlined-basic"
               label={t("old_password")}
               variant="outlined"
-              fullWidth sx={{ m: 1, width: '25ch' }}
+              fullWidth sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)} />
 
@@ -76,7 +78,7 @@ export default function ChangePassword() {
               id="outlined-basic"
               label={t("new_password")}
               variant="outlined"
-              fullWidth sx={{ m: 1, width: '25ch' }}
+              fullWidth sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)} />
 

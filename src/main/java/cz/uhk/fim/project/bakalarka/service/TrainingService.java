@@ -43,6 +43,7 @@ public class TrainingService {
     private final MessageSource messageSource;
     private final UserStatsRepository userStatsRepository;
     MessageHandler<String> messageHandler = new MessageHandler<>();
+    MessageHandler<List<Training>> trainingListMessageHandler = new MessageHandler<>();
     private final JWTUtils jwtUtils;
     public final double MAX_PERCENTAGE_INCREASE = 2.5;
 
@@ -71,7 +72,7 @@ public class TrainingService {
         classifier = j48;
     }
 
-    public ResponseEntity<?> generateTraining(CreateTrainingDTO createTrainingRequest, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> generateTraining(CreateTrainingDTO createTrainingRequest, HttpServletRequest request) {
         System.out.println(createTrainingRequest);
         Instant wantedTime = Instant.parse(createTrainingRequest.getWantedTime());
         Instant actualTime = Instant.parse(createTrainingRequest.getActualTime());
@@ -86,7 +87,7 @@ public class TrainingService {
         System.out.println("WANTED TIME: " + wantedTimeDuration);
         System.out.println("ACTUAL TIME: " + actualTimeDuration);
 
-        String token = httpServletRequest.getHeader("Authorization");
+        String token = request.getHeader("Authorization");
         User user = userRepository.findUserByToken(token);
         UserStats userStats = userStatsRepository.findUserStatsByUser(user);
 
@@ -284,13 +285,20 @@ public class TrainingService {
 
     public Boolean hasActiveTraining(long id) {
         LocalDate today = LocalDate.now();
-        List<Training> t = trainingRepository.findTrainingsContainingUser(id);
-        for (Training training : t
+        List<Training> trainings = trainingRepository.findTrainingsContainingUser(id);
+        for (Training t : trainings
         ) {
-            if (today.isBefore(training.getRaceday()))
+            if (today.isBefore(t.getRaceday()))
                 return true;
         }
         return false;
+    }
+
+    public ResponseEntity<?> getTrainings(String token){
+        User user = userRepository.findUserByToken(token);
+        if (user == null) return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+        List<Training> trainings = trainingRepository.findTrainingsContainingUser(user.getId());
+        return trainingListMessageHandler.success(trainings);
     }
 
 

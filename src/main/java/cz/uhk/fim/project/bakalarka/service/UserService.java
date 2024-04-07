@@ -6,7 +6,6 @@ import cz.uhk.fim.project.bakalarka.DTO.UserDTO;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
 import io.micrometer.common.util.StringUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.context.MessageSource;
@@ -19,6 +18,7 @@ import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.DAO.UserRepository;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Service
@@ -111,6 +111,15 @@ public class UserService {
         if (isValidNickname(userDTO.getNickname())) {
             return messageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
         }
+
+        LocalDate currentDate = LocalDate.now();
+        LocalDate eighteenYearsAgo = currentDate.minusYears(18);
+        LocalDate userBirthDate = userDTO.getDateOfBirth();
+
+        if(userBirthDate.isAfter(eighteenYearsAgo)){
+            return messageHandler.error(messageSource.getMessage("error.register.ageTooYoung", null, LocaleContextHolder.getLocale()));
+        }
+
         if(userDTO.getPassword().length() < 8) return messageHandler.error(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
 
         String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
@@ -131,8 +140,9 @@ public class UserService {
         if (header != null) {
             User user = userRepository.findUserById(jwtUtils.getID(header).asLong());
             if (user != null) {
+                log.info(user);
                 UserStats userStats = userStatsRepository.findUserStatsByUser(user);
-
+                log.info(userStats);
                 return ResponseEntity.ok(userStats);
             } else{
                 return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
@@ -140,8 +150,6 @@ public class UserService {
 
         } else
             return messageHandler.error(messageSource.getMessage("error.header.invalid", null, LocaleContextHolder.getLocale()));
-
-
     }
 
     public ResponseEntity<?> generateUserStats(String header) {
@@ -175,7 +183,7 @@ public class UserService {
     }
 
 
-    public ResponseEntity<?> updateData(User user, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> updateData(User user) {
         if (user != null) {
 
             if (isValidNickname(user.getNickname())) {
@@ -193,12 +201,21 @@ public class UserService {
             user.setId(user2.getId());
             userRepository.save(user);
 
-            generateUserStats(httpServletRequest.getHeader("Authorization"));
+            generateUserStats(user);
 
             return messageHandler.success(messageSource.getMessage("success.user.updated", null, LocaleContextHolder.getLocale()));
         }
         return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
 
+    }
+    public ResponseEntity<?> addAverageValues(String token, UserDTO userDTO){
+        User user = userRepository.findUserByToken(token);
+        log.info(user);
+        log.info(userDTO);
+        user.setAverageRunLength(userDTO.getAverageRunLength());
+        user.setAverageRunPace(userDTO.getAverageRunPace());
+        updateData(user);
+        return messageHandler.success(messageSource.getMessage("success.user.updated", null, LocaleContextHolder.getLocale()));
     }
 
 }

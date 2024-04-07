@@ -7,9 +7,13 @@ import MenuItem from '@mui/material/MenuItem';
 import getXSRFtoken from './XSRF_token';
 import { callAPI, callAPIMultipartFile, callAPINoAuth } from './CallAPI';
 import { useNavigate } from 'react-router-dom';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
+
 
 export default function AddExercise() {
-
+  const {t} = useTranslation();
   const navigate = useNavigate()
   const [name, setName] = useState(null);
   const [name_eng, setName_eng] = useState(null);
@@ -34,8 +38,10 @@ export default function AddExercise() {
   const handleExerciseTypeChange = (selectedType) => {
     setExerciseType(selectedType);
   };
-
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const xsrfToken = getXSRFtoken();
+  const [errorMessage, setErrorMessage] = useState('');
 
   callAPI("GET", "user/getUserData", null, null)
     .then(async response => {
@@ -58,7 +64,6 @@ export default function AddExercise() {
           .slice(1, -1)
           .split(', ')
           .map((item) => item.trim());
-        console.log(exerciseTagsArray);
         setExerciseTags(exerciseTagsArray);
       })
       .catch(async (error) => {
@@ -72,7 +77,6 @@ export default function AddExercise() {
 
   const addExercise = async (e) => {
     e.preventDefault();
-
     const formData = new FormData();
 
     if (exerciseType === "RUN") {
@@ -112,39 +116,55 @@ export default function AddExercise() {
         length: length,
         style: style,
         tags: tags
-      })], { type: 'multipart' }));
-    }
+      })], { type: 'application/json' }));
+    } else {
+      setErrorMessage(t("null_type"));
+      return;
+    } 
 
-    formData.append('imageData', selectedFile, {type: 'multipart/form-data'});
-
-    try {
+    if(selectedFile == null) {
+      setErrorMessage(t("null_image"));
+      return;
+    } 
+    try{
+      formData.append('imageData', selectedFile, {type: 'multipart/form-data'});
       callAPIMultipartFile("POST", "exercise/addExercise", formData, xsrfToken)
         .then((response) => {
           const responseBody = response.data;
-          console.log(responseBody);
+          navigate("/exercise/"+responseBody)
         })
         .catch((error) => {
-          console.error("Request failed with status:", error);
+          if (error.response && error.response.data === "Token expired") {
+            navigate("/tokenExpired")
+          }
+
+          let errorMessage = "An error occurred";
+          if (error.response) {
+            errorMessage = error.response.data || errorMessage;
+          }
+          setErrorMessage(errorMessage);
         })
     } catch (error) {
-      console.error("Error:", error);
-      if(error.response && error.response.data === "Token expired"){
-              navigate("/tokenExpired")
-         }
+      if (error.response && error.response.data === "Token expired") {
+        navigate("/tokenExpired")
+      }
+      setErrorMessage("Falied to communicate with server");
     }
   };
 
+
   const handleImageChange = (e) => {
-    setSelectedFile(e.target.files[0])
-    if (selectedFile) {
+    const file = e.target.files[0];
+  
+    if (file) {
       const reader = new FileReader();
-
-      reader.onload = (e) => {
-        const base64Data = e.target.result;
-        setPicture(base64Data);
+  
+      reader.onload = (event) => {
+        setPicture(event.target.result);
       };
-
-      reader.readAsDataURL(selectedFile);
+  
+      reader.readAsDataURL(file);
+      setSelectedFile(file);
     }
   };
 
@@ -155,29 +175,29 @@ export default function AddExercise() {
           <>
             <TextField
               style={{ margin: '10px auto' }}
-              sx={{ m: 1, width: '25ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               id="outlined-basic"
-              label="length (m)"
+              label={t("length")}
               variant="outlined"
               fullWidth
               value={length}
               onChange={(e) => setLength(e.target.value)}
             />
-            <FormHelperText>Run category</FormHelperText>
+            <FormHelperText>{t("run_category")}</FormHelperText>
             <Select
               style={{ margin: '10px auto' }}
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={category}
-              label="category"
+              label={t("category")}
               sx={{ m: 1, width: '25ch' }}
               onChange={(e) => setCategory(e.target.value)}
             >
-              <MenuItem value={"INTERVALS"}>Intervals</MenuItem>
-              <MenuItem value={"TEMPO"}>tempo</MenuItem>
-              <MenuItem value={"UPHILL"}>uphill</MenuItem>
-              <MenuItem value={"ENDURANCE"}>endurance</MenuItem>
-              <MenuItem value={"SPRINT"}>sprint</MenuItem>
+              <MenuItem value={"INTERVALS"}>{t("intervals")}</MenuItem>
+              <MenuItem value={"TEMPO"}>{t("tempo")}</MenuItem>
+              <MenuItem value={"UPHILL"}>{t("Uphill")}</MenuItem>
+              <MenuItem value={"ENDURANCE"}>{t("endurance")}</MenuItem>
+              <MenuItem value={"SPRINT"}>{t("Sprint")}</MenuItem>
             </Select>
 
           </>
@@ -186,9 +206,9 @@ export default function AddExercise() {
         return (
           <> <TextField
             style={{ margin: '10px auto' }}
-            sx={{ m: 1, width: '25ch' }}
+            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
             id="outlined-basic"
-            label="repetitions"
+            label={t("repetitions")}
             variant="outlined"
             fullWidth
             value={repetitions}
@@ -196,9 +216,9 @@ export default function AddExercise() {
           />
             <TextField
               style={{ margin: '10px auto' }}
-              sx={{ m: 1, width: '25ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               id="outlined-basic"
-              label="series"
+              label={t("series")}
               variant="outlined"
               fullWidth
               value={series}
@@ -211,29 +231,29 @@ export default function AddExercise() {
 
             <TextField
               style={{ margin: '10px auto' }}
-              sx={{ m: 1, width: '25ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               id="outlined-basic"
-              label="length (m)"
+              label={t("length")}
               variant="outlined"
               fullWidth
               value={length}
               onChange={(e) => setLength(e.target.value)}
             />
 
-            <FormHelperText>Swimming style</FormHelperText>
+            <FormHelperText>{t("swimming_style")}</FormHelperText>
             <Select
               style={{ margin: '10px auto' }}
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={style}
-              label="style"
-              sx={{ m: 1, width: '25ch' }}
+              label={t("swimming")}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               onChange={(e) => setStyle(e.target.value)}
             >
-              <MenuItem value={"BREASTSSTROKE"}>breasts stroke</MenuItem>
-              <MenuItem value={"BUTTERFLYSTROKE"}>butterfly stroke</MenuItem>
-              <MenuItem value={"BACKSTROKE"}>back stroke</MenuItem>
-              <MenuItem value={"FRONTCRAWLSTROKE"}>front crawl stroke</MenuItem>
+              <MenuItem value={"BREASTSSTROKE"}>{t("breasts_stroke")}</MenuItem>
+              <MenuItem value={"BUTTERFLYSTROKE"}>{t("butterfly_stroke")}</MenuItem>
+              <MenuItem value={"BACKSTROKE"}>{t("back_stroke")}</MenuItem>
+              <MenuItem value={"FRONTCRAWLSTROKE"}>{t("front_crawl_stroke")}</MenuItem>
             </Select>
 
 
@@ -250,16 +270,16 @@ export default function AddExercise() {
     <div>
       {isAdmin !== undefined ? (
         isAdmin ? (
-          <Container>
+          <Container style={{padding : "20px"}}>
             <Paper elevation={3} className='paper'>
               <form noValidate autoComplete="off">
-                <h1>Add exercise</h1>
+                <h1>{t("add_exercise")}</h1>
 
                 <TextField
                   style={{ margin: '10px auto' }}
-                  sx={{ m: 1, width: '25ch' }}
+                  sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
                   id="outlined-basic"
-                  label="Name"
+                  label={t("name")}
                   variant="outlined"
                   fullWidth
                   value={name}
@@ -268,9 +288,9 @@ export default function AddExercise() {
 
                 <TextField
                   style={{ margin: '10px auto' }}
-                  sx={{ m: 1, width: '25ch' }}
+                  sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
                   id="outlined-basic"
-                  label="Name_eng"
+                  label={t("name_eng")}
                   variant="outlined"
                   fullWidth
                   value={name_eng}
@@ -279,9 +299,9 @@ export default function AddExercise() {
 
                 <TextField
                   style={{ margin: '10px auto' }}
-                  sx={{ m: 1, width: '25ch' }}
+                  sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
                   id="outlined-basic"
-                  label="description"
+                  label={t("description")}
                   variant="outlined"
                   fullWidth
                   value={description}
@@ -290,9 +310,9 @@ export default function AddExercise() {
 
                 <TextField
                   style={{ margin: '10px auto' }}
-                  sx={{ m: 1, width: '25ch' }}
+                  sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
                   id="outlined-basic"
-                  label="description_eng"
+                  label={t("description_eng")}
                   variant="outlined"
                   fullWidth
                   value={description_eng}
@@ -300,25 +320,25 @@ export default function AddExercise() {
                 />
 
 
-                <FormHelperText>Exercise type</FormHelperText>
+                <FormHelperText>{t("exercise_type")}</FormHelperText>
                 <Select
                   style={{ margin: '10px auto' }}
-                  sx={{ m: 1, width: '25ch' }}
+                  sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
                   select
-                  label="Select Exercise Type"
+                  label={t("select_exercise_type")}
                   variant="outlined"
                   fullWidth
                   value={exerciseType}
                   onChange={(e) => handleExerciseTypeChange(e.target.value)}
                 >
-                  <MenuItem value="RUN">Run</MenuItem>
-                  <MenuItem value="GYM">Gym</MenuItem>
-                  <MenuItem value="SWIMMING">Swimming</MenuItem>
+                  <MenuItem value="RUN">{t("run")}</MenuItem>
+                  <MenuItem value="GYM">{t("gym")}</MenuItem>
+                  <MenuItem value="SWIMMING">{t("swimming")}</MenuItem>
                 </Select>
 
                 {renderExerciseForm()}
 
-                <TagSelection pool={exerciseTags} maxSelection={2} />
+                {TagSelection(exerciseTags)}
                 <br />
 
                 <input
@@ -335,11 +355,17 @@ export default function AddExercise() {
                   </div>
                 )}
 
-
-                <Button variant="contained" onClick={addExercise}> Submit </Button>
+              
+                <Button style={{margin:"10px"}} variant="contained" onClick={addExercise}>{t("submit")} </Button>
+                {errorMessage && (
+            <div style={{ color: 'red', marginTop: '10px' }}>
+              {errorMessage}
+            </div>
+          )}
               </form>
             </Paper>
           </Container>
+         
         ) : (
           <p>Admin only</p>
         )
@@ -349,7 +375,7 @@ export default function AddExercise() {
     </div>
   );
 
-  function TagSelection({ pool }) {
+  function TagSelection(pool) {
 
     const handleTagSelection = (tag) => {
       setTags((prevSelectedTags) => {
@@ -361,11 +387,9 @@ export default function AddExercise() {
       });
     };
 
-    console.log(tags);
-
     return (
       <div>
-        <h1>Tag Selection</h1> <br />
+        <h1>{t("tag_selection")}</h1> <br />
         <ul>
           {pool.map((tag) => (
             <li className='listStyleTypeNone' key={tag}>

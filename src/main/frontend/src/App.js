@@ -78,7 +78,7 @@ function App() {
           <Route path="/" element={<WelcomePage />} />
         </Routes>
       </div>
-      <footer> {t('footertext1')} <br /><br /> © {year} - <a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a> <br />{t('copyright2')}</footer>
+      <footer> © {year} - <a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a> <br />{t('copyright2')}</footer>
     </>
   );
 }

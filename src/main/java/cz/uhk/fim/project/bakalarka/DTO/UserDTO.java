@@ -16,5 +16,7 @@ public class UserDTO {
     private int weight;
     private int height;
     private BodyType bodyType;
+    private int averageRunLength;
+    private double averageRunPace;
 
 }

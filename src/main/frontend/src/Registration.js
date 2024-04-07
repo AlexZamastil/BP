@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
 import { Container } from '@mui/system';
-import { TextField, Button } from '@mui/material';
-import { Paper } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from "react-router-dom";
-import { FormHelperText } from '@mui/material';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { callAPINoAuth } from './CallAPI';
 import getXSRFtoken from './XSRF_token';
 import { useTranslation } from 'react-i18next';
 import InputAdornment from '@mui/material/InputAdornment';
+import { Checkbox,FormControlLabel,FormHelperText,Paper,TextField,Button  } from '@mui/material';
 
 
 export default function Registration() {
   const navigate = useNavigate();
   const { t } = useTranslation()
   const [errorMessage, setErrorMessage] = useState('');
-
+  const [checked,setChecked] = useState(false);
   const  [user,setUser] = useState({
     email: "",
     nickname: "",
@@ -28,18 +26,23 @@ export default function Registration() {
     sex: null,
     bodyType: null
   });
-  const formattedBirthdate = user.birthdate ? user.birthdate.toISOString().split('T')[0] : '';
+ 
+  //const formattedBirthdate = user.birthdate ? user.birthdate.toISOString().split('T')[0] : '';
   const xsrfToken = getXSRFtoken();
-
   const onlyNumbers = (e) => {
     const inputValue = e.target.value.replace(/[^0-9]/g, '');
     e.target.value = inputValue;
 };
 
 
+
   const handleRegistration = (e) => {
     e.preventDefault();
 
+    if(!checked){
+      setErrorMessage(t("checkbox_needed"));
+    } else{
+      
     console.log(user);
 
     callAPINoAuth("POST", "user/register", user, xsrfToken)
@@ -50,9 +53,9 @@ export default function Registration() {
             console.log('Logged in successfully')
             const token = response.data;
             localStorage.setItem('token', token);
-            localStorage.setItem('user', user.email);
             console.log("redirect to profile");
             navigate("/profile");
+            window.location.reload(false);
           })
           .catch((error)=>{
             console.log(error.data)
@@ -72,11 +75,20 @@ export default function Registration() {
         setErrorMessage(errorMessage);
         console.error("Login failed", error);
     });
+    }
+
   };
 
 
-  return (
-    <div className='loginBG'>
+  return (<div className='loginBG'>
+    <Container>
+        <Paper elevation={3} className='paper'>
+                <h1> {t('ToU')}</h1>
+                <br/>
+                {t('terms_of_use')}
+        </Paper>
+      </Container>
+  
       <Container>
         <Paper elevation={3} className='paper'>
           <form noValidate autoComplete="off">
@@ -135,8 +147,8 @@ export default function Registration() {
               className='datepicker'
               sx={{ m: 1, width: '25ch' }}
               style={{ margin: '10px auto' }}
-              
-              format="YYYY-MM-DD"
+              format="DD-MM-YYYY"
+              //maxData a MinDate not working here
               label={t('birthdate')}
               onChange={(newDate) => setUser({ ...user, dateOfBirth: newDate})}
             />
@@ -185,6 +197,15 @@ export default function Registration() {
               <MenuItem value={"MUSCULAR"}>{t('muscular')}</MenuItem>
             </Select>
 
+            <FormControlLabel control={<Checkbox
+            checked = {checked}
+            onChange={(e)=>{
+              setChecked(e.target.checked)
+            }
+            
+            }/>} label={t('checkbox_text')}/>
+
+            <br/>
             <Button variant="contained" onClick={handleRegistration}> {t('submit')} </Button>
 
             {errorMessage && (
@@ -195,6 +216,8 @@ export default function Registration() {
           </form>
         </Paper>
       </Container>
+
+     
     </div>
   );
 }

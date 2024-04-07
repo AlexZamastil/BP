@@ -57,7 +57,7 @@ public class UserController {
     @PostMapping(value = "user/updateData",consumes = {"application/json"})
     public ResponseEntity<?> updateData(@RequestBody User user, HttpServletRequest request){
         if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
-        return userService.updateData(user, request);
+        return userService.updateData(user);
 
     }
     @GetMapping(value= "user/getUserData")
@@ -65,6 +65,13 @@ public class UserController {
         if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
         String header = request.getHeader("Authorization");
         return userService.getUserData(header);
+    }
+
+    @PostMapping(value = "user/addAverageValues",consumes = {"application/json"})
+    public ResponseEntity<?> addAverageValues(HttpServletRequest request, @RequestBody UserDTO userDTO){
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
+        String header = request.getHeader("Authorization");
+        return userService.addAverageValues(header,userDTO);
     }
 
 }

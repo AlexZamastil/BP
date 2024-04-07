@@ -11,6 +11,8 @@ import { FormHelperText } from '@mui/material';
 import { callAPI } from './CallAPI';
 import getXSRFtoken from './XSRF_token';
 import { useTranslation } from 'react-i18next';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 export default function UpdateData() {
   const navigate = useNavigate();
@@ -31,7 +33,8 @@ export default function UpdateData() {
   const xsrfToken = getXSRFtoken();
   const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState('');
-
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   useEffect(() => {
     callAPI("GET", "user/getUserData", null, null)
       .then(response => {
@@ -104,105 +107,108 @@ export default function UpdateData() {
   };
   return (
     <div className='divupdate'>
-      <Container>
-        <Paper elevation={3} className='paper'>
-          <form noValidate autoComplete="off">
-            <h1>{t('user_data')}</h1>
 
-            <TextField
-              style={{ margin: '10px auto' }}
-              id="outlined-basic"
-              label={t('username')}
-              variant="outlined"
-              sx={{ m: 1, width: '25ch' }}
-              fullWidth
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-            />
-            <TextField
-              style={{ margin: '10px auto' }}
-              id="outlined-basic"
-              label={t('email')}
-              variant="outlined"
-              fullWidth
-              sx={{ m: 1, width: '25ch' }}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+      <Paper elevation={3} className='paper'>
+        <form noValidate autoComplete="off">
+          <h1>{t('user_data')}</h1>
 
-            <TextField
-              style={{ margin: '10px auto' }}
-              label={t('weight')}
-              value={weight}
-              id="outlined-start-adornment"
-              sx={{ m: 1, width: '25ch' }}
-              onInput={onlyNumbers}
-              InputProps={{
-                startAdornment: <InputAdornment position="start">kg</InputAdornment>,
-              }}
-              onChange={(e) => setWeight(e.target.value)}
-            />
-            <TextField
-              style={{ margin: '10px auto' }}
-              label={t('height')}
-              value={height}
-              id="outlined-start-adornment"
-              sx={{ m: 1, width: '25ch' }}
-              onInput={onlyNumbers}
-              InputProps={{
-                startAdornment: <InputAdornment position="start">M</InputAdornment>,
-              }}
-              onChange={(e) => setHeight(e.target.value)}
-            />
+          <TextField
+            style={{ margin: '10px auto' }}
+            id="outlined-basic"
+            label={t('username')}
+            variant="outlined"
+            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
+            fullWidth
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+          />
+          <br />
+          <TextField
+            style={{ margin: '10px auto' }}
+            id="outlined-basic"
+            label={t('email')}
+            variant="outlined"
+            fullWidth
+            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <br />
+          <TextField
+            style={{ margin: '10px auto' }}
+            label={t('weight')}
+            value={weight}
+            id="outlined-start-adornment"
+            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
+            onInput={onlyNumbers}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">kg</InputAdornment>,
+            }}
+            onChange={(e) => setWeight(e.target.value)}
+          />
+          <br />
+          <TextField
+            style={{ margin: '10px auto' }}
+            label={t('height')}
+            value={height}
+            id="outlined-start-adornment"
+            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
+            onInput={onlyNumbers}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">M</InputAdornment>,
+            }}
+            onChange={(e) => setHeight(e.target.value)}
+          />
+          <br />
+          <FormHelperText>{t('select_bodytype')}</FormHelperText>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={bodyType}
+            label={t('body_type')}
+            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
+            onChange={(e) => setBodyType(e.target.value)}
+          >
+            <MenuItem value={"AVERAGE"}>{t('average')}</MenuItem>
+            <MenuItem value={"ATHLETIC"}>{t('athletic')}</MenuItem>
+            <MenuItem value={"OBESE"}>{t('obese')}</MenuItem>
+          </Select>
+          <br />
+          <FormHelperText>{t('select_sex')}</FormHelperText>
+          <Select
+            labelId="demo-simple-select-label"
+            style={{ margin: '10px auto' }}
+            id="demo-simple-select"
+            value={sex}
+            label={t('sex')}
+            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
+            onChange={(e) => setSex(e.target.value)}
+          >
+            <MenuItem value={"MALE"}>{t('man')}</MenuItem>
+            <MenuItem value={"FEMALE"}>{t('women')}</MenuItem>
+          </Select>
+          <br />
+          <FormHelperText>{t('select_birth')}</FormHelperText>
+          <DatePicker
+            className='datepicker'
+            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
+            style={{ margin: '10px auto' }}
+            format="DD-MM-YYYY"
+            onChange={(newDate) => setBirthdate(newDate)}
+          />
+          <br />
+          <Button variant="contained" style={{ margin: "10px" }} onClick={handleUpdate}> {t('submit')} </Button>
 
-            <FormHelperText>{t('select_bodytype')}</FormHelperText>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={bodyType}
-              label={t('body_type')}
-              sx={{ m: 1, width: '25ch' }}
-              onChange={(e) => setBodyType(e.target.value)}
-            >
-              <MenuItem value={"AVERAGE"}>{t('average')}</MenuItem>
-              <MenuItem value={"ATHLETIC"}>{t('athletic')}</MenuItem>
-              <MenuItem value={"OBESE"}>{t('obese')}</MenuItem>
-            </Select>
+          {errorMessage && (
+            <div style={{ color: 'red', marginTop: '10px' }}>
+              {errorMessage}
+            </div>
+          )}
+        </form>
+      </Paper>
 
-            <FormHelperText>{t('select_sex')}</FormHelperText>
-            <Select
-              labelId="demo-simple-select-label"
-              style={{ margin: '10px auto' }}
-              id="demo-simple-select"
-              value={sex}
-              label={t('sex')}
-              sx={{ m: 1, width: '30ch' }}
-              onChange={(e) => setSex(e.target.value)}
-            >
-              <MenuItem value={"MALE"}>{t('man')}</MenuItem>
-              <MenuItem value={"FEMALE"}>{t('women')}</MenuItem>
-            </Select>
 
-            <DatePicker
-              className='datepicker'
-              sx={{ m: 1, width: '25ch' }}
-              style={{ margin: '10px auto' }}
-              format="YYYY-MM-DD"
-              onChange={(newDate) => setBirthdate(newDate)}
-            />
-
-            <Button variant="contained" style={{margin : "10px"}} onClick={handleUpdate}> {t('submit')} </Button>
-
-            {errorMessage && (
-              <div style={{ color: 'red', marginTop: '10px' }}>
-                {errorMessage}
-              </div>
-            )}
-          </form>
-        </Paper>
-      </Container>
-
-      <Button variant="contained" color='dark' style={{margin : "10px"}} onClick={handleNavigate}> {t('change_password')} </Button>
+      <Button variant="contained" color='dark' style={{ margin: "10px" }} onClick={handleNavigate}> {t('change_password')} </Button>
     </div>
   );
 }

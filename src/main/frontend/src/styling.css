@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
 
-
 :root {
   --yellow-color: #d9ff00;
   --greer-color: #61e248;
@@ -23,7 +22,7 @@ body {
 }
 
 .container {
-  min-height: 100%;
+  min-height: 500px;
   position: relative;
 }
 
@@ -170,6 +169,7 @@ body {
   text-decoration: none;
   transition: transform 0.2s ease-in-out;
   margin-right: 50px;
+  margin-top: 20px;
 }
 
 .animatedLink:hover {
@@ -222,7 +222,12 @@ body {
   padding: 10px;
   max-width: 300px;
   opacity: 0.9;
+}
 
+.flexDiv{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .paperProfile {
@@ -269,15 +274,13 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: center;
-
+  width: auto;
 
 }
 
 .profile_info {
   display: flex;
   margin: 20px;
-
-
 }
 
 .profile_stats {
@@ -289,6 +292,9 @@ body {
   padding: 150px;
   background-image: url(/src/sources/img_legs.jpg);
   background-size: cover;
+  display: flex;
+  flex-flow: row;
+  justify-content:center;
 }
 
 .paperProfile b {
@@ -312,6 +318,16 @@ body {
   margin: 0;
 }
 
+.createTrainingDiv{
+  display: flex; margin: auto;
+  padding : 25px;
+  flex-direction: row;
+  justify-content: center;
+}
+.trainingDiv1{
+  display: flex;
+}
+
 footer {
   background-color: var(--greer-color);
   color: #000000;
@@ -321,9 +337,13 @@ footer {
 
 .divupdate {
   margin: auto;
-  padding: 30px;
   text-align: center;
+  justify-content: center;
+  padding: 10px;
+  width:fit-content;
+ 
 }
+
 
 .header {
   font-size: x-large;
@@ -332,23 +352,416 @@ footer {
   font-weight: 400;
 }
 
-@media (max-width: 768px) {
+
+
+
+
+
+
+
+
+
+@media (max-width: 600px) {
   .nav {
-    flex-direction: column;
-    align-items: flex-start;
+   display: flex;
+   flex-direction: column;
+    align-items: center;
+
   }
+  .logo{
+    margin: auto;
+  }
+  
+  
+  .logo_image {
+    width: 100px;
+ 
+    }
 
   .nav ul {
-    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
   }
 
   .nav ul li {
-    margin-right: 0px;
-    margin-bottom: 10px;
+    margin: auto;
+    padding-top: 10px;
+  }
+  .localizationButton{
+    position: absolute;
+    top: 10px;
+    right: 10px;
   }
 
-  .site-title {
-    margin: 10px 0;
+  .nav ul .c-link {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    transition: all 0.3s ease 0s;
+    padding: 0;
+  }
+  
+  .nav ul :hover {
+    color: #ffffff;
+  }
+  
+  .nav ul .loginnav {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    transition: all 0.3s ease 0s;
+    padding: 0;
   }
 
+  
+  .nav ul .registernav {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    transition: all 0.3s ease 0s;
+    padding: 0;
+  }
+  
+  
+.welcomeDiv1 {
+  color: #ffffff;
+  text-align: left;
+  padding: 15px 20px;
+  background-image: url(/src/sources/img_runners.jpg);
+  background-image:
+    linear-gradient(45deg,
+      rgba(27, 90, 25, 0.836),
+      rgba(161, 63, 6, 0.57)), url(/src/sources/img_runners.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.flexDiv {
+  background-image: no-repeat url(/src/sources/racing_track.jpg);
+  background-image:
+    linear-gradient(45deg,
+      rgba(27, 90, 25, 0.836),
+      rgba(161, 63, 6, 0.57)), url(/src/sources/racing_track.jpg);
+  display:block;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.welcomeDiv1 p {
+  padding: 20px;
+  font-size: medium;
+}
+
+.welcomeDiv1 h1 {
+  font-size: x-large;
+  text-align: center;
+  color: var(--yellow-color);
+}
+
+.welcomeDiv2 {
+
+  text-align: left;
+  padding: 35px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  flex: 1;
+
+}
+
+.welcomeDiv2 h1 {
+  font-size: x-large;
+  text-align: justify;
+  color: var(--yellow-color);
+}
+
+.flex2 {
+  margin: auto;
+  text-align: center;
+}
+
+.animatedLink {
+  background-color: transparent;
+  border-radius: 20px;
+  border: 2px solid var(--greer-color);
+  display: inline-block;
+  cursor: pointer;
+  color: var(--yellow-color);
+  font-size:large;
+  padding: 10px 35px;
+  margin: auto;
+  text-decoration: none;
+  transition: transform 0.2s ease-in-out;
+  margin : 20px;
+}
+
+.animatedLink:hover {
+  background-color: var(--greer-color);
+  color: #ffffff;
+  transform: translateY(-10px);
+}
+
+.animatedLink2 {
+  background-color: transparent;
+  border-radius: 42px;
+  border: 2px solid var(--greer-color);
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: large;
+  padding: 10px 35px;
+  text-decoration: none;
+  transition: transform 0.2s ease-in-out;
+  margin : 20px;
+}
+
+.animatedLink2:hover {
+  background-color: var(--greer-color);
+  transform: translateY(-10px);
+}
+
+.h11,.h22,.h33,.h44 {
+  padding: 15px 0 0 100px;
+  margin: auto;
+}
+
+footer {
+  background-color: var(--greer-color);
+  color: #000000;
+  padding: 20px;
+  text-align: center;
+  font-size: small;
+}
+footer a{font-size: small;}
+
+.loginBG {
+  padding: 20px;
+  padding-bottom:  250px;
+  background-image: url(/src/sources/img_legs.jpg);
+  background-size: cover;
+
+  justify-content:center;
+}
+.paper {
+  padding: 20px;
+  max-width: 250px;
+  opacity: 0.9;
+  margin: auto;
+}
+
+.profile {
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  width: fit-content;
+  margin: auto;
+
+}
+
+.profile_info {
+  margin: 0%;
+  padding: 0%;
+}
+
+.profile_stats {
+ margin: auto;
+}
+.paperProfile {
+  padding: 10px;
+  max-width: 300px;
+  opacity: 1;
+  margin: 20px;;
+  
+}
+
+
+.trainingDiv {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+
+}
+
+.exerciseFlex{
+  display:block;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  max-width: 100%;
+  margin: auto;
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@media (min-width: 600px) and (max-width: 991px) {
+  .nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: var(--greer-color);
+    color: rgb(98, 65, 218);
+    padding: 10px 10%;
+  }
+  
+  
+  .nav ul {
+    list-style: none;
+    display: flex;
+  }
+  
+  .nav li {
+    padding: 0px 20px;
+  }
+  
+  .nav ul .c-link {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    transition: all 0.3s ease 0s;
+    padding: 10px 15px;
+  }
+  
+  .nav ul .c-link:hover {
+    color: #ffffff;
+  }
+  
+  .nav ul .loginnav {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    transition: all 0.3s ease 0s;
+    padding: 10px 15px;
+  }
+  
+  .nav ul .loginnav:hover {
+    color: #ffffff;
+  }
+  
+  .nav ul .registernav {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    transition: all 0.3s ease 0s;
+    padding: 10px 15px;
+  }
+  
+  .nav ul .registernav:hover {
+    color: #ffffff;
+  }
+
+  
+.welcomeDiv1 {
+  color: #ffffff;
+  text-align: left;
+  padding: 15px 20px;
+  background-image: url(/src/sources/img_runners.jpg);
+  background-image:
+    linear-gradient(45deg,
+      rgba(27, 90, 25, 0.836),
+      rgba(161, 63, 6, 0.57)), url(/src/sources/img_runners.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.flexDiv {
+  background-image: no-repeat url(/src/sources/racing_track.jpg);
+  background-image:
+    linear-gradient(45deg,
+      rgba(27, 90, 25, 0.836),
+      rgba(161, 63, 6, 0.57)), url(/src/sources/racing_track.jpg);
+  display:flex;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.welcomeDiv1 p {
+  padding: 30px;
+  font-size: large;
+}
+
+.welcomeDiv1 h1 {
+  font-size:xx-large;
+  text-align: center;
+  color: var(--yellow-color);
+}
+
+.welcomeDiv2 {
+
+  text-align: left;
+  padding: 35px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  flex: 1;
+
+}
+
+.welcomeDiv2 h1 {
+  font-size: xx-large;
+  text-align: justify;
+  color: var(--yellow-color);
+}
+
+.flex2 {
+  margin: auto;
+  text-align: center;
+}
+
+.animatedLink {
+  background-color: transparent;
+  border-radius: 20px;
+  border: 2px solid var(--greer-color);
+  display: inline-block;
+  cursor: pointer;
+  color: var(--yellow-color);
+  font-size:large;
+  padding: 10px 35px;
+  margin: auto;
+  text-decoration: none;
+  transition: transform 0.2s ease-in-out;
+  margin : 20px;
+}
+
+.animatedLink:hover {
+  background-color: var(--greer-color);
+  color: #ffffff;
+  transform: translateY(-10px);
+}
+
+.animatedLink2 {
+  background-color: transparent;
+  border-radius: 42px;
+  border: 2px solid var(--greer-color);
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: large;
+  padding: 10px 35px;
+  text-decoration: none;
+  transition: transform 0.2s ease-in-out;
+  margin : 20px;
+}
+
+.animatedLink2:hover {
+  background-color: var(--greer-color);
+  transform: translateY(-10px);
+}
+
+.h11,.h22,.h33,.h44 {
+  padding: 15px 0 0 100px;
+  margin: auto;
+}
+.loginBG {
+  padding: 20px;
+  padding-bottom:  250px;
+  background-image: url(/src/sources/img_legs.jpg);
+  background-size: cover;
+  
+  justify-content:center;
+}
+
+
+  
 }

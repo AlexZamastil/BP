@@ -8,7 +8,8 @@ import { callAPI } from './CallAPI';
 export default function Profile() {
   const [userStats, setUserStats] = useState([]);
   const [bmiColor, setBmiColor] = useState(null);
-
+  const [trainings, setTrainings] = useState([]);
+  const [age,setAge] = useState(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -28,6 +29,14 @@ export default function Profile() {
     window.location.reload(false);
   }
 
+  const handleAge = (date) => {
+    const today = new Date();
+    const day = new Date(date);
+    const difference = (today - day);
+    const ageInYears = Math.floor(difference/1000/60/60/24/365.25);
+    setAge(ageInYears);
+  }
+
   const [adminTools, setAdminTools] = useState(null);
 
   useEffect(() => {
@@ -35,6 +44,7 @@ export default function Profile() {
       .then((response => response.data))
       .then((userStats) => {
         setUserStats(userStats);
+        handleAge(userStats.user.dateOfBirth)
         if (userStats.user && userStats.user.role === "ADMIN") {
           setAdminTools(
             <Button color="dark" style={{ margin: '10px' }} variant="contained" onClick={handleAdminTools}>
@@ -57,11 +67,24 @@ export default function Profile() {
       .catch((error) => {
         console.log(error)
         console.log(error.response)
+        // console.log(error.response.data)
+        if (error.response && error.response.data === "Token expired") {
+          navigate("/tokenExpired")
+        }
+      });
+
+      callAPI("GET", "training/getTrainings", null, null)
+      .then(response => {
+        setTrainings(response)
+      })
+      .catch((error) => {
+        console.log(error)
+        console.log(error.response)
         console.log(error.response.data)
         if (error.response && error.response.data === "Token expired") {
           navigate("/tokenExpired")
         }
-      })
+      });
   }, [localStorage.getItem("Localization")])
 
   return (
@@ -76,11 +99,11 @@ export default function Profile() {
 
                   {t('username')} <b> {userStats.user.nickname}</b> <br />
                   {t('email')}<b>{userStats.user.email}</b><br />
-                  {t('birthdate')}<b>{userStats.user.dateOfBirth}</b><br />
-                  {t('sex')}<b>{userStats.user.sex}</b><br />
+                  {t('age')}<b>{age}</b><br />
+                  {t('sex')}<b> {t(userStats.user.sex)}</b><br />
                   {t('height')}<b>{userStats.user.height}</b><br />
                   {t('weight')}<b>{userStats.user.weight}</b><br />
-                  {t('body_type')}<b>{userStats.user.bodyType}</b><br />
+                  {t('body_type')}<b>{t(userStats.user.bodyType)}</b><br />
                   <br />
                   <Button color='primary' variant='contained' onClick={handleChange}> {t('change_data')} </Button>
                 </div>

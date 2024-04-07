@@ -56,6 +56,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,"/user/updateData").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET,"/user/getUserData").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.POST,"/generateTraining").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/getTrainings").hasAnyRole("USER","ADMIN")
                                 .requestMatchers(HttpMethod.GET,"/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.POST,"/trainJ48").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/getExerciseTags").permitAll()
@@ -66,6 +67,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,"/user/login").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/user/register").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/language/switch").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/initConnection").permitAll()
+
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(authFilter, BasicAuthenticationFilter.class);

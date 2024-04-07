@@ -36,7 +36,7 @@ export default function AdminTools(){
             <div>
               {isAdmin !== undefined ? ( 
                 isAdmin ? (
-                    <Container>
+                    <Container style={{padding : "20px"}}>
                     <Paper elevation={3} className='paper'>
                         <h1>Admin tools </h1>
                         <br/>

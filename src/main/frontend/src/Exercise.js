@@ -19,6 +19,7 @@ export default function Exercise() {
         callAPI("GET", "exercise/getExercise/" + exerciseID, null, null)
             .then((response) => {
                 setExerciseData(response.data)
+                console.log(response.data)
             })
             .catch((error) => {
                 if (error.response && error.response.data === "Token expired") {
@@ -29,10 +30,9 @@ export default function Exercise() {
     }, [])
 
     useEffect(() => {
-            setIsPictureLoading(true)
-            callAPI("GET", "exercise/getExercise/picture/" + exerciseID, null, null)
+        setIsPictureLoading(true)
+        callAPI("GET", "exercise/getExercise/picture/" + exerciseID, null, null)
             .then(response => {
-                console.log("Get excercise picture response", response)
                 setPicture(response.data)
                 setIsPictureLoading(false)
             })
@@ -43,43 +43,112 @@ export default function Exercise() {
                     navigate("/tokenExpired")
                 }
             }
+
+            )
+    }, [])
+
+    function renderExercise(localization){
             
-    )}, [])
+            if(localization === "cs"){
+                if(exerciseData.type === "RUN"){
+                    return(
+                        <>
+                        Name: {exerciseData.name}<br/>
+                        Description: {exerciseData.description}<br/>
+                        Type: {exerciseData.type}<br/>
+                        Category: {exerciseData.category}<br/>
+                        Length: {exerciseData.length}<br/>
+                        {exerciseData.tagsJSON}
+                    </>
+                    )
+                } else if (exerciseData.type === "GYM"){
+                    return(
+                        <>
+                        Name: {exerciseData.name}<br/>
+                        Description: {exerciseData.description}<br/>
+                        Type: {exerciseData.type}<br/>
+                        Repetitions: {exerciseData.repetitions}<br/>
+                        Series: {exerciseData.series}<br/>
+                        {exerciseData.tagsJSON}
+                    </>
+                    )
+                } else {
+                    return(
+                        <>
+                        Name: {exerciseData.name}<br/>
+                        Description: {exerciseData.description}<br/>
+                        Type: {exerciseData.type}<br/>
+                        Style: {exerciseData.style}<br/>
+                        Length: {exerciseData.length}<br/>
+                        {exerciseData.tagsJSON}
+
+                    </>
+                    )
+                }
+
+                   
+            } else {
+                if(exerciseData.type === "RUN"){
+                    return(
+                        <>
+                        Name: {exerciseData.name_eng}<br/>
+                        Description: {exerciseData.description_eng}<br/>
+                        Type: {exerciseData.type}<br/>
+                        Category: {exerciseData.category}<br/>
+                        Length: {exerciseData.length}<br/>
+                        {exerciseData.tagsJSON}
+                    </>
+                    )
+                } else if (exerciseData.type == "GYM"){
+                    return(
+                        <>
+                        Name: {exerciseData.name_eng}<br/>
+                        Description: {exerciseData.description_eng}<br/>
+                        Type: {exerciseData.type}<br/>
+                        Repetitions: {exerciseData.repetitions}<br/>
+                        Series: {exerciseData.series}<br/>
+                        {exerciseData.tagsJSON}
+                    </>
+                    )
+                } else {
+                    return(
+                        <>
+                        Name: {exerciseData.name_eng}<br/>
+                        Description: {exerciseData.description_eng}<br/>
+                        Type: {exerciseData.type}<br/>
+                        Style: {exerciseData.style}<br/>
+                        Length: {exerciseData.length}<br/>
+                        {exerciseData.tagsJSON}
+
+                    </>
+                    )
+                }
+            }
+    }
 
     return (
         <>
-        <div className="exerciseFlex">
-       <div style={{height: "150px", marginTop: "20px", display: "flex"}}>
+            <div className="exerciseFlex">
+
+
+                <Paper elevation={3} style={{ maxWidth: '100%' }} className='paperExercise'>
+                    <div>
+                        {exerciseData && (
+
+                            renderExercise(localStorage.getItem("Localization"))
+                          
+                        )}
+                    </div>
+                </Paper>
+                <div style={{ height: "250px", marginTop: "20px", display: "flex" }}>
                     {isPictureLoading ?
-                        <CircularProgress/>
+                        <CircularProgress />
                         :
-                          <img src={`data:image/png;base64,${picture}`}
-                             alt="Exercise Picture"
+                        <img src={`data:image/png;base64,${picture}`}
+                            alt="Exercise Picture"
                         />
                     }
                 </div>
-           
-            <Paper elevation={3} className='paperExercise'>
-                <div>
-                    {exerciseData && (
-                        <>
-                        <h2>{t('exercise_name')}</h2>
-                            <div>Name: {exerciseData.name}</div>
-                            <div>Name (English): {exerciseData.name_eng}</div>
-                            <div>Description: {exerciseData.description}</div>
-                            <div>Description (English): {exerciseData.description_eng}</div>
-                            <div>Type: {exerciseData.type}</div>
-                            <div>Category: {exerciseData.category}</div>
-                            <div>Style: {exerciseData.style}</div>
-                            <div>Length: {exerciseData.length}</div>
-                            <div>Repetitions: {exerciseData.repetitions}</div>
-                            <div>Series: {exerciseData.series}</div>
-                            <div>Tags: {exerciseData.tagsJSON}</div>
-                            
-                        </>
-                    )}
-                </div>
-            </Paper>
             </div>
         </>
     );
