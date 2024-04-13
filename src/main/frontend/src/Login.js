@@ -9,6 +9,12 @@ import getXSRFtoken from './XSRF_token';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
+
+/**
+ * Author: Alex Zamastil
+ * File displays login form.
+ */
+
 export default function Login(){
 
   const navigate = useNavigate();
@@ -21,7 +27,7 @@ export default function Login(){
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
  const xsrfToken = getXSRFtoken();
-
+  //handler for sending login request to server
   const logInRequest =(e)=>{
     e.preventDefault();
 
@@ -55,7 +61,7 @@ export default function Login(){
     
    }
 
-    
+    //file returns the login form
     return (
       <div className='loginBG'>
       <Container >

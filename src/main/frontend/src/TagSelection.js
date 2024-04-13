@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 
+/**
+ * Author: Alex Zamastil
+ * Component that is used for selecting tags.
+ */
+
 function TagSelection({pool, tags }) {
   const [selectedTags, setSelectedTags] = useState([]);
 
@@ -13,10 +18,10 @@ function TagSelection({pool, tags }) {
     console.log(tags);
     console.log(selectedTags);
   };
-
+//returns list of tags that could be selected and assigned as selected tags
   return (
     <div>
-      <h1>Tag Selection</h1> <br/>
+      <h1>{t('tag_selection')} </h1> <br/>
       <ul>
         {pool.map((tag) => (
           <li className='listStyleTypeNone' key={tag}>

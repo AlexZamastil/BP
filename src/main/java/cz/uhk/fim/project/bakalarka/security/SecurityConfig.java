@@ -23,15 +23,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Configuration class for defining security configurations.
+ * Configures authentication, authorization, CORS, CSRF protection, and HTTP security headers.
+ *
+ * @author Alex Zamastil
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final List<String> allowedMethods = Arrays.asList("GET", "POST","OPTIONS","DELETE","PUT");
-    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization","XSRF-TOKEN", "Accept","Localization");
+    private final List<String> allowedMethods = Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT");
+    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization", "XSRF-TOKEN", "Accept", "Localization");
     @Value("${security.cors.origins}")
     private final List<String> allowedOrigins = Collections.emptyList();
-
     AuthFilter authFilter;
 
     @Autowired
@@ -39,6 +44,15 @@ public class SecurityConfig {
         this.authFilter = authFilter;
     }
 
+    /**
+     * Configures the security filter chain for HTTP requests.
+     * This method sets up headers, CORS, CSRF protection, and request authorization.
+     * It specifies which HTTP requests require authentication and authorization using role-based access control.
+     *
+     * @param http HttpSecurity object for configuring security settings.
+     * @return SecurityFilterChain instance representing the configured security filter chain.
+     * @throws Exception if an error occurs while configuring the security filter chain.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -52,22 +66,28 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers(HttpMethod.POST,"/user/passwordReset").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/user/updateData").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/user/getUserData").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/generateTraining").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/getTrainings").hasAnyRole("USER","ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/trainJ48").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/getExerciseTags").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/getFoodTags").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/getTimingTags").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/getExercise/{id}").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/addExercise").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/user/login").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/user/register").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/language/switch").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/initConnection").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/user/passwordReset").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/user/updateData").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/user/getUserData").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/generateTraining").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/getTrainings").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/training/getActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/trainJ48").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/getExerciseTags").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/getFoodTags").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/getTimingTags").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/getExercise/{id}").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/addExercise").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/language/switch").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/initConnection").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/user/deleteUser").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/user/addAverageValues").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/training/deleteTraining/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/training/getTrainings").hasAnyRole("USER", "ADMIN")
+
 
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
@@ -75,7 +95,12 @@ public class SecurityConfig {
 
         return http.build();
     }
-
+    /**
+     * Provides a CorsConfigurationSource bean for configuring Cross-Origin Resource Sharing (CORS) settings.
+     * This method sets up CORS configuration with allowed origins, methods, headers, and credentials.
+     *
+     * @return CorsConfigurationSource instance with configured CORS settings.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -90,6 +115,12 @@ public class SecurityConfig {
         return urlCORFConfig;
     }
 
+    /**
+     * Provides a CookieCsrfTokenRepository bean for managing Cross-Site Request Forgery (CSRF) tokens.
+     * This method configures the repository with the cookie name, security flag and cookie path.
+     *
+     * @return CookieCsrfTokenRepository instance with configured settings.
+     */
     @Bean
     public CookieCsrfTokenRepository csrfTokenRepository() {
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
@@ -100,6 +131,13 @@ public class SecurityConfig {
         return repository;
     }
 
+    /**
+     * Provides a PasswordEncoder bean for encoding passwords securely.
+     * Password hashing ensures that passwords are stored securely in the database - not in plaintext,
+     * protecting user credentials from unauthorized access even in the event of a data breach.
+     *
+     * @return BCryptPasswordEncoder instance for password encoding.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

@@ -2,6 +2,7 @@ package cz.uhk.fim.project.bakalarka.service;
 
 
 import cz.uhk.fim.project.bakalarka.DAO.UserStatsRepository;
+import cz.uhk.fim.project.bakalarka.DTO.AddAverageValuesDTO;
 import cz.uhk.fim.project.bakalarka.DTO.UserDTO;
 import cz.uhk.fim.project.bakalarka.model.UserStats;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
@@ -21,6 +22,11 @@ import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * Service class responsible for handling user-related operations.
+ *
+ * @author Alex Zamastil
+ */
 @Service
 @Log4j2
 public class UserService {
@@ -32,10 +38,6 @@ public class UserService {
     private final MessageSource messageSource;
     MessageHandler<String> messageHandler = new MessageHandler<>();
 
-    private boolean isValidNickname(String nickname) {
-        return !nickname.matches("^[a-zA-Z0-9_ ]{5,20}$");
-    }
-
     public UserService(UserRepository userRepository, UserStatsRepository userStatsRepository, JWTUtils jwtUtils, PasswordEncoder passwordEncoder, MessageSource messageSource) {
         this.userRepository = userRepository;
         this.jwtUtils = jwtUtils;
@@ -45,6 +47,25 @@ public class UserService {
         this.messageSource = messageSource;
     }
 
+    /**
+     * Validates if the provided nickname is valid.
+     * Defines which characters can be used in a nickname.
+     *
+     * @param nickname The nickname to validate.
+     * @return True if the nickname is valid, otherwise false.
+     */
+    private boolean isValidNickname(String nickname) {
+        return !nickname.matches("^[a-zA-Z0-9_ ]{5,20}$");
+    }
+
+    /**
+     * Handles user login authentication.
+     * Verifies the provided email and password against stored credentials.
+     *
+     * @param email    The user's email.
+     * @param password The user's password.
+     * @return ResponseEntity containing the JWT token if authentication is successful, otherwise an error message.
+     */
     public ResponseEntity<?> login(String email, String password) {
         System.out.println(LocaleContextHolder.getLocale());
         if (email == null || email.equals("") || password == null || password.equals(""))
@@ -62,9 +83,18 @@ public class UserService {
             return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
     }
 
+    /**
+     * Handles password change for a user.
+     * Verifies the old password, validates the new password, and updates it if all conditions are met.
+     *
+     * @param token       The user's authentication token.
+     * @param oldPassword The old password.
+     * @param newPassword The new password.
+     * @return ResponseEntity indicating the success or failure of the password change operation.
+     */
     public ResponseEntity<?> changePassword(String token, String oldPassword, String newPassword) {
 
-        if(oldPassword == null || newPassword == null){
+        if (oldPassword == null || newPassword == null) {
             return messageHandler.error(messageSource.getMessage("error.changePassword.null", null, LocaleContextHolder.getLocale()));
         }
         User user = null;
@@ -79,18 +109,26 @@ public class UserService {
             return messageHandler.error(messageSource.getMessage("error.changePassword.invalid", null, LocaleContextHolder.getLocale()));
         }
 
-        if(newPassword.length() < 8) return messageHandler.error(messageSource.getMessage("error.changePassword.invalidNew", null, LocaleContextHolder.getLocale()));
+        if (newPassword.length() < 8)
+            return messageHandler.error(messageSource.getMessage("error.changePassword.invalidNew", null, LocaleContextHolder.getLocale()));
 
         if (Objects.equals(oldPassword, newPassword)) {
             return messageHandler.error(messageSource.getMessage("error.password.same", null, LocaleContextHolder.getLocale()));
         }
-            String encryptedPassword = passwordEncoder.encode(newPassword);
-            Objects.requireNonNull(user).setPassword(encryptedPassword);
-            userRepository.save(user);
-            return messageHandler.success(messageSource.getMessage("success.password.changed", null, LocaleContextHolder.getLocale()));
+        String encryptedPassword = passwordEncoder.encode(newPassword);
+        Objects.requireNonNull(user).setPassword(encryptedPassword);
+        userRepository.save(user);
+        return messageHandler.success(messageSource.getMessage("success.password.changed", null, LocaleContextHolder.getLocale()));
 
     }
 
+    /**
+     * Registers a new user with the provided user details.
+     * Validates the provided details and creates a new user entity if all conditions are met.
+     *
+     * @param userDTO The DTO containing the user's details for registration.
+     * @return ResponseEntity indicating the success or failure of the registration process.
+     */
     public ResponseEntity<?> register(UserDTO userDTO) {
         if (StringUtils.isBlank(userDTO.getEmail()) ||
                 StringUtils.isBlank(userDTO.getNickname()) ||
@@ -116,14 +154,15 @@ public class UserService {
         LocalDate eighteenYearsAgo = currentDate.minusYears(18);
         LocalDate userBirthDate = userDTO.getDateOfBirth();
 
-        if(userBirthDate.isAfter(eighteenYearsAgo)){
+        if (userBirthDate.isAfter(eighteenYearsAgo)) {
             return messageHandler.error(messageSource.getMessage("error.register.ageTooYoung", null, LocaleContextHolder.getLocale()));
         }
 
-        if(userDTO.getPassword().length() < 8) return messageHandler.error(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
+        if (userDTO.getPassword().length() < 8)
+            return messageHandler.error(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
 
         String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
-        User user = new User(userDTO.getEmail(), userDTO.getNickname(), encryptedPassword, userDTO.getDateOfBirth(), userDTO.getSex(), userDTO.getWeight(), userDTO.getHeight(),userDTO.getBodyType());
+        User user = new User(userDTO.getEmail(), userDTO.getNickname(), encryptedPassword, userDTO.getDateOfBirth(), userDTO.getSex(), userDTO.getWeight(), userDTO.getHeight(), userDTO.getBodyType());
         user.setPassword(encryptedPassword);
         try {
             userRepository.save(user);
@@ -136,6 +175,13 @@ public class UserService {
 
     }
 
+    /**
+     * Retrieves user data based on the provided authentication token.
+     * Fetches user stats associated with the user and returns them.
+     *
+     * @param header The authentication token.
+     * @return ResponseEntity containing the user stats or an error message if the user is not found.
+     */
     public ResponseEntity<?> getUserData(String header) {
         if (header != null) {
             User user = userRepository.findUserById(jwtUtils.getID(header).asLong());
@@ -144,7 +190,7 @@ public class UserService {
                 UserStats userStats = userStatsRepository.findUserStatsByUser(user);
                 log.info(userStats);
                 return ResponseEntity.ok(userStats);
-            } else{
+            } else {
                 return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
             }
 
@@ -152,11 +198,23 @@ public class UserService {
             return messageHandler.error(messageSource.getMessage("error.header.invalid", null, LocaleContextHolder.getLocale()));
     }
 
+    /**
+     * Generates userStats for the user obtained from authentication token.
+     *
+     * @param header The authentication token.
+     * @return ResponseEntity indicating the success or failure of the user statistics generation process.
+     */
     public ResponseEntity<?> generateUserStats(String header) {
         User user = userRepository.findUserById(jwtUtils.getID(header).asLong());
         return generateUserStats(user);
     }
 
+    /**
+     * Generates userStats for the specified user.
+     *
+     * @param user The user for whom to generate statistics.
+     * @return ResponseEntity indicating the success or failure of the userStats generation process.
+     */
     public ResponseEntity<?> generateUserStats(User user) {
         if (user != null) {
             UserStats userStats = userStatsRepository.findUserStatsByUser(user);
@@ -175,14 +233,19 @@ public class UserService {
                 userStatsRepository.save(userStats);
                 return messageHandler.success("values updated into database");
             } else {
-                UserStats userStats2 = new UserStats(bmi, waterIntake, user);
+                UserStats userStats2 = new UserStats(bmi,waterIntake,0,0.,user);
                 userStatsRepository.save(userStats2);
                 return messageHandler.success("values inserted into database");
             }
         } else return messageHandler.error("invalid user ID");
     }
 
-
+    /**
+     * Updates user data with the provided user details.
+     *
+     * @param user The user with updated details.
+     * @return ResponseEntity indicating the success or failure of the user data update process.
+     */
     public ResponseEntity<?> updateData(User user) {
         if (user != null) {
 
@@ -206,16 +269,36 @@ public class UserService {
             return messageHandler.success(messageSource.getMessage("success.user.updated", null, LocaleContextHolder.getLocale()));
         }
         return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
-
     }
-    public ResponseEntity<?> addAverageValues(String token, UserDTO userDTO){
+
+    /**
+     * Adds average values for the user. Average run lenght and pace are used to determine, if the training would be achievable.
+     *
+     * @param token               The authentication token.
+     * @param addAverageValuesDTO DTO containing the average values to add.
+     * @return ResponseEntity indicating the success or failure of the operation.
+     */
+    public ResponseEntity<?> addAverageValues(String token, AddAverageValuesDTO addAverageValuesDTO) {
         User user = userRepository.findUserByToken(token);
-        log.info(user);
-        log.info(userDTO);
-        user.setAverageRunLength(userDTO.getAverageRunLength());
-        user.setAverageRunPace(userDTO.getAverageRunPace());
+        UserStats userStats = userStatsRepository.findUserStatsByUser(user);
+        log.info(userStats);
+        log.info(addAverageValuesDTO);
+        userStats.setAverageRunLength(addAverageValuesDTO.getAverageRunLength());
+        userStats.setAverageRunPace(addAverageValuesDTO.getAverageRunPace());
         updateData(user);
         return messageHandler.success(messageSource.getMessage("success.user.updated", null, LocaleContextHolder.getLocale()));
+    }
+
+    /**
+     * Deletes the user obtained from the authentication token.
+     *
+     * @param token The authentication token.
+     * @return ResponseEntity indicating the success or failure of the user deletion process.
+     */
+    public ResponseEntity<?> deleteUser(String token) {
+        User user = userRepository.findUserByToken(token);
+        userRepository.deleteUserWithData(user);
+        return messageHandler.success(messageSource.getMessage("success.onDelete", null, LocaleContextHolder.getLocale()));
     }
 
 }

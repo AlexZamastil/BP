@@ -1,5 +1,11 @@
 import axios from "axios";
 
+/**
+ * Author: Alex Zamastil
+ * Utility file for creating unified API calls.
+ */
+
+//standart API call with authentication
 export function callAPI(method, requestName, data, xsrfToken){
 
     return axios({
@@ -16,7 +22,7 @@ export function callAPI(method, requestName, data, xsrfToken){
                    }
       })
 }
-
+//API call without authentication
 export function callAPINoAuth(method, requestName, data, xsrfToken){
    
     return axios({
@@ -32,7 +38,7 @@ export function callAPINoAuth(method, requestName, data, xsrfToken){
                    }
       })
 }
-
+//API call with multipart file, the Content type is different, so it must have a separate function
 export function callAPIMultipartFile(method, requestName, data, xsrfToken){
     
     return axios({

@@ -1,5 +1,9 @@
 import { createTheme } from '@mui/material/styles';
 
+/**
+ * Author: Alex Zamastil
+ * This file defines a theme used for a project based on MUI library.
+ */
 
 const theme = createTheme({
   palette: {

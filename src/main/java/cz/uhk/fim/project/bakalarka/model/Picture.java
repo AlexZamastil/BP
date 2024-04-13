@@ -3,7 +3,13 @@ package cz.uhk.fim.project.bakalarka.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * Entity class representing a Picture of an exercise. Pictures and other data are stored and accessed separately.
+ *
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "picture")
 @Data

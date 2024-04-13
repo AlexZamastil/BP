@@ -7,7 +7,13 @@ import lombok.Data;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ * Entity class representing an Exercise. Picture of the exercise is stored separately.
+ * Exercises are assigned to Day entities in Training.
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "exercise")
 @Data
@@ -73,11 +79,11 @@ public class Exercise {
         this.description_eng = description_eng;
     }
 
-    public void addTagexercise(Tag t) {
+    public void addTagExercise(Tag t) {
         this.tagexercise.add(t);
     }
 
-    @Override
+   /* @Override
     public String toString() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -86,5 +92,17 @@ public class Exercise {
             e.printStackTrace();
         }
         return null;
+    }*/
+
+    @Override
+    public String toString() {
+        return "Exercise{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", name_eng='" + name_eng + '\'' +
+                ", description='" + description + '\'' +
+                ", description_eng='" + description_eng + '\'' +
+                ", tagexercise=" + tagexercise +
+                '}';
     }
 }

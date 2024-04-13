@@ -8,6 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * Supportive controller class for haldling utility endpoints.
+ *
+ * @author Alex Zamastil
+ */
 @RestController
 @RequestMapping("/api")
 public class UtilController {
@@ -16,6 +22,12 @@ public class UtilController {
     public UtilController(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
+
+    /**
+     * Utility endpoint for initializing connection.
+     *
+     * @return ResponseEntity with the result of the operation.
+     */
     @Autowired
     @PostMapping(value = "initConnection")
     public ResponseEntity<?> initConnection(){

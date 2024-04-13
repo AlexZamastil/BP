@@ -3,6 +3,11 @@ import { useTranslation } from 'react-i18next';
 import {useNavigate} from "react-router-dom";
 import { Button } from "@mui/material";
 
+/**
+ * Author: Alex Zamastil
+ * Error notification informing user about session expiration.
+ */
+
 export default function TokenExpired() {
 
     const navigate = useNavigate();

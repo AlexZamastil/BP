@@ -5,6 +5,11 @@ import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { callAPI } from './CallAPI';
 
+/**
+ * Author: Alex Zamastil
+ * File contains a overview of a basic user information.
+ */
+
 export default function Profile() {
   const [userStats, setUserStats] = useState([]);
   const [bmiColor, setBmiColor] = useState(null);
@@ -12,23 +17,23 @@ export default function Profile() {
   const [age,setAge] = useState(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
-
+//function that logs out the user
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/WelcomePage");
     window.location.reload(false);
   }
-
+//function that navigates to update data form
   const handleChange = () => {
     navigate("/UpdateData");
     window.location.reload(false);
   }
-
+//function that navigates to administrator tools (only for administrator)
   const handleAdminTools = () => {
     navigate("/AdminTools");
     window.location.reload(false);
   }
-
+//function that computes user's age
   const handleAge = (date) => {
     const today = new Date();
     const day = new Date(date);
@@ -38,7 +43,7 @@ export default function Profile() {
   }
 
   const [adminTools, setAdminTools] = useState(null);
-
+  //getting user data and training data from server
   useEffect(() => {
     callAPI("GET", "user/getUserData", null, null)
       .then((response => response.data))
@@ -86,7 +91,7 @@ export default function Profile() {
         }
       });
   }, [localStorage.getItem("Localization")])
-
+  //file returns overview of user information
   return (
     <>
       <div className='profile_bg'>

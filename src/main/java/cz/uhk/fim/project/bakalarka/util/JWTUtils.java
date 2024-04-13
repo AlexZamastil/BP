@@ -13,6 +13,12 @@ import org.springframework.stereotype.Component;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+/**
+ * Utility class for generating and validating JSON Web Tokens (JWT).
+ * Uses the Auth0 JWT library for token generation and validation.
+ *
+ * @author Alex Zamastil
+ */
 @Component
 @Log4j2
 public class JWTUtils {
@@ -25,6 +31,13 @@ public class JWTUtils {
 
     public JWTUtils() {
     }
+
+    /**
+     * Generates a JWT token with the given user ID, organization, and expiration date.
+     *
+     * @param userID The user ID to include in the token.
+     * @return The generated JWT token.
+     */
     public String generateJWToken(Long userID) {
         String var = hashHandler.hashString(secretVar);
         long day = 7;
@@ -74,7 +87,16 @@ public class JWTUtils {
             return false;
         }
     }
-
+    /**
+     * Verifies the legitimacy of the given JWT token by performing the following checks:
+     * 1. Validates that the token contains the expected number of claims and that the organization claim matches the expected value.
+     * 2. Verifies that the token's algorithm is HMAC256 (HS256).
+     * 3. Checks if the hash value included in the token matches the hash value generated from the application's secret.
+     * If any of these checks fail, the token is considered illegitimate.
+     *
+     * @param token The JWT token to verify.
+     * @return True if the token is legitimate and passes all checks, otherwise false.
+     */
     public boolean isTokenLegitimate(String token) {
 
         DecodedJWT decodedJWT = JWT.decode(token);

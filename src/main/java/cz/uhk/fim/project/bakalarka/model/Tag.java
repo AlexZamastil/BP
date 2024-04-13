@@ -7,7 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
-
+/**
+ * Entity class representing a Tag.Tags are used to categorize exercises and food into various categories.
+ *
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "tag")
 @Data

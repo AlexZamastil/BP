@@ -10,17 +10,34 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
 
+/**
+ * Configuration class for setting up LocaleResolver.
+ * This class defines beans for managing locale resolution and message sources.
+ *
+ * @author Alex Zamastil
+ */
+
 @Configuration
 public class LocalizationConfig {
+    /**
+     * Definition for locale resolver, that is set to Czech as default language
+     *
+     * @return LocaleResolver
+     */
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver resolver = new SessionLocaleResolver();
-        resolver.setDefaultLocale(Locale.ENGLISH);
+        resolver.setDefaultLocale(new Locale.Builder().setLanguage("cs").setRegion("CZ").build());
         return resolver;
     }
 
+    /**
+     * Definition of source of the localization messages, that are being sent to frontend part of project
+     *
+     * @return messageSource
+     */
     @Bean
-    public MessageSource messageSource(){
+    public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");

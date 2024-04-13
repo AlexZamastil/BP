@@ -1,29 +1,26 @@
 package cz.uhk.fim.project.bakalarka.DTO;
 
 import cz.uhk.fim.project.bakalarka.enumerations.ElevationProfile;
-import cz.uhk.fim.project.bakalarka.enumerations.Goal;
+import cz.uhk.fim.project.bakalarka.enumerations.Type;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
 @Data
+@AllArgsConstructor
 public class CreateTrainingDTO {
     LocalDate startDay;
     LocalDate raceDay;
-    Goal goal;
+    Type type;
     Integer lengthOfRaceInMeters;
-    String wantedTime;
-    Integer actualRunLength;
-    String actualTime;
+    double wantedPace;
     ElevationProfile elevationProfile;
+    boolean monday;
+    boolean tuesday;
+    boolean wednesday;
+    boolean thursday;
+    boolean friday;
+    boolean saturday;
+    boolean sunday;
 
-    public CreateTrainingDTO(LocalDate startDay, LocalDate raceDay, Goal goal, Integer lengthOfRaceInMeters, String wantedTime, Integer actualRunLength, String actualTime) {
-        this.startDay = startDay;
-        this.raceDay = raceDay;
-        this.goal = goal;
-        this.lengthOfRaceInMeters = lengthOfRaceInMeters;
-        this.wantedTime = wantedTime;
-        this.actualRunLength = actualRunLength;
-        this.actualTime = actualTime;
-
-    }
 }

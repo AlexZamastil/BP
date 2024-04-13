@@ -2,6 +2,11 @@
 import { useTranslation } from 'react-i18next';
 import {Link} from "react-router-dom"
 
+/**
+ * Author: Alex Zamastil
+ * The welcome page of the project. Refers to login and registration page. 
+ */
+
 export default function WelcomePage() {
 
     const {t} = useTranslation();

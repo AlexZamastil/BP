@@ -9,12 +9,20 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import theme from './Theme'; 
 import { ThemeProvider } from '@mui/material/styles';
 
+/**
+ * Author: Alex Zamastil
+ * Index file
+ */
+
+
+// Creating a root element for rendering React components
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
+// setting up locale
 const storedLocale = localStorage.getItem("locale"); 
+const defaultLocale = storedLocale || 'cs';
 
-const defaultLocale = storedLocale || 'cs'; 
-
+// Initializing i18next with resources and default language
 i18next.init({
   interpolation: { escapeValue: false },
   lng: defaultLocale, 
@@ -24,7 +32,7 @@ i18next.init({
   },
 });
 
-
+// Rendering the main application wrapped with providers for localization, theming, and routing
   root.render (
     <React.StrictMode>
       <BrowserRouter>

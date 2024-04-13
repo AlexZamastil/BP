@@ -2,7 +2,13 @@ package cz.uhk.fim.project.bakalarka.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
+/**
+ * Entity class representing an ingredient of Food entity. Food consists of multiple ingredients.
+ *
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "ingredient")
 @Data

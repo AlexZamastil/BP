@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Container } from '@mui/system';
 import { TextField, Button } from '@mui/material';
 import { Paper } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -13,6 +12,11 @@ import getXSRFtoken from './XSRF_token';
 import { useTranslation } from 'react-i18next';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+
+/**
+ * Author: Alex Zamastil
+ * File contains a form for updating user data.
+ */
 
 export default function UpdateData() {
   const navigate = useNavigate();
@@ -53,16 +57,12 @@ export default function UpdateData() {
   }, [])
 
   const formattedBirthdate = birthdate ? birthdate.toISOString().split('T')[0] : '';
-
+  //hendler that allows only number input, used in textfields
   const onlyNumbers = (e) => {
     const inputValue = e.target.value.replace(/[^0-9]/g, '');
     e.target.value = inputValue;
   };
-
-  const handleNavigate = () => {
-    navigate("/changePassword")
-  }
-
+  //handler that sends update data request to server
   const handleUpdate = (e) => {
     e.preventDefault();
 
@@ -105,6 +105,8 @@ export default function UpdateData() {
         console.error("Login failed", error);
       })
   };
+
+//file returns a form for updating data
   return (
     <div className='divupdate'>
 
@@ -208,7 +210,8 @@ export default function UpdateData() {
       </Paper>
 
 
-      <Button variant="contained" color='dark' style={{ margin: "10px" }} onClick={handleNavigate}> {t('change_password')} </Button>
+      <Button variant="contained" color='dark' style={{ margin: "10px" }} onClick={() => navigate("/changePassword")}> {t('change_password')} </Button>
+      <Button variant="contained" color='secondary' style={{ margin: "10px" }} onClick={() => navigate("/deleteUser")}> {t('delete_user_button')} </Button>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 package cz.uhk.fim.project.bakalarka.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.uhk.fim.project.bakalarka.DAO.*;
 import cz.uhk.fim.project.bakalarka.enumerations.RunCategory;
@@ -17,7 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-
+/**
+ * Service class responsible for managing exercise-related operations.
+ *
+ * @author Alex Zamastil
+ */
 @Service
 public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
@@ -41,6 +46,15 @@ public class ExerciseService {
         this.tagRepository = tagRepository;
         this.messageSource = messageSource;
     }
+    /**
+     * Adds a new exercise based on the provided ExerciseDTO and multipart file.
+     * The type of exercise (RUN, GYM, SWIMMING) determines how the exercise is created and stored.
+     * Returns an appropriate ResponseEntity indicating the result of the operation.
+     *
+     * @param exerciseRequest Details of the exercise to be added.
+     * @param multipartFile   Multipart file containing the picture associated with the exercise.
+     * @return ResponseEntity containing the result of the operation.
+     */
 
     public ResponseEntity<?> addNewExercise(ExerciseDTO exerciseRequest, MultipartFile multipartFile) {
         if(exerciseRequest == null) return stringMessageHandler.error(messageSource.getMessage("error.exercise.null", null, LocaleContextHolder.getLocale()));
@@ -88,8 +102,15 @@ public class ExerciseService {
         }
         return stringMessageHandler.error(messageSource.getMessage("error.exercise.failedToAdd", null, LocaleContextHolder.getLocale()));
     }
-
-    public ResponseEntity<?> getExercise(long id) throws IOException {
+    /**
+     * Retrieves details of an exercise based on its ID.
+     * If the exercise is found, the details are encapsulated in an ExerciseDTO object and returned as a success response.
+     * Otherwise, an error response is returned.
+     *
+     * @param id The ID of the exercise to retrieve.
+     * @return ResponseEntity containing the exercise details or an error message.
+     */
+    public ResponseEntity<?> getExercise(long id) {
         Optional<Exercise> e = exerciseRepository.findExerciseById(id);
         if (e.isPresent()) {
             Exercise exercise = e.get();
@@ -102,7 +123,12 @@ public class ExerciseService {
                 tagList.add(t.getText());
             }
             ObjectMapper objectMapper = new ObjectMapper();
-            String jsonList = objectMapper.writeValueAsString(tagList);
+            String jsonList = null;
+            try {
+                jsonList = objectMapper.writeValueAsString(tagList);
+            } catch (JsonProcessingException ex) {
+                throw new RuntimeException(ex);
+            }
             System.out.println(jsonList);
 
             if (g.isPresent()) {
@@ -148,7 +174,14 @@ public class ExerciseService {
         }
         return stringMessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
     }
-
+    /**
+     * Retrieves the picture associated with an exercise based on its ID.
+     * If the exercise is found, its picture data is converted to a Base64-encoded string and returned as a success response.
+     * Otherwise, an error response is returned.
+     *
+     * @param id The ID of the exercise to retrieve the picture for.
+     * @return ResponseEntity containing the Base64-encoded picture data or an error message.
+     */
     public ResponseEntity<?> getExercisePicture(long id) {
         Optional<Exercise> e = exerciseRepository.findExerciseById(id);
         if (e.isPresent()) {
@@ -159,28 +192,77 @@ public class ExerciseService {
         }
         return stringMessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
     }
-
+    /**
+     * Adds a new running exercise with the provided details.
+     * The exercise is created along with its associated Run entity.
+     * Returns a success response containing the ID of the newly created exercise.
+     *
+     * @param name           The name of the exercise.
+     * @param description    The description of the exercise.
+     * @param name_eng       The English name of the exercise.
+     * @param description_eng The English description of the exercise.
+     * @param category       The category of the running exercise.
+     * @param lengthInMeters The length of the running exercise in meters.
+     * @param tags           The tags associated with the exercise.
+     * @param multipartFile  The multipart file containing the exercise picture.
+     * @return ResponseEntity containing the ID of the newly created exercise or an error message.
+     */
     public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
         runRepository.save(run);
         return longMessageHandler.success(exercise.getId());
     }
-
+    /**
+     * Adds a new gym exercise with the provided details.
+     * The exercise is created along with its associated GymWorkout entity.
+     * Returns a success response containing the ID of the newly created exercise.
+     *
+     * @param name           The name of the exercise.
+     * @param description    The description of the exercise.
+     * @param name_eng       The English name of the exercise.
+     * @param description_eng The English description of the exercise.
+     * @param repetitions    The number of repetitions for the gym exercise.
+     * @param series         The number of series for the gym exercise.
+     * @param tags           The tags associated with the exercise.
+     * @param multipartFile  The multipart file containing the exercise picture.
+     * @return ResponseEntity containing the ID of the newly created exercise or an error message.
+     */
     public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         gymWorkoutRepository.save(gymWorkout);
         return longMessageHandler.success(exercise.getId());
     }
-
+    /**
+     * Adds a new swimming exercise with the provided details.
+     * The exercise is created along with its associated Swimming entity.
+     * Returns a success response containing the ID of the newly created exercise.
+     *
+     * @param name           The name of the exercise.
+     * @param description    The description of the exercise.
+     * @param name_eng       The English name of the exercise.
+     * @param description_eng The English description of the exercise.
+     * @param style          The swimming style for the exercise.
+     * @param lengthInMeters The length of the swimming exercise in meters.
+     * @param tags           The tags associated with the exercise.
+     * @param multipartFile  The multipart file containing the exercise picture.
+     * @return ResponseEntity containing the ID of the newly created exercise or an error message.
+     */
     public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
         Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
         Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
         swimmingRepository.save(swimming);
         return longMessageHandler.success(exercise.getId());
     }
-
+    /**
+     * Handles the processing of tags associated with an exercise.
+     * Tags are converted to uppercase and checked against predefined exercise tags.
+     * If a tag matches, it is saved and associated with the exercise.
+     *
+     * @param tags     The list of tags associated with the exercise.
+     * @param exercise The exercise to associate the tags with.
+     */
     public void handleTags(List<String> tags, Exercise exercise) {
 
         for (String tag : tags) {
@@ -204,12 +286,17 @@ public class ExerciseService {
                 }
                 cz.uhk.fim.project.bakalarka.model.Tag tag2 = tagRepository.findTagByText(tag);
                 exerciseRepository.save(exercise);
-                exercise.addTagexercise(tag2);
+                exercise.addTagExercise(tag2);
                 tagRepository.save(tag2);
             }
         }
     }
-
+    /**
+     * Converts a multipart file to its byte array representation.
+     *
+     * @param f The multipart file to convert.
+     * @return The byte array representing the contents of the multipart file.
+     */
     public byte[] handlePicture(MultipartFile f) {
         try {
             return f.getBytes();
@@ -217,7 +304,18 @@ public class ExerciseService {
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Creates a new exercise entity based on the provided details.
+     * The exercise is associated with a picture and tags.
+     *
+     * @param multipartFile  The multipart file containing the exercise picture.
+     * @param name           The name of the exercise.
+     * @param description    The description of the exercise.
+     * @param name_eng       The English name of the exercise.
+     * @param description_eng The English description of the exercise.
+     * @param tags           The tags associated with the exercise.
+     * @return The newly created Exercise entity.
+     */
     public Exercise createExercise(MultipartFile multipartFile, String name, String description, String name_eng, String description_eng, List<String> tags) {
         byte[] pictureData = handlePicture(multipartFile);
         Picture picture = new Picture(pictureData);

@@ -6,7 +6,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
-
+/**
+ * Entity class representing a Food entity.
+ * Foods are assigned to Day entities in Training based on their calories and tags.
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "food")
 @Data
@@ -40,5 +46,6 @@ public class Food {
                     @JoinColumn(name = "fk_ingredientid", referencedColumnName = "pk_ingredientid")}
     )
     private Set<Ingredient> ingredients = new HashSet<>();
+
 
 }

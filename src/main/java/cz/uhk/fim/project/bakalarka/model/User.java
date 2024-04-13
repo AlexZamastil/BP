@@ -11,7 +11,14 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ * Entity class representing a User. This entity holds all important user's personal data
+ * besides BMI and daily water intake, that are stored in UserStats entity.
+ *
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "user", schema = "public")
 @Data
@@ -51,11 +58,6 @@ public class User {
     @Column(name = "token")
     private String token;
 
-    @Column(name = "averagerunlength")
-    private Integer averageRunLength;
-
-    @Column(name = "averagerunpace")
-    private Double averageRunPace;
     @ManyToMany
     @JoinTable(name = "userbannedfood",
             joinColumns = {

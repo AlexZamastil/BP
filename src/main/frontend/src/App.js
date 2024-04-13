@@ -17,9 +17,16 @@ import Exercise from './Exercise';
 import AdminTools from './AdminTools';
 import TokenExpired from './TokenExpired';
 import ChangePassword from './ChangePassword';
+import DeleteTraining from './DeleteTraining';
+import DeleteUser from './DeleteUser';
 import i18next from 'i18next';
 import { callAPI } from './CallAPI';
 import getXSRFtoken from './XSRF_token';
+
+/**
+ * Author: Alex Zamastil
+ * Main component of the web app.
+ */
 
 function App() {
   const { t } = useTranslation();
@@ -27,7 +34,7 @@ function App() {
   const locale = localStorage.getItem("Localization");
   const xsrfToken = getXSRFtoken();
   const [loggedIn, setLoggedIn] = useState(1)
-
+// Effect hook for initializing connection with the backend
   useEffect(() => {
     callAPI("POST", "initConnection", null, xsrfToken)
       .then(response => {
@@ -36,14 +43,14 @@ function App() {
       .catch(error => {
         console.error('Failed to establish communication with the backend.');
         console.error('Error initiating communication:', error);
-        setLoggedIn(loggedIn += 1);
+        setLoggedIn(loggedIn + 1);
       });
   }, [loggedIn]);
-
+// Effect hook for setting document title
   useEffect(() => {
     document.title = 'Runora';
   }, []);
-
+// Effect hook for handling localization
   useEffect(() => {
     i18next.changeLanguage(locale)
     localStorage.setItem("Localization", locale)
@@ -55,7 +62,7 @@ function App() {
 
     }
   }, [locale])
-
+  // Whole navigation is based on this return element. Based on library React Router
   return (
     <>
       <Navbar />
@@ -74,6 +81,8 @@ function App() {
           <Route path="/adminTools" element={<AdminTools />} />
           <Route path="/tokenExpired" element={<TokenExpired />} />
           <Route path="/changePassword" element={<ChangePassword />} />
+          <Route path="/deleteTraining/:trainingID" element={<DeleteTraining />} />
+          <Route path="/deleteUser" element={<DeleteUser />} />
           <Route path="*" element={<PageNotFound />} />
           <Route path="/" element={<WelcomePage />} />
         </Routes>

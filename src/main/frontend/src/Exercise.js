@@ -5,6 +5,11 @@ import { Paper } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import CircularProgress from "@mui/material/CircularProgress";
 
+/**
+ * Author: Alex Zamastil
+ * File displays information about specific exercise, based on ID from URL parameter.
+ */
+
 export default function Exercise() {
     const navigate = useNavigate()
     const { exerciseID } = useParams();
@@ -14,7 +19,7 @@ export default function Exercise() {
     const [isPictureLoading, setIsPictureLoading] = useState(false)
 
     const { t } = useTranslation();
-
+    //getting exercise information from server
     useEffect(() => {
         callAPI("GET", "exercise/getExercise/" + exerciseID, null, null)
             .then((response) => {
@@ -28,7 +33,7 @@ export default function Exercise() {
             }
             )
     }, [])
-
+    //getting the exercise picture from server 
     useEffect(() => {
         setIsPictureLoading(true)
         callAPI("GET", "exercise/getExercise/picture/" + exerciseID, null, null)
@@ -46,86 +51,86 @@ export default function Exercise() {
 
             )
     }, [])
+    //rendering exercise data
+    function renderExercise(localization) {
 
-    function renderExercise(localization){
-            
-            if(localization === "cs"){
-                if(exerciseData.type === "RUN"){
-                    return(
-                        <>
-                        Name: {exerciseData.name}<br/>
-                        Description: {exerciseData.description}<br/>
-                        Type: {exerciseData.type}<br/>
-                        Category: {exerciseData.category}<br/>
-                        Length: {exerciseData.length}<br/>
+        if (localization === "cs") {
+            if (exerciseData.type === "RUN") {
+                return (
+                    <>
+                        Name: {exerciseData.name}<br />
+                        Description: {exerciseData.description}<br />
+                        Type: {exerciseData.type}<br />
+                        Category: {exerciseData.category}<br />
+                        Length: {exerciseData.length}<br />
                         {exerciseData.tagsJSON}
                     </>
-                    )
-                } else if (exerciseData.type === "GYM"){
-                    return(
-                        <>
-                        Name: {exerciseData.name}<br/>
-                        Description: {exerciseData.description}<br/>
-                        Type: {exerciseData.type}<br/>
-                        Repetitions: {exerciseData.repetitions}<br/>
-                        Series: {exerciseData.series}<br/>
+                )
+            } else if (exerciseData.type === "GYM") {
+                return (
+                    <>
+                        Name: {exerciseData.name}<br />
+                        Description: {exerciseData.description}<br />
+                        Type: {exerciseData.type}<br />
+                        Repetitions: {exerciseData.repetitions}<br />
+                        Series: {exerciseData.series}<br />
                         {exerciseData.tagsJSON}
                     </>
-                    )
-                } else {
-                    return(
-                        <>
-                        Name: {exerciseData.name}<br/>
-                        Description: {exerciseData.description}<br/>
-                        Type: {exerciseData.type}<br/>
-                        Style: {exerciseData.style}<br/>
-                        Length: {exerciseData.length}<br/>
-                        {exerciseData.tagsJSON}
-
-                    </>
-                    )
-                }
-
-                   
+                )
             } else {
-                if(exerciseData.type === "RUN"){
-                    return(
-                        <>
-                        Name: {exerciseData.name_eng}<br/>
-                        Description: {exerciseData.description_eng}<br/>
-                        Type: {exerciseData.type}<br/>
-                        Category: {exerciseData.category}<br/>
-                        Length: {exerciseData.length}<br/>
-                        {exerciseData.tagsJSON}
-                    </>
-                    )
-                } else if (exerciseData.type == "GYM"){
-                    return(
-                        <>
-                        Name: {exerciseData.name_eng}<br/>
-                        Description: {exerciseData.description_eng}<br/>
-                        Type: {exerciseData.type}<br/>
-                        Repetitions: {exerciseData.repetitions}<br/>
-                        Series: {exerciseData.series}<br/>
-                        {exerciseData.tagsJSON}
-                    </>
-                    )
-                } else {
-                    return(
-                        <>
-                        Name: {exerciseData.name_eng}<br/>
-                        Description: {exerciseData.description_eng}<br/>
-                        Type: {exerciseData.type}<br/>
-                        Style: {exerciseData.style}<br/>
-                        Length: {exerciseData.length}<br/>
+                return (
+                    <>
+                        Name: {exerciseData.name}<br />
+                        Description: {exerciseData.description}<br />
+                        Type: {exerciseData.type}<br />
+                        Style: {exerciseData.style}<br />
+                        Length: {exerciseData.length}<br />
                         {exerciseData.tagsJSON}
 
                     </>
-                    )
-                }
+                )
             }
-    }
 
+
+        } else {
+            if (exerciseData.type === "RUN") {
+                return (
+                    <>
+                        Name: {exerciseData.name_eng}<br />
+                        Description: {exerciseData.description_eng}<br />
+                        Type: {exerciseData.type}<br />
+                        Category: {exerciseData.category}<br />
+                        Length: {exerciseData.length}<br />
+                        {exerciseData.tagsJSON}
+                    </>
+                )
+            } else if (exerciseData.type === "GYM") {
+                return (
+                    <>
+                        Name: {exerciseData.name_eng}<br />
+                        Description: {exerciseData.description_eng}<br />
+                        Type: {exerciseData.type}<br />
+                        Repetitions: {exerciseData.repetitions}<br />
+                        Series: {exerciseData.series}<br />
+                        {exerciseData.tagsJSON}
+                    </>
+                )
+            } else {
+                return (
+                    <>
+                        Name: {exerciseData.name_eng}<br />
+                        Description: {exerciseData.description_eng}<br />
+                        Type: {exerciseData.type}<br />
+                        Style: {exerciseData.style}<br />
+                        Length: {exerciseData.length}<br />
+                        {exerciseData.tagsJSON}
+
+                    </>
+                )
+            }
+        }
+    }
+    //file returns an exercise
     return (
         <>
             <div className="exerciseFlex">
@@ -136,7 +141,7 @@ export default function Exercise() {
                         {exerciseData && (
 
                             renderExercise(localStorage.getItem("Localization"))
-                          
+
                         )}
                     </div>
                 </Paper>

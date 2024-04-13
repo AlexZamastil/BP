@@ -4,10 +4,16 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity class representing a day of a training plan. The training consists of a list of Days.
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "day")
 @Data
@@ -17,9 +23,9 @@ public class Day {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_dayid")
     private long id;
-
+    @Temporal(TemporalType.DATE)
     @Column(name = "date")
-    private LocalDate date;
+    private Date date;
 
     @Column (name = "caloriesgained")
     private double caloriesgained;
@@ -30,6 +36,10 @@ public class Day {
     @ManyToOne
     @JoinColumn(name = "fk_trainingid")
     private Training training;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_userid")
+    private User user;
 
 
     @OneToMany
@@ -50,4 +60,11 @@ public class Day {
     )
     private Set<Food> menu = new HashSet<>();
 
+    public void addExercise(Exercise exercise) {
+        exercises.add(exercise);
+    }
+    public void addFood(Food food) {
+        menu.add(food);
+
+    }
 }

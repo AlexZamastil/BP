@@ -2,6 +2,11 @@ import styling from "./styling.css";
 import error from "./sources/error-icon.png";
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Author: Alex Zamastil
+ * File renders an error 404 - not found. This page is referenced from any URL that is not defined.
+ */
+
 export default function PageNotFound() {
 
      const { t } = useTranslation();

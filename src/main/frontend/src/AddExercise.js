@@ -11,6 +11,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Author: Alex Zamastil
+ * Page containing a form for adding an exercise. This page is only accesible by administrator. 
+ */
+
 
 export default function AddExercise() {
   const {t} = useTranslation();
@@ -19,7 +24,6 @@ export default function AddExercise() {
   const [name_eng, setName_eng] = useState(null);
   const [description, setDescription] = useState(null);
   const [description_eng, setDescription_eng] = useState(null);
-  const [type, setType] = useState(null);
   const [category, setCategory] = useState(null);
   const [style, setStyle] = useState(null);
   const [length, setLength] = useState(null);
@@ -43,6 +47,8 @@ export default function AddExercise() {
   const xsrfToken = getXSRFtoken();
   const [errorMessage, setErrorMessage] = useState('');
 
+  //getting user data from server
+  useEffect(() => {
   callAPI("GET", "user/getUserData", null, null)
     .then(async response => {
       const userData = response.data;
@@ -55,7 +61,8 @@ export default function AddExercise() {
         navigate("/tokenExpired")
    }
     })
-
+  },[]);
+//getting exercise tags from server
   useEffect(() => {
     callAPINoAuth("GET", "tag/getExerciseTags", null, null)
       .then(async (response) => {
@@ -74,7 +81,7 @@ export default function AddExercise() {
      }
       })
   }, [])
-
+  // method for trying to send an exercise to server
   const addExercise = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -152,7 +159,7 @@ export default function AddExercise() {
     }
   };
 
-
+  //method for uploading a picture
   const handleImageChange = (e) => {
     const file = e.target.files[0];
   
@@ -167,7 +174,7 @@ export default function AddExercise() {
       setSelectedFile(file);
     }
   };
-
+  //method rendering an extension for a form, that is used to gather new exercise information. The extension is based on the type of exercise
   const renderExerciseForm = () => {
     switch (exerciseType) {
       case 'RUN':
@@ -265,7 +272,7 @@ export default function AddExercise() {
         return null;
     }
   };
-
+  //file returns a form
   return (
     <div>
       {isAdmin !== undefined ? (
@@ -374,7 +381,7 @@ export default function AddExercise() {
       )}
     </div>
   );
-
+  //method for setting up a list of tags of the exercise
   function TagSelection(pool) {
 
     const handleTagSelection = (tag) => {

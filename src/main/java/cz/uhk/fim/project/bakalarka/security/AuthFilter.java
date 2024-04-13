@@ -18,6 +18,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Authentication filter responsible for validating JSON Web Tokens (JWT) in incoming HTTP requests.
+ * It intercepts requests, extracts the JWT token from the Authorization header
+ * and performs various checks to ensure the token's validity.
+ * If the token is valid, it verifies the user's identity and grants access to protected resources.
+ * Otherwise, it returns HttpServletResponse.SC_UNAUTHORIZED.
+ *
+ * @author Alex Zamastil
+ */
 @Log4j2
 @Component
 public class AuthFilter extends OncePerRequestFilter {
@@ -30,6 +39,15 @@ public class AuthFilter extends OncePerRequestFilter {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Filters incoming HTTP requests and validates JWT tokens.
+     *
+     * @param request     incoming HttpServletRequest request.
+     * @param response    outgoing HttpServletResponse response.
+     * @param filterChain FilterChain object for invoking the next filter in the chain.
+     * @throws ServletException if an error occurs during the filter execution throws ServletException.
+     * @throws IOException      if an I/O error occurs while processing the request throws I/O exception.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
@@ -63,7 +81,7 @@ public class AuthFilter extends OncePerRequestFilter {
             Claim userIDClaim = jwtUtils.getID(token);
             log.info(userIDClaim + " = User ID from jwtToken");
             User user = userRepository.findUserById(userIDClaim.asLong());
-            if (user == null){
+            if (user == null) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("User from token not found");
                 log.info("User from token not found : " + token);
@@ -71,6 +89,9 @@ public class AuthFilter extends OncePerRequestFilter {
             }
             if (Objects.equals(user.getToken(), token)) {
                 filterChain.doFilter(request, response);
+            } else {
+                log.error("Token does not match current value in database");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
         } catch (IOException | ServletException e) {
             log.error("An error occurred while trying to get data from the token.", e);

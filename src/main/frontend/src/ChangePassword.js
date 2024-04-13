@@ -9,7 +9,10 @@ import { useNavigate } from "react-router-dom";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
-
+/**
+ * Author: Alex Zamastil
+ * Page containing a form for password reset. The form demands old and new password.
+ */
 
 export default function ChangePassword() {
   const [oldPassword, setOldPassword] = useState(null);
@@ -22,6 +25,7 @@ export default function ChangePassword() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  //handler for sending a password reset request to server 
   const handlePasswordChange = (e) => {
     e.preventDefault();
 
@@ -55,7 +59,7 @@ export default function ChangePassword() {
       setNewPassword("");
 
   }
-
+  //file returns a form
   return (
     <div>
       <Container style={{padding : "20px"}}>

@@ -8,14 +8,22 @@ import { callAPINoAuth } from './CallAPI';
 import getXSRFtoken from './XSRF_token';
 import { useTranslation } from 'react-i18next';
 import InputAdornment from '@mui/material/InputAdornment';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import { Checkbox,FormControlLabel,FormHelperText,Paper,TextField,Button  } from '@mui/material';
 
+/**
+ * Author: Alex Zamastil
+ * File contains a registration form.
+ */
 
 export default function Registration() {
   const navigate = useNavigate();
   const { t } = useTranslation()
   const [errorMessage, setErrorMessage] = useState('');
+  const theme = useTheme();
   const [checked,setChecked] = useState(false);
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const  [user,setUser] = useState({
     email: "",
     nickname: "",
@@ -35,7 +43,7 @@ export default function Registration() {
 };
 
 
-
+  //handler for sending registration request to server
   const handleRegistration = (e) => {
     e.preventDefault();
 
@@ -79,7 +87,7 @@ export default function Registration() {
 
   };
 
-
+//file returns a registration form
   return (<div className='loginBG'>
     <Container>
         <Paper elevation={3} className='paper'>
@@ -96,7 +104,7 @@ export default function Registration() {
 
             <TextField
               style={{ margin: '10px auto' }}
-              sx={{ m: 1, width: '25ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               id="outlined-basic"
               label={t('username')}
               variant="outlined"
@@ -107,7 +115,7 @@ export default function Registration() {
 
             <TextField
               style={{ margin: '10px auto' }}
-              sx={{ m: 1, width: '25ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               id="outlined-basic"
               label={t('email')}
               variant="outlined"
@@ -119,7 +127,7 @@ export default function Registration() {
             <TextField
               type="password"
               style={{ margin: '10px auto' }}
-              sx={{ m: 1, width: '25ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               id="outlined-basic"
               label={t('password')}
               variant="outlined"
@@ -135,7 +143,7 @@ export default function Registration() {
               id="demo-simple-select"
               value={user.sex}
               label={t('sex')}
-              sx={{ m: 1, width: '30ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               onChange={(e) => setUser({ ...user,sex: e.target.value})}
             >
               <MenuItem value={"MALE"}>{t('man')}</MenuItem>
@@ -145,7 +153,7 @@ export default function Registration() {
 
             <DatePicker
               className='datepicker'
-              sx={{ m: 1, width: '25ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
               style={{ margin: '10px auto' }}
               format="DD-MM-YYYY"
               //maxData a MinDate not working here
@@ -157,7 +165,7 @@ export default function Registration() {
                             style={{ margin: '10px auto', padding: "10px" }}
                             label={t('weight')}
                             id="outlined-start-adornment"
-                            sx={{ m: 1, width: '13ch' }}
+                            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
                             InputProps={{
                                 inputMode: 'numeric',
                                 pattern: '[0-9]*',
@@ -171,7 +179,7 @@ export default function Registration() {
                             style={{ margin: '10px auto', padding: "10px" }}
                             label={t('height')}
                             id="outlined-start-adornment"
-                            sx={{ m: 1, width: '13ch' }}
+                            sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
                             InputProps={{
                                 inputMode: 'numeric',
                                 pattern: '[0-9]*',
@@ -188,7 +196,7 @@ export default function Registration() {
               id="demo-simple-select"
               value={user.bodyType}
               label={t('body_type')}
-              sx={{ m: 1, width: '30ch' }}
+              sx={{ m: 1, width: isSmallScreen ? '20ch' : '30ch' }}
               onChange={(e) => setUser({ ...user, bodyType: e.target.value })}
             >
               <MenuItem value={"AVERAGE"}>{t('average')}</MenuItem>

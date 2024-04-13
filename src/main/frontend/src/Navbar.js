@@ -6,14 +6,19 @@ import { ButtonGroup } from "@mui/material";
 import i18next from "i18next";
 
 
+/**
+ * Author: Alex Zamastil
+ * File contains a navigation bar, situated on the top. This component consisnt of basic navigation and localization selection button.
+ */
+
 export default function Navbar() {
   const { t } = useTranslation();
-
+//function for selecting a language
   function changeLanguage(lng) {
     i18next.changeLanguage(lng);
     localStorage.setItem("Localization", lng); 
   }
-
+//file returns a navbar and a button
  return (
     <>
       <nav className="nav">
@@ -54,11 +59,13 @@ export default function Navbar() {
   )
   
 }
-
+//CustomLink component renders a custom navigation link with active state based on the current route.
 function CustomLink({ to, children, ...props }) {
+    // Resolve the path using useResolvedPath hook to handle relative paths and ensure correct URL matching
   const resolvedPath = useResolvedPath(to)
+  // Check if the resolved path matches the current route
   const isActive = useMatch({ path: resolvedPath.pathname, end: true })
-
+// Render a list item with active class if the link is active
   return (
     <li className={isActive ? "active" : ""}>
       <Link to={to} {...props}>

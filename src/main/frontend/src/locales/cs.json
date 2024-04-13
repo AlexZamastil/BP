@@ -114,6 +114,30 @@
     "front_crawl_stroke": "Prsa",
     "tag_selection": "Výběr štítků",
     "null_image" : "Prosím vyberte obrázek",
-    "null_type" : "Zadejte druh cviku"
+    "null_type" : "Zadejte druh cviku",
+    "select_time" : "Použít čas",
+    "select_pace" : "Použít tempo",
+    "average_time" : "Průměrný čas",
+    "flat" : "běh po rovině",
+    "cross" : "Krosový běh",
+    "up_hill" : "běh do vrchu",
+    "select_days" : "Zvolte 3 až 5 dnů tréninku",
+    "invalid_day_count" : "Vyberte 3 až 5 tréninkových dní",
+    "select_date" : "Zvolte datum závodu v rozmezí 1 měsíce a 1 roku ode dneška",
+    "monday" : "Pondělí",
+    "tuesday" : "Úterý",
+    "wednesday" : "Středa",
+    "thursday" : "Čtvrtek",
+    "friday" : "Pátek",
+    "saturday" : "Sobota",
+    "sunday" : "Neděle",
+    "average_values" : "Mé průměrné hodnoty",
+    "change_values" : "Upravit hodnoty",
+    "delete_training" : "Jste si jisti, že chcete zrušit tento trénink? Tato akce nelze vzít zpět",
+    "delete_training_button" : "Zrušit trénink",
+    "no" : "Ne",
+    "delete_user" : "Přejete si trvale smazat váš účet? Tato akce nelze vzít zpět",
+    "delete_user_button" : "Smazat účet"
+
 
     }

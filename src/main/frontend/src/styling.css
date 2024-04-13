@@ -535,14 +535,14 @@ footer a{font-size: small;}
   padding-bottom:  250px;
   background-image: url(/src/sources/img_legs.jpg);
   background-size: cover;
-
+  display: block;
   justify-content:center;
 }
 .paper {
   padding: 20px;
   max-width: 250px;
   opacity: 0.9;
-  margin: auto;
+  margin: 10px;
 }
 
 .profile {
@@ -574,6 +574,16 @@ footer a{font-size: small;}
 .trainingDiv {
   display: flex;
   flex-direction: column;
+  padding: 20px;
+}
+.createTrainingDiv{
+  display: inline; margin: auto;
+  padding : 25px;
+  justify-content: center;
+}
+
+.trainingDiv1 {
+  display:inline;
   padding: 20px;
 
 }
@@ -760,6 +770,18 @@ footer a{font-size: small;}
   background-size: cover;
   
   justify-content:center;
+}
+
+.createTrainingDiv{
+  display: block; margin: auto;
+  padding : 25px;
+  justify-content: center;
+}
+
+.trainingDiv1 {
+  display:inline;
+  padding: 20px;
+
 }
 
 

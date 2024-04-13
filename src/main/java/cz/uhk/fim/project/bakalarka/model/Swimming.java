@@ -3,13 +3,17 @@ package cz.uhk.fim.project.bakalarka.model;
 import cz.uhk.fim.project.bakalarka.enumerations.SwimmingStyle;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
+/**
+ * Entity class representing a Swimming, that implements ExerciseType and specifies data of Exercise entity.
+ *
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "swimming")
 @Data
-@NoArgsConstructor
-public class Swimming {
+public class Swimming implements ExerciseType{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_swimmingid")
@@ -26,11 +30,13 @@ public class Swimming {
     @JoinColumn(name = "fk_exerciseid")
     private Exercise exercise;
 
+    public Swimming() {
+    }
+
     public Swimming(Integer lenglhinmeters, SwimmingStyle swimmingstyle, Exercise exercise) {
         this.lenglhinmeters = lenglhinmeters;
         this.swimmingstyle = swimmingstyle;
         this.exercise = exercise;
     }
-
 }
 

@@ -1,11 +1,19 @@
 package cz.uhk.fim.project.bakalarka.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
+/**
+ * Entity class representing a UserStats entity. This is stored additional user's data, that are not his personal information.
+ *
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "userstats")
 @Data
+@AllArgsConstructor
 public class UserStats {
 
     @Id
@@ -18,6 +26,12 @@ public class UserStats {
 
     @Column(name = "waterintake")
     private double waterintake;
+    @Column(name = "averagerunlength")
+    private Integer averageRunLength;
+
+    @Column(name = "averagerunpace")
+    private Double averageRunPace;
+
 
     @OneToOne
     @JoinColumn(name = "fk_userid")
@@ -26,10 +40,11 @@ public class UserStats {
     public UserStats() {
     }
 
-    public UserStats(double bmi,  double waterintake, User user) {
+    public UserStats(double bmi, double waterintake, Integer averageRunLength, Double averageRunPace, User user) {
         this.bmi = bmi;
         this.waterintake = waterintake;
+        this.averageRunLength = averageRunLength;
+        this.averageRunPace = averageRunPace;
         this.user = user;
     }
-
 }

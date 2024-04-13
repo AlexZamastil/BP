@@ -3,11 +3,17 @@ package cz.uhk.fim.project.bakalarka.model;
 import cz.uhk.fim.project.bakalarka.enumerations.RunCategory;
 import jakarta.persistence.*;
 import lombok.Data;
-
+/**
+ * Entity class representing a Run, that implements ExerciseType and specifies data of Exercise entity.
+ *
+ * This class maps database objects to its corresponding PostgreSQL database table.
+ *
+ * @author Alex Zamastil
+ */
 @Entity
 @Table(name = "run")
 @Data
-public class Run {
+public class Run implements ExerciseType{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_runid")
