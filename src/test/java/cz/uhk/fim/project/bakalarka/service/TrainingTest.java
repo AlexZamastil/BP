@@ -26,7 +26,7 @@ class TrainingTest {
 
      @Test
      void test(){
-         log.info("123")
+         log.info("123");
      }
 
     @Test

@@ -79,7 +79,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/getTimingTags").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/getExercise/{id}").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/addExercise").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
+//                                FIXME V kontroléru UserController (a dalších) máte @RequestMapping("/api"), pak každé API v tomto kontroléru bude na cestě /api/...
+                                .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/user/logout").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/language/switch").permitAll()

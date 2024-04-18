@@ -26,6 +26,8 @@ services:
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       HIBERNATE_DDL: ${HIBERNATE_DDL}
+    volumes:
+      - ../src/main/resources/files:/app/src/main/resources/files
 
   postgresql:
     image: postgres:16

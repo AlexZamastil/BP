@@ -7,16 +7,12 @@ import cz.uhk.fim.project.bakalarka.enumerations.BodyType;
 import cz.uhk.fim.project.bakalarka.enumerations.Sex;
 import cz.uhk.fim.project.bakalarka.model.User;
 import cz.uhk.fim.project.bakalarka.util.JWTUtils;
-import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +42,7 @@ import static org.mockito.Mockito.when;
 class UserServiceTest {
 
     private final UserRepository userRepositoryMock = mock(UserRepository.class);
-    @MockBean
+    @Autowired
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
@@ -56,12 +52,15 @@ class UserServiceTest {
     private UserStatsRepository userStatsRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private MessageSource messageSource;
 
 
     @BeforeEach
     void setUp() {
         log.info("Resetting environment");
 
+        userStatsRepository.deleteAll();
         userRepository.deleteAll();
 
         reset(userRepositoryMock);
@@ -72,6 +71,7 @@ class UserServiceTest {
     void tearDown() {
         log.info("");
 
+        userStatsRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -96,7 +96,7 @@ class UserServiceTest {
 
         // Data preparation
         String email = "home.simpson@uhk.cz";
-        String nickname = "home";
+        String nickname = "homee";
         String password = "Passwd_123!";
         LocalDate birthdate = LocalDate.of(2000, 1, 1);
         int height = 178;
@@ -112,7 +112,7 @@ class UserServiceTest {
         // Verification
         assertThat(responseEntity, notNullValue());
         assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.OK));
-        assertThat(responseEntity.getBody(), equalTo("Account created successfully"));
+        assertThat(responseEntity.getBody(), equalTo("Účet byl úspěšně zaregistrován"));
 
         // Verify status/database record
         List<User> users = userRepository.findAll();// FIXME Možno testovat načtení očekávaného uživatele dle emailu, ale je vhodné ověřit, že se v databázi nevyskytuje žádný jiný záznam
@@ -123,12 +123,12 @@ class UserServiceTest {
         assertThat(user.getId(), greaterThan(0L));
         assertThat(user.getDateOfBirth(), equalTo(birthdate));
         assertThat(user.getEmail(), equalTo(email));
-        assertThat(user.getHeight(), equalTo(0.0D));
+        assertThat(user.getHeight(), equalTo((double) height));
         assertThat(user.getNickname(), equalTo(nickname));
         assertThat(user.getPassword(), notNullValue());
         assertThat(user.getPassword().length(), greaterThan(50));
-        assertThat(user.getWeight(), equalTo(0.0));
-        assertThat(user.getBodyType(), nullValue());
+        assertThat(user.getWeight(), equalTo((double) weight));
+        assertThat(user.getBodyType(), is(bodyType));
         assertThat(user.getSex(), is(sex));
         assertThat(user.getToken(), nullValue());
     }
@@ -145,8 +145,12 @@ class UserServiceTest {
         String nickname = "123!()<>{}\\|@";
         String password = "A";
         LocalDate birthdate = LocalDate.now().plusYears(1L);
+        int height = 178;
+        int weight = 70;
+        Sex sex = Sex.MALE;
+        BodyType bodyType = BodyType.AVERAGE;
 
-        UserDTO dto = new UserDTO(birthdate, email, nickname, password, null, 0, 0, null, 0, 0);
+        UserDTO dto = new UserDTO(birthdate, email, nickname, password, sex, weight, height, bodyType, 0, 0);
 
         // Execution
         ResponseEntity<?> responseEntity = userService.register(dto);
@@ -155,7 +159,7 @@ class UserServiceTest {
 //        FIXME Postrádám zde informaci o dalších nevalidních či neuvedených povinných hodnotách - jsou-li
         assertThat(responseEntity, notNullValue());
         assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
-        assertThat(responseEntity.getBody(), is("The entered text is not a valid email address"));
+        assertThat(responseEntity.getBody(), is("Prosím, zadejte platnou e-mailovou adresu"));
 
         // Verify status/database record
         assertThat(userRepository.findAll(), empty());
@@ -171,21 +175,31 @@ class UserServiceTest {
 
         // Data preparation
         String email = "home.simpson@uhk.cz";
-        String nickname = "home";
+        String nickname = "homee";
         String password = "Passwd_123!";
         LocalDate birthdate = LocalDate.of(2000, 1, 1);
+        int height = 178;
+        int weight = 70;
         Sex sex = Sex.MALE;
+        BodyType bodyType = BodyType.AVERAGE;
 
-        UserDTO dto = new UserDTO(birthdate, email, nickname, password, sex);
+        UserDTO dto = new UserDTO(birthdate, email, nickname, password, sex, weight, height, bodyType, 0, 0);
 
         // Execution
 
-        ResponseEntity<?> responseEntity = userService.register(dto);
+        UserService userServiceTest = new UserService(
+                userRepositoryMock,
+                userStatsRepository,
+                jwtUtils,
+                passwordEncoder,
+                messageSource
+        );
+        ResponseEntity<?> responseEntity = userServiceTest.register(dto);
 
         // Verification
         assertThat(responseEntity, notNullValue());
         assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
-        assertThat(responseEntity.getBody(), is("An error occurred while trying to save (/register) a new user."));
+        assertThat(responseEntity.getBody(), is("Nepodařilo se uložit Uživatele do databáze"));
     }
 
     @Test
