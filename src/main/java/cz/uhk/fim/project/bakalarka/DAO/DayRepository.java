@@ -1,6 +1,5 @@
 package cz.uhk.fim.project.bakalarka.DAO;
 
-import cz.uhk.fim.project.bakalarka.DTO.DayDTO;
 import cz.uhk.fim.project.bakalarka.model.Day;
 import cz.uhk.fim.project.bakalarka.model.Training;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +22,14 @@ public interface DayRepository extends JpaRepository<Day, Long> {
      */
     @Query("SELECT d FROM Day d WHERE d.training = :training")
     List<Day> findAllByTraining(@Param("training") Training training);
+    /**
+     * Retrieves the next 7 days that are bonded with a given training.
+     *
+     * @param training The training entity to retrieve days for.
+     * @return A list of Day entities bonded with the training.
+     */
+
+    @Query("SELECT d FROM Day d WHERE d.training = :training AND d.date >= CURRENT_DATE AND d.date < CURRENT_DATE + 7")
+    List<Day> findUpcomingTrainingDays(@Param("training") Training training);
 
 }

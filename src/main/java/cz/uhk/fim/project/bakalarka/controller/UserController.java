@@ -140,6 +140,17 @@ public class UserController {
         String header = request.getHeader("Authorization");
         return userService.deleteUser(header);
     }
-
+    /**
+     * Endpoint for logging out of a user account.
+     *
+     * @param request The HttpServletRequest for authorization check and obtaining user ID.
+     * @return ResponseEntity with the result of the operation.
+     */
+    @PostMapping(value = "user/logout")
+    public ResponseEntity<?>logoutUser(HttpServletRequest request) {
+        if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
+        String header = request.getHeader("Authorization");
+        return userService.logout(header);
+    }
 
 }

@@ -18,11 +18,6 @@ export default function AdminTools() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  //handler for navigating to AddExercise page
-  const handleAddExercise = () => {
-    navigate("/AddExercise");
-    window.location.reload(false);
-  }
   //getting user data from server
   useEffect(() => {
     callAPI("GET", "user/getUserData", null, null)
@@ -44,9 +39,10 @@ export default function AdminTools() {
         isAdmin ? (
           <Container style={{ padding: "20px" }}>
             <Paper elevation={3} className='paper'>
-              <h1>Admin tools </h1>
+              <h1>{t("admin_tools")} </h1>
               <br />
-              <Button color="dark" variant="contained" onClick={handleAddExercise}> Add Exercise </Button>
+              <Button style={{margin: "5px"}} color="dark" variant="contained" onClick={()=>navigate("/AddExercise")}> Add Exercise </Button>
+              <Button style={{margin: "5px"}} color="dark" variant="contained" onClick={()=>navigate("/AddFood")}> Add Food </Button>
             </Paper>
           </Container>
         ) : (

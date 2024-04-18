@@ -23,8 +23,8 @@ public class Food {
     @Column(name = "pk_foodid")
     private long id;
 
-    @Column(name = "calories")
-    private double calories;
+    @Column(name = "caloriesgained")
+    private Integer caloriesGained;
 
     @Column(name = "description")
     private String description;
@@ -32,11 +32,24 @@ public class Food {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "description_eng")
+    private String description_eng;
+
+    @Column(name = "name_eng")
+    private String name_eng;
+
     @OneToOne
     @JoinColumn(name = "fk_pictureid", referencedColumnName = "pk_pictureid")
     private Picture picture;
 
 
+    @ManyToMany
+    @JoinTable(
+            name = "tagfood",
+            joinColumns = @JoinColumn(name = "fk_foodid"),
+            inverseJoinColumns = @JoinColumn(name = "fk_tagid")
+    )
+    private Set<Tag> tagfood = new HashSet<>();
 
     @OneToMany
     @JoinTable(name = "foodingredient",
@@ -47,5 +60,17 @@ public class Food {
     )
     private Set<Ingredient> ingredients = new HashSet<>();
 
+    public void addTagFood(Tag t) {
+        this.tagfood.add(t);
+    }
 
+    public Food(int caloriesGained, String description, String name, String description_eng, String name_eng, Picture picture) {
+        this.caloriesGained = caloriesGained;
+        this.description = description;
+        this.name = name;
+        this.description_eng = description_eng;
+        this.name_eng = name_eng;
+        this.picture = picture;
+
+    }
 }

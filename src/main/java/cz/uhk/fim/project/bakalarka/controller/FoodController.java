@@ -1,7 +1,9 @@
 package cz.uhk.fim.project.bakalarka.controller;
 
 import cz.uhk.fim.project.bakalarka.DTO.ExerciseDTO;
+import cz.uhk.fim.project.bakalarka.DTO.FoodDTO;
 import cz.uhk.fim.project.bakalarka.service.ExerciseService;
+import cz.uhk.fim.project.bakalarka.service.FoodService;
 import cz.uhk.fim.project.bakalarka.util.AuthorizationCheck;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,62 +12,64 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 /**
- * Controller class for handling exercise-related endpoints.
+ * Controller class for handling food-related endpoints.
  *
  * @author Alex Zamastil
  */
 @RestController
 @RequestMapping("/api")
 
-public class ExerciseController {
-    private final ExerciseService exerciseService;
+public class FoodController {
+    private final FoodService foodService;
     MessageHandler<String> messageHandler = new MessageHandler<>();
 
     @Autowired
-    public ExerciseController(ExerciseService exerciseService) {
-        this.exerciseService = exerciseService;
+    public FoodController(FoodService foodService) {
+        this.foodService = foodService;
     }
 
     /**
-     * Endpoint for adding a new exercise
+     * Endpoint for adding a new food
      *
-     * @param exerciseRequest = the DTO containing the exercise data
-     * @param imageData       = data of the exercise image
+     * @param foodRequest = the DTO containing the food data
+     * @param imageData       = data of the food image
      * @param request         = HttpServletRequest that contains headers, authorization header is needed for this request
      * @return ResponseEntity with the result of the operation.
      */
 
-    @PostMapping(value = "exercise/addExercise", consumes = "multipart/form-data")
-    public ResponseEntity<?> addExercise(
-            @RequestPart(name = "exerciseRequest") ExerciseDTO exerciseRequest,
+    @PostMapping(value = "food/addFood", consumes = "multipart/form-data")
+    public ResponseEntity<?> addFood(
+            @RequestPart(name = "foodRequest") FoodDTO foodRequest,
             @RequestPart(name = "imageData") MultipartFile imageData,
             HttpServletRequest request
     ) {
         if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
-        return exerciseService.addNewExercise(exerciseRequest, imageData);
+        return foodService.addNewFood(foodRequest, imageData);
     }
 
     /**
-     * Endpoint for retrieving exercise details by ID.
+     * Endpoint for retrieving food details by ID.
      *
-     * @param id The ID of the exercise to retrieve.
-     * @return ResponseEntity with the exercise details. (retrieving image data has its own endpoint)
+     * @param id The ID of the food to retrieve.
+     * @return ResponseEntity with the food details. (retrieving image data has its own endpoint)
      */
-    @GetMapping(value = "exercise/getExercise/{id}")
-    public ResponseEntity<?> getExercise(@PathVariable Long id) {
-        return exerciseService.getExercise(id);
+    @GetMapping(value = "food/getFood/{id}")
+    public ResponseEntity<?> getFood(@PathVariable Long id) {
+        return foodService.getFood(id);
     }
 
     /**
-     * Endpoint for retrieving the picture of an exercise by ID.
+     * Endpoint for retrieving the picture of the food by ID.
      *
      * @param id The ID of the exercise to retrieve the picture for.
      * @return ResponseEntity with the exercise picture.
      */
-    @GetMapping(value = "exercise/getExercise/picture/{id}")
-    public ResponseEntity<?> getExercisePicture(@PathVariable Long id) {
-        return exerciseService.getExercisePicture(id);
+    @GetMapping(value = "food/getFood/picture/{id}")
+    public ResponseEntity<?> getFoodPicture(@PathVariable Long id) {
+        return foodService.getFoodPicture(id);
     }
 }
 

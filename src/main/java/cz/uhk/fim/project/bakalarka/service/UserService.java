@@ -20,6 +20,7 @@ import cz.uhk.fim.project.bakalarka.DAO.UserRepository;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Objects;
 
 /**
@@ -225,15 +226,22 @@ public class UserService {
             double waterIntake = 0.033 * user.getWeight();
             waterIntake = Math.round(waterIntake * 1000.0) / 1000.0;
 
-            if (userStats != null) {
+            double basalMetabolicRate;
+            int userAge = Period.between(user.getDateOfBirth(), LocalDate.now()).getYears();
 
+            if (user.getSex().toString().equals("MALE")){
+                basalMetabolicRate = 10* user.getWeight()+6.25*user.getHeight()-5*userAge + 5;
+            }else basalMetabolicRate = 10* user.getWeight()+6.25*user.getHeight()-5*userAge - 161;
+
+            if (userStats != null) {
+                userStats.setBmr(basalMetabolicRate);
                 userStats.setBmi(bmi);
                 userStats.setWaterintake(waterIntake);
 
                 userStatsRepository.save(userStats);
                 return messageHandler.success("values updated into database");
             } else {
-                UserStats userStats2 = new UserStats(bmi,waterIntake,0,0.,user);
+                UserStats userStats2 = new UserStats(bmi,waterIntake,basalMetabolicRate,0,0.,user);
                 userStatsRepository.save(userStats2);
                 return messageHandler.success("values inserted into database");
             }
@@ -297,8 +305,30 @@ public class UserService {
      */
     public ResponseEntity<?> deleteUser(String token) {
         User user = userRepository.findUserByToken(token);
+        if (user == null){
+            return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+        }
         userRepository.deleteUserWithData(user);
         return messageHandler.success(messageSource.getMessage("success.onDelete", null, LocaleContextHolder.getLocale()));
+    }
+
+    /**
+     * Logs out the user obtained from the authentication token.
+     * The users JWT is deleted from the database, so it cannot be used by potential attacker after logging out.
+     * This improves overall security of the project
+     *
+     * @param token The authentication token.
+     * @return ResponseEntity indicating the success or failure of the user deletion process.
+     */
+
+    public ResponseEntity<?> logout(String token){
+        User user = userRepository.findUserByToken(token);
+        if (user == null){
+            return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
+        }
+        user.setToken("");
+        userRepository.save(user);
+        return messageHandler.success(messageSource.getMessage("success.onLogout", null, LocaleContextHolder.getLocale()));
     }
 
 }

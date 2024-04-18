@@ -1,5 +1,6 @@
 package cz.uhk.fim.project.bakalarka.DTO;
 
+import cz.uhk.fim.project.bakalarka.model.Ingredient;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;

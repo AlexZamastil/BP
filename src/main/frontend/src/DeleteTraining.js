@@ -21,7 +21,8 @@ export default function DeleteTraining() {
      function handleDelete() {
             callAPI("DELETE","training/deleteTraining/"+trainingID,null,xsrfToken)
             .then((response)=>{
-                console.log("training deleted")
+                console.log("training deleted");
+                navigate("/profile");
             }
                 
             )

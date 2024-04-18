@@ -57,13 +57,13 @@ public class ExerciseService {
      */
 
     public ResponseEntity<?> addNewExercise(ExerciseDTO exerciseRequest, MultipartFile multipartFile) {
-        if(exerciseRequest == null) return stringMessageHandler.error(messageSource.getMessage("error.exercise.null", null, LocaleContextHolder.getLocale()));
+        if(exerciseRequest == null) return stringMessageHandler.error(messageSource.getMessage("error.exercise/food.null", null, LocaleContextHolder.getLocale()));
         if (StringUtils.isBlank(exerciseRequest.getName()) ||
                 StringUtils.isBlank(exerciseRequest.getName_eng()) ||
                 StringUtils.isBlank(exerciseRequest.getDescription()) ||
                 StringUtils.isBlank(exerciseRequest.getDescription_eng()) ||
                 multipartFile.isEmpty()
-        )  return stringMessageHandler.error(messageSource.getMessage("error.exercise.null", null, LocaleContextHolder.getLocale()));
+        )  return stringMessageHandler.error(messageSource.getMessage("error.exercise/food.null", null, LocaleContextHolder.getLocale()));
 
         switch (exerciseRequest.getType()) {
             case "RUN" -> {
@@ -123,7 +123,7 @@ public class ExerciseService {
                 tagList.add(t.getText());
             }
             ObjectMapper objectMapper = new ObjectMapper();
-            String jsonList = null;
+            String jsonList;
             try {
                 jsonList = objectMapper.writeValueAsString(tagList);
             } catch (JsonProcessingException ex) {
@@ -190,7 +190,7 @@ public class ExerciseService {
             String pictureBytes = Base64.getEncoder().encodeToString(picture);
             return stringMessageHandler.success(pictureBytes);
         }
-        return stringMessageHandler.error(messageSource.getMessage("error.exercise.invalidID", null, LocaleContextHolder.getLocale()));
+        return stringMessageHandler.error(messageSource.getMessage("error.invalidID", null, LocaleContextHolder.getLocale()));
     }
     /**
      * Adds a new running exercise with the provided details.

@@ -1,4 +1,4 @@
-import { Paper, Button, Container } from "@mui/material";
+import { Paper, Button, LinearProgress } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { callAPI, callAPINoAuth } from "./CallAPI";
@@ -12,7 +12,9 @@ import { useTranslation } from 'react-i18next';
 export default function Training() {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const [trainingID,setTrainingID] = useState(null);
+    const [trainingID, setTrainingID] = useState(null);
+    const [day, setDay] = useState(null);
+    const [trainingInfo, setTrainingInfo] = useState(null);
     const paperRun = {
         backgroundColor: `rgb(${125}, ${175}, ${255})`,
         padding: '10px',
@@ -37,17 +39,16 @@ export default function Training() {
                 let id = response.data.user.id;
                 callAPINoAuth("GET", "training/hasActiveTraining/" + id, null, null)
                     .then(response => {
-                        console.log("response: " + response.data)
                         if (response.data !== "no") {
-                            
+
                             setTrainingID(response.data);
+
                             callAPINoAuth("GET", "training/getActiveTraining/" + id, null, null)
                                 .then(response => {
-                                    console.log(response.data)
-                                    
                                     setPageContent(displayTraining(response.data));
-                                    
+
                                 })
+
 
                         } else
                             setPageContent(
@@ -74,58 +75,136 @@ export default function Training() {
     function generateTraining(trainingType) {
         navigate(`/generateTraining/${trainingType}`);
     }
+
+    const handleExerciseClick = (id) => {
+        navigate(`/exercise/${id}`);
+    };
+
+    const handleFoodClick = (id) => {
+        navigate(`/food/${id}`);
+    };
+    //function for rendering exercises as links to exercise detail
+    function displayExercises(exercises, localization) {
+        if (localization === "en") {
+            return (
+                <div>
+                    {exercises.map((exercise, id) => (
+                        <div key={id} onClick={() => handleExerciseClick(exercise.id)} style={{ cursor: 'pointer', color: "#61e248" }}>
+
+                            {exercise.name_eng}
+                        </div>
+                    ))}
+                </div>
+            );
+        } else return (
+            <div>
+                {exercises.map((exercise, id) => (
+                    <div key={id} onClick={() => handleExerciseClick(exercise.id)} style={{ cursor: 'pointer', color: "#61e248" }}>
+
+                        {exercise.name}
+                    </div>
+                ))}
+            </div>
+        );
+
+    }
+    //function for rendering menu items as links to food detail
+    function displayMenu(food, localization) {
+        if (localization === "en") {
+            return (
+                <div>
+                    {food.map((food, id) => (
+                        <div key={id} onClick={() => handleFoodClick(food.id)} style={{ cursor: 'pointer', color: "#61e248" }}>
+                            {food.name_eng}
+                        </div>
+                    ))}
+                </div>
+            );
+        } else return (
+            <div>
+                {food.map((food, id) => (
+                    <div key={id} onClick={() => handleFoodClick(food.id)} style={{ cursor: 'pointer', color: "#61e248" }}>
+                        {food.name}
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+
     //function that processes training data and renders them
-    function displayTraining(data) {
-        console.log(data)
+    function displayTraining(dayData) {
         let today = new Date();
-        today.setDate(today.getDate() + 1)
-        console.log(today)
+        today.setDate(today.getDate())
         let todayTraining = null;
         let tomorrowTraining = null;
+        let progress = null;
+        let localization = localStorage.getItem("Localization")
+        console.log(dayData);
+        //TODO
+    
 
-        for (let i = 0; i < data.length; i++) {
-            let trainingDate = new Date(data[i].date);
+        for (let i = 0; i < dayData.trainingDays.length; i++) {
+            let trainingDate = new Date(dayData.trainingDays[i].date);
+            console.log(trainingDate)
             if (trainingDate.toDateString() === today.toDateString()) {
-                todayTraining = data[i];
-                tomorrowTraining = data[i + 1];
+                setDay(i);
+                todayTraining = dayData.trainingDays[i];
+                tomorrowTraining = dayData.trainingDays[i + 1];
+               // progress = Math.floor((dayNumber / numberOfTrainingDays) * 100);
+                console.log(progress);
                 break;
             }
         }
 
-        console.log(todayTraining)
+
         return (<>
-            <Container >
 
-            <Paper className="paper">
-                today training <br />
+            <div className="displayTraining">
 
-                today:{todayTraining.date}<br />
-                {todayTraining.caloriesburned}<br />
-                {todayTraining.exercises}<br />
-                {todayTraining.menu}<br />
+                <Paper className="displayTodayTraining">
+                    {/* <h2>{t("today_traning")}</h2> <br />*/}
+
+                    {t("date")}{todayTraining.date}<br />
+                    {t("calories")}{todayTraining.caloriesburned}<br />
+                    {t("exercises")} {displayExercises(todayTraining.exercises, localization)}<br />
+                    {t("calories_gain")}<p> {todayTraining.caloriesgained}</p>  <br />
+                    {t("menu")}  {displayMenu(todayTraining.menu, localization)}<br />
+                </Paper>
+
+                <Paper className="displayTomorrowTraining">
+                    <h2>{t("tomorrow_training")}</h2><br />
+                    {t("date")} {tomorrowTraining.date}<br />
+                    {t("calories")}{tomorrowTraining.caloriesburned}<br />
+                    {t("exercises")}{displayExercises(tomorrowTraining.exercises, localization)}<br />
+                    {t("calories_gain")} <p>{tomorrowTraining.caloriesgained} </p> <br />
+                    {t("menu")} {displayMenu(tomorrowTraining.menu, localization)}<br />
+
+
+                </Paper>
+
+                <Paper className="displayProgress">
+                    <h2>{t("progress")}</h2>
+                    {t("progress_stat")} {day} <br />
+                    {t("progress_stat2")} {progress}%
+                    <LinearProgress variant="determinate" value={progress} style={{
+                        width: '200px',
+                        margin: 'auto',
+                        marginTop: '20px',
+                        borderRadius: '10px',
+                        backgroundColor: '#e0e0e0',
+                        height: '10px',
+                    }} />
+                </Paper>
+
+            </div>
+            <Paper style={{ alignContent: "center" }}>
+
             </Paper>
+            <Button style={{ margin: '10px' }} color="secondary" variant="contained" onClick={() => navigate("/deleteTraining/" + trainingID)}>{t("delete_training_button")}</Button>
 
-            <Paper className="paper">
-                tomorrow training <br />
-                tomorrow: {tomorrowTraining.date}<br />
-                {tomorrowTraining.caloriesburned}<br />
-                {tomorrowTraining.exercises}<br />
-                {tomorrowTraining.menu}<br />
-             
-
-            </Paper>
-
-            <Paper className="paper">
-                overview & progress
-            </Paper>
-
-            <Button style={{ margin: '10px' }} color="secondary" variant="contained" onClick={() => navigate("/deleteTraining/"+trainingID)}>{t("delete_training_button")}</Button>
-            </Container>
-
-           
         </>)
     }
-
     return (
         pageContent
     );

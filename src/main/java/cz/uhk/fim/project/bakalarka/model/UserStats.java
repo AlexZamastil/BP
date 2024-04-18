@@ -32,6 +32,8 @@ public class UserStats {
     @Column(name = "averagerunpace")
     private Double averageRunPace;
 
+    @Column(name="bmr")
+    private Double bmr;
 
     @OneToOne
     @JoinColumn(name = "fk_userid")
@@ -40,9 +42,10 @@ public class UserStats {
     public UserStats() {
     }
 
-    public UserStats(double bmi, double waterintake, Integer averageRunLength, Double averageRunPace, User user) {
+    public UserStats(double bmi, double waterintake, double bmr, Integer averageRunLength, Double averageRunPace, User user) {
         this.bmi = bmi;
         this.waterintake = waterintake;
+        this.bmr = bmr;
         this.averageRunLength = averageRunLength;
         this.averageRunPace = averageRunPace;
         this.user = user;

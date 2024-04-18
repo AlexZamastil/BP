@@ -33,7 +33,7 @@ public class JWTUtils {
     }
 
     /**
-     * Generates a JWT token with the given user ID, organization, and expiration date.
+     * Generates a JWT token with the given user ID, organization, hashed secret variable and expiration date.
      *
      * @param userID The user ID to include in the token.
      * @return The generated JWT token.
@@ -50,7 +50,6 @@ public class JWTUtils {
                 .withExpiresAt(expirationDate);
 
         Algorithm algorithm = Algorithm.HMAC256(secret);
-        //return "{\"jwt\": \"" + jwtBuilder.sign(algorithm) + "\"}";
         return jwtBuilder.sign(algorithm);
     }
 

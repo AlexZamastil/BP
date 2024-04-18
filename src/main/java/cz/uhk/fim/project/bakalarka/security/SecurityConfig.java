@@ -80,6 +80,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/getExercise/{id}").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/addExercise").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/user/logout").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/language/switch").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/initConnection").permitAll()
@@ -87,6 +88,9 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/user/addAverageValues").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/training/deleteTraining/{id}").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/training/getTrainings").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/food/addFood").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/food/getFood/{id}").hasAnyRole("USER","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/food/getFood/picture/{id}").hasAnyRole("USER","ADMIN")
 
 
                                 .anyRequest().permitAll())

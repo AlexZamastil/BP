@@ -11,6 +11,8 @@ import Registration from './Registration';
 import PageNotFound from './PageNotFound';
 import UpdateData from './UpdateData';
 import AddExercise from './AddExercise';
+import AddFood from './AddFood';
+import Food from './Food';
 import Training from './Training';
 import GenerateTraining from './GenerateTraining';
 import Exercise from './Exercise';
@@ -75,6 +77,8 @@ function App() {
           <Route path="/register" element={<Registration />} />
           <Route path="/UpdateData" element={<UpdateData />} />
           <Route path="/addExercise" element={<AddExercise />} />
+          <Route path="/addFood" element={<AddFood />} />
+          <Route path="/Food/:foodID" element={<Food />} />
           <Route path="/training" element={<Training />} />
           <Route path="/generateTraining/:trainingType" element={<GenerateTraining />} />
           <Route path="/exercise/:exerciseID" element={<Exercise />} />
@@ -87,7 +91,7 @@ function App() {
           <Route path="/" element={<WelcomePage />} />
         </Routes>
       </div>
-      <footer> © {year} - <a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a> <br />{t('copyright2')}</footer>
+      <footer> © {year} - <a href='https://www.uhk.cz/cs/fakulta-informatiky-a-managementu/fim' target="_blank" rel="noopener noreferrer">UHK FIM</a></footer>
     </>
   );
 }

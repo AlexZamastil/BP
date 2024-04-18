@@ -32,6 +32,7 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
      * @return The training entity matching the criteria, if found; otherwise, null.
      */
     Training findTrainingByUserAndRacedayIsAfter(User user, LocalDate date);
+
     /**
      * Deletes days associated with a training.
      *
@@ -41,6 +42,8 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
     @Modifying
     @Query("DELETE FROM Day d WHERE d.training = :training")
     void deleteDaysByTraining(Training training);
+
+
     /**
      * Deletes a training entity.
      *

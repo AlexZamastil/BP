@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { callAPI } from './CallAPI';
+import getXSRFtoken from './XSRF_token';
 
 /**
  * Author: Alex Zamastil
@@ -14,11 +15,13 @@ export default function Profile() {
   const [userStats, setUserStats] = useState([]);
   const [bmiColor, setBmiColor] = useState(null);
   const [trainings, setTrainings] = useState([]);
+  const xsrfToken = getXSRFtoken();
   const [age,setAge] = useState(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
 //function that logs out the user
   const handleLogout = () => {
+    callAPI("post", "user/logout", null,xsrfToken)
     localStorage.removeItem("token");
     navigate("/WelcomePage");
     window.location.reload(false);

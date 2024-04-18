@@ -304,8 +304,9 @@ export default function GenerateTraining() {
             var seconds = dateTime.getSeconds();
 
             let minutesTotal = hours * 60 + minutes + seconds / 60;
-       
-            setPace(minutesTotal / (length1 / 1000));
+            let pace = (minutesTotal / (length1 / 1000)).toFixed(2);
+            setPace(pace);
+            
         }
     }
     //function that renders add average values form

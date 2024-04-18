@@ -7,6 +7,7 @@ import cz.uhk.fim.project.bakalarka.DTO.CreateTrainingDTO;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -33,13 +34,19 @@ import java.util.*;
 @Log4j2
 public class TrainingService {
 
-    public String dataset = "src/main/java/cz/uhk/fim/project/bakalarka/files/dataset_1.arff";
+    public String dataset = "src/main/resources/files/dataset_1.arff";
+    public String gladiatorData = "src/main/resources/files/gladiator_data.arff";
+    public String runData = "src/main/resources/files/run_data.arff";
+    public String longRunData = "src/main/resources/files/long_run_data.arff";
     SimpleDateFormat sdf = new SimpleDateFormat("EEEE", Locale.US);
     private Classifier classifier;
     private Instances data;
+
     private final UserRepository userRepository;
     private final TrainingRepository trainingRepository;
     private final DayRepository dayRepository;
+
+    private final FoodRepository foodRepository;
     private final GymWorkoutRepository gymWorkoutRepository;
     private final RunRepository runRepository;
     private final SwimmingRepository swimmingRepository;
@@ -47,15 +54,16 @@ public class TrainingService {
     private final UserStatsRepository userStatsRepository;
     MessageHandler<String> messageHandler = new MessageHandler<>();
     MessageHandler<List<Training>> trainingListMessageHandler = new MessageHandler<>();
-    public final float MAX_PERCENTAGE_INCREASE_LENGTH = 6;
-    public final float MAX_PERCENTAGE_INCREASE_PACE = 3;
-    public final double LONG_RUN_THRESHOLD = 10000;
+    public final double MAX_PERCENTAGE_INCREASE_LENGTH_PER_TRAINING_DAY = 1.3;
+    public final double MAX_PERCENTAGE_INCREASE_PACE_PER_TRAINING_DAY = 0.8;
+    public final double LONG_RUN_THRESHOLD = 12000;
 
 
-    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, DayRepository dayRepository, ExerciseRepository exerciseRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, UserStatsRepository userStatsRepository, MessageSource messageSource) {
+    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, DayRepository dayRepository, ExerciseRepository exerciseRepository, FoodRepository foodRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, UserStatsRepository userStatsRepository, MessageSource messageSource) {
         this.userRepository = userRepository;
         this.trainingRepository = trainingRepository;
         this.dayRepository = dayRepository;
+        this.foodRepository = foodRepository;
         this.gymWorkoutRepository = gymWorkoutRepository;
         this.runRepository = runRepository;
         this.swimmingRepository = swimmingRepository;
@@ -69,9 +77,9 @@ public class TrainingService {
      * @throws Exception If an error occurs during model training.
      */
     public void trainModel() throws Exception {
-        ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(dataset);
+        ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(gladiatorData);
         Instances data = dataSource.getDataSet();
-        data.setClassIndex(data.numAttributes() - 1);
+       // data.setClassIndex(data.numAttributes() - 1);
 
         this.data = data;
         J48 j48 = new J48();
@@ -92,6 +100,7 @@ public class TrainingService {
      * @param request      HttpServletRequest used for obtaining user ID.
      * @returnResponseEntity indicating the success or failure of the training plan generation process.
      */
+    @Transactional
     public ResponseEntity<?> generateTraining(CreateTrainingDTO trainingData, HttpServletRequest request) {
         if (StringUtils.isBlank(trainingData.getElevationProfile().toString()) ||
                 trainingData.getLengthOfRaceInMeters() == null ||
@@ -106,6 +115,8 @@ public class TrainingService {
         if (trainingData.getRaceDay().isBefore(LocalDate.now()) || trainingDays < 30 || trainingDays > 365)
             return messageHandler.error(messageSource.getMessage("error.training.invalidTime", null, LocaleContextHolder.getLocale()));
 
+        int trainingDaysPerWeek = trainingData.countTrainingDays();
+
         log.info(trainingData);
         String token = request.getHeader("Authorization");
         User user = userRepository.findUserByToken(token);
@@ -118,7 +129,8 @@ public class TrainingService {
                 trainingData.getWantedPace(),
                 userStats.getAverageRunLength(),
                 userStats.getAverageRunPace(),
-                user
+                user,
+                trainingDaysPerWeek
         );
         log.info(testTraining.getStatusCode());
         if (testTraining.getStatusCode() == HttpStatusCode.valueOf(400)) {
@@ -126,9 +138,33 @@ public class TrainingService {
         }
 
         List<ExerciseType> exercisePool = new ArrayList<>();
+        List<Food> foodPool = foodRepository.findAll();
 
         if (trainingData.getType().toString().equals("OCR")) {
             //for OCR the training consists of all 3 types of exercise to ensure versatility
+            ConverterUtils.DataSource gladiator;
+            try {
+                gladiator = new ConverterUtils.DataSource(gladiatorData);
+                Instances data = gladiator.getDataSet();
+                data.setClassIndex(data.numAttributes() - 1);
+
+                J48 j48 = new J48();
+                //j48.setUnpruned(false);
+                //j48.setUseLaplace(true);
+                //String[] options = {"-U"};
+                //j48.setOptions(options);
+                j48.buildClassifier(data);
+                //dataset evaluation
+                Evaluation eval = new Evaluation(data);
+                eval.crossValidateModel(j48, data, 3, new java.util.Random(1));
+                log.info(eval.toSummaryString());
+                classifier = j48;
+            } catch (Exception e) {
+                log.error(e);
+                return messageHandler.error(messageSource.getMessage("error.training.read", null, LocaleContextHolder.getLocale()));
+            }
+
+
             List<GymWorkout> gymWorkouts = gymWorkoutRepository.findAll();
             List<Run> runs = runRepository.findAll();
             List<Swimming> swimming = swimmingRepository.findAll();
@@ -159,29 +195,96 @@ public class TrainingService {
         trainingRepository.save(training);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
+
         for (int x = 0; x < trainingDays; x++) {
-            calendar.add(Calendar.DATE, 1);
+            List<ExerciseType> exercises = new ArrayList<>(exercisePool);
+            List<Food> food = new ArrayList<>(foodPool);
             log.info(calendar.getTime());
             log.info("Day of the week: " + sdf.format(calendar.getTime()));
             Day day = new Day();
             day.setDate(calendar.getTime());
             day.setTraining(training);
             day.setUser(user);
-            generateExercises(userStats, day, exercisePool);
-            generateFood(userStats, day);
+            day.setCaloriesGained(userStats.getBmr());
+            if(isTrainingDay(calendar.get(Calendar.DAY_OF_WEEK),trainingData)){
+                generateExercises(userStats, day, exercises,trainingData);
+            }
+            generateFood(userStats, day, food);
             dayRepository.save(day);
+            calendar.add(Calendar.DATE, 1);
         }
 
 
         return messageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
     }
 
-    public void generateExercises(UserStats userStats, Day day, List<ExerciseType> exercises) {
+    public void generateExercises(UserStats userStats, Day day, List<ExerciseType> exercises, CreateTrainingDTO trainingData) {
         log.info("exercise pool: " + exercises.size());
-        //pro normalni beh zohlednit druh trati
+        if (exercises.size() < 3) {
+            log.info("Insufficient exercises available.");
+
+            return;
+        }
+        Random random = new Random();
+        Set<Exercise> exerciseList = new HashSet<>();
+        while (exerciseList.size() < 3) {
+            int randomIndex = random.nextInt(exercises.size());
+            Exercise randomExercise = exercises.get(randomIndex).getExercise();
+            exerciseList.add(randomExercise);
+            day.setCaloriesBurned(day.getCaloriesBurned());
+            exercises.remove(randomIndex);
+        }
+        day.setExercises(exerciseList);
     }
 
-    public void generateFood(UserStats userStats, Day day) {
+    public void generateFood(UserStats userStats, Day day, List<Food> foodPool) {
+        log.info("food pool: " + foodPool.size());
+        if (foodPool.size() < 3) {
+            log.info("Insufficient food available.");
+
+            return;
+        }
+
+        Random random = new Random();
+        Set<Food> foodList = new HashSet<>();
+        while (foodList.size() < 3) {
+            int randomIndex = random.nextInt(foodPool.size());
+            Food randomFood = foodPool.get(randomIndex);
+            foodList.add(randomFood);
+            day.setCaloriesGained(day.getCaloriesGained()+randomFood.getCaloriesGained());
+            foodPool.remove(randomIndex);
+        }
+        day.setMenu(foodList);
+    }
+
+    /**
+     * Determines if the day of the week is a training day
+     *
+     * @param dayOfWeek Day of the week
+     * @param c DTO containing the training day
+     * @return true if the day is training day, otherwise false
+     */
+
+    public boolean isTrainingDay(int dayOfWeek, CreateTrainingDTO c) {
+        switch (dayOfWeek) {
+            case Calendar.MONDAY:
+                return c.isMonday();
+            case Calendar.TUESDAY:
+                return c.isTuesday();
+            case Calendar.WEDNESDAY:
+                return c.isWednesday();
+            case Calendar.THURSDAY:
+                return c.isThursday();
+            case Calendar.FRIDAY:
+                return c.isFriday();
+            case Calendar.SATURDAY:
+                return c.isSaturday();
+            case Calendar.SUNDAY:
+                return c.isSunday();
+            default:
+                return false;
+        }
+
 
     }
 
@@ -199,10 +302,11 @@ public class TrainingService {
 
     public ResponseEntity<?> testTrainingPossibility(int numberOfDays,
                                                      Integer raceLength,
-                                                     double wantedPace,
+                                                     Double wantedPace,
                                                      Integer averageRunLength,
                                                      double averagePace,
-                                                     User user
+                                                     User user,
+                                                     int trainingDaysPerWeek
     ) {
         if (!isGoalSuitable(raceLength)) {
             return messageHandler.error(messageSource.getMessage("error.training.badRace", null, LocaleContextHolder.getLocale()));
@@ -217,18 +321,18 @@ public class TrainingService {
             // for long runs we cannot compare average training length, because it is not usual to run the race length as a training
             double x = weeklyPercentageIncreaseInLength(numberOfWeeks, averageRunLength, raceLength);
             log.info("Weekly percentage increase in length: " + x);
-            if (x > MAX_PERCENTAGE_INCREASE_LENGTH)
+            if (x > (MAX_PERCENTAGE_INCREASE_LENGTH_PER_TRAINING_DAY)*trainingDaysPerWeek)
                 return messageHandler.error(messageSource.getMessage("error.training.badLength", null, LocaleContextHolder.getLocale()));
         }
         log.info("Average pace: " + averagePace);
         log.info("Wanted pace: " + wantedPace);
 
-        if (averagePace > wantedPace) {
+        if (wantedPace != null && averagePace > wantedPace ) {
 
             double x = weeklyPercentageIncreaseInPace(numberOfWeeks, averagePace, wantedPace);
             log.info("Weeks: " + numberOfWeeks);
             log.info("Weekly percentage increase in pace: " + x);
-            if (x > MAX_PERCENTAGE_INCREASE_PACE)
+            if (x > (MAX_PERCENTAGE_INCREASE_PACE_PER_TRAINING_DAY)*trainingDaysPerWeek)
                 return messageHandler.error(messageSource.getMessage("error.training.badPace", null, LocaleContextHolder.getLocale()));
         }
 
@@ -305,14 +409,23 @@ public class TrainingService {
         log.info(activeTraining);
         if (activeTraining == null)
             return messageHandler.error(messageSource.getMessage("error.training.notFound", null, LocaleContextHolder.getLocale()));
-        List<Day> trainingDays = dayRepository.findAllByTraining(activeTraining);
+        List<Day> trainingDays = dayRepository.findUpcomingTrainingDays(activeTraining);
         List<DayDTO> daysDTO = new ArrayList<>();
         for (Day d : trainingDays) {
-            DayDTO dayDTO = new DayDTO(d.getDate(), d.getCaloriesgained(), d.getCaloriesburned(), d.getExercises(), d.getMenu());
+            DayDTO dayDTO = new DayDTO(d.getDate(), d.getCaloriesGained(), d.getCaloriesBurned(), d.getExercises(), d.getMenu());
             daysDTO.add(dayDTO);
         }
-        return ResponseEntity.ok(daysDTO);
+        CreateTrainingDTO createTrainingDTO = new CreateTrainingDTO();
+        createTrainingDTO.setLengthOfRaceInMeters(activeTraining.getLengthinmeters());
+        createTrainingDTO.setType(activeTraining.getType());
+        createTrainingDTO.setStartDay(activeTraining.getStartday());
+        createTrainingDTO.setRaceDay(activeTraining.getRaceday());
+        Map<String, Object> response = new HashMap<>();
+        response.put("trainingDays", daysDTO);
+        response.put("trainingInfo", createTrainingDTO);
+        return ResponseEntity.ok(response);
     }
+
     /**
      * Deletes the training with the specified ID.
      *

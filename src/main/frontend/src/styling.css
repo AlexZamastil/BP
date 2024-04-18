@@ -14,6 +14,7 @@
   font-weight: 500;
   font-size: 16px;
   text-decoration: none;
+;
 }
 
 html,
@@ -22,7 +23,7 @@ body {
 }
 
 .container {
-  min-height: 500px;
+  min-height: 80vh;
   position: relative;
 }
 
@@ -237,18 +238,15 @@ body {
   margin: auto;
   margin-top: 100px;
 }
-.paperExercise {
-  padding: 10px;
-  max-width: 200px;
-  opacity: 1;
-  margin: 20px;
-  display: flex;
-}
+
 
 .exerciseFlex{
   display: flex;
   flex-direction: row;
   justify-content: center;
+  width:fit-content;
+  max-width: 100%;
+
 }
 
 .paperRun {
@@ -352,6 +350,52 @@ footer {
   font-weight: 400;
 }
 
+.displayTodayTraining {
+  padding: 20px;
+  max-width: 250px;
+  opacity: 0.9;
+  margin: 10px;
+  
+}
+.displayTodayTraining p {
+  color:var(--greer-color);
+}
+
+.displayTomorrowTraining {
+  padding: 20px;
+  max-width: 250px;
+  opacity: 0.9;
+  margin: 10px;
+ 
+}
+.displayTomorrowTraining p {
+  color:var(--greer-color);
+}
+
+.displayProgress {
+  padding: 20px;
+  max-width: 250px;
+  opacity: 0.9;
+  margin: 10px;
+ 
+}
+.displayTraining{
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.paperExercise {
+  padding: 10px;
+  max-width:600px;
+  opacity: 1;
+  margin: 20px;
+  display: flex;
+}
+
+.exerciseFoodDisplay{
+  max-width: 550px;
+}
 
 
 
@@ -593,9 +637,52 @@ footer a{font-size: small;}
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
-  max-width: 100%;
   margin: auto;
+ 
 }
+
+.displayTodayTraining {
+  padding: 20px;
+  max-width: 250px;
+  opacity: 0.9;
+  margin: 10px;
+  
+}
+
+.displayTomorrowTraining {
+  padding: 20px;
+  max-width: 250px;
+  opacity: 0.9;
+  margin: 10px;
+ 
+}
+
+.displayProgress {
+  padding: 20px;
+  max-width: 250px;
+  opacity: 0.9;
+  margin: 10px;
+ 
+}
+
+.displayTraining{
+  display:block;
+  flex-direction: row;
+  justify-content: center;
+}
+.paperExercise {
+  padding: 10px;
+  width:330px;
+  opacity: 1;
+  margin: 20px;
+  display: flex;
+}
+.exerciseFoodDisplay{
+  max-width: 320px;
+  font-size: small;
+}
+
+
 }
 
 
@@ -782,6 +869,25 @@ footer a{font-size: small;}
   display:inline;
   padding: 20px;
 
+}
+
+.exerciseFlex{
+  display: block;
+  justify-content: center;
+  width:fit-content;
+ 
+
+}
+.paperExercise {
+  padding: 10px;
+  width:600px;
+  opacity: 1;
+  margin: 20px;
+  display: flex;
+}
+.exerciseFoodDisplay{
+  max-width: 500px;
+  font-size: small;
 }
 
 

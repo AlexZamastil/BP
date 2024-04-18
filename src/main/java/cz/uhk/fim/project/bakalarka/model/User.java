@@ -24,9 +24,9 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 public class User {
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-@Column(name = "pk_userid")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "pk_userid")
     private long id;
     @Column(name = "dateofbirth")
     private LocalDate dateOfBirth;
@@ -57,6 +57,8 @@ public class User {
     private Role role;
     @Column(name = "token")
     private String token;
+
+
 
     @ManyToMany
     @JoinTable(name = "userbannedfood",

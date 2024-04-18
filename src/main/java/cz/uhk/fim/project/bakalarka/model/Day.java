@@ -28,10 +28,10 @@ public class Day {
     private Date date;
 
     @Column (name = "caloriesgained")
-    private double caloriesgained;
+    private double caloriesGained;
 
     @Column (name = "caloriesburned")
-    private double caloriesburned;
+    private double caloriesBurned;
 
     @ManyToOne
     @JoinColumn(name = "fk_trainingid")
