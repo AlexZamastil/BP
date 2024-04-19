@@ -6,6 +6,7 @@ import cz.uhk.fim.project.bakalarka.enumerations.Sex;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -77,7 +78,7 @@ public class User {
         this.sex = sex;
         this.role = Role.USER;
     }
-    public User(String email, String nickname, String password, LocalDate dateOfBirth, Sex sex, int weight, int height, BodyType bodyType){
+    public User(String email, String nickname, String password, LocalDate dateOfBirth, Sex sex, double weight, double height, BodyType bodyType){
         this.email = email;
         this.nickname = nickname;
         this.password = password;
@@ -87,5 +88,22 @@ public class User {
         this.weight = weight;
         this.height = height;
         this.bodyType = bodyType;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", dateOfBirth=" + dateOfBirth +
+                ", email='" + email + '\'' +
+                ", height=" + height +
+                ", nickname='" + nickname + '\'' +
+                ", password='" + password + '\'' +
+                ", weight=" + weight +
+                ", bodyType=" + bodyType +
+                ", sex=" + sex +
+                ", role=" + role +
+                ", token='" + token + '\'' +
+                '}';
     }
 }

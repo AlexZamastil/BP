@@ -17,8 +17,8 @@ public class UserDTO {
     private String nickname;
     private String password;
     private Sex sex;
-    private int weight;
-    private int height;
+    private double weight;
+    private double height;
     private BodyType bodyType;
     private int averageRunLength;
     private double averageRunPace;

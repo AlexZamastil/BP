@@ -79,7 +79,7 @@ public class TrainingService {
     public void trainModel() throws Exception {
         ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(gladiatorData);
         Instances data = dataSource.getDataSet();
-       // data.setClassIndex(data.numAttributes() - 1);
+        data.setClassIndex(data.numAttributes() - 1);
 
         this.data = data;
         J48 j48 = new J48();
@@ -97,11 +97,11 @@ public class TrainingService {
      * Create instances of Training and Day object, while utilizing J48 algorithm.
      *
      * @param trainingData DTO containing all the necessary data to create a training plan.
-     * @param request      HttpServletRequest used for obtaining user ID.
+     * @param token        Users JWToken.
      * @returnResponseEntity indicating the success or failure of the training plan generation process.
      */
     @Transactional
-    public ResponseEntity<?> generateTraining(CreateTrainingDTO trainingData, HttpServletRequest request) {
+    public ResponseEntity<?> generateTraining(CreateTrainingDTO trainingData, String token) {
         if (StringUtils.isBlank(trainingData.getElevationProfile().toString()) ||
                 trainingData.getLengthOfRaceInMeters() == null ||
                 StringUtils.isBlank(trainingData.getLengthOfRaceInMeters().toString()) ||
@@ -118,7 +118,6 @@ public class TrainingService {
         int trainingDaysPerWeek = trainingData.countTrainingDays();
 
         log.info(trainingData);
-        String token = request.getHeader("Authorization");
         User user = userRepository.findUserByToken(token);
         UserStats userStats = userStatsRepository.findUserStatsByUser(user);
 
@@ -386,7 +385,6 @@ public class TrainingService {
      * @return ResponseEntity indicating whether the user has an active training session or not.
      */
     public ResponseEntity<?> hasActiveTraining(long id) {
-        log.info("a");
         LocalDate today = LocalDate.now();
         List<Training> trainings = trainingRepository.findTrainingsContainingUser(id);
         for (Training t : trainings
@@ -434,7 +432,6 @@ public class TrainingService {
      */
     public ResponseEntity<?> deleteTraining(long id) {
         Optional<Training> t = trainingRepository.findById(id);
-        log.info(t);
 
         if (t.isPresent()) {
             trainingRepository.deleteTrainingWithData(t.get());

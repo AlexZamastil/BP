@@ -21,6 +21,8 @@ import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -131,6 +133,9 @@ public class UserService {
      * @return ResponseEntity indicating the success or failure of the registration process.
      */
     public ResponseEntity<?> register(UserDTO userDTO) {
+
+        List<String> errors = new ArrayList<>();
+
         if (StringUtils.isBlank(userDTO.getEmail()) ||
                 StringUtils.isBlank(userDTO.getNickname()) ||
                 StringUtils.isBlank(userDTO.getPassword()) ||
@@ -139,16 +144,16 @@ public class UserService {
                 userDTO.getWeight() == 0 ||
                 userDTO.getSex() == null ||
                 userDTO.getBodyType() == null)
-            return messageHandler.error(messageSource.getMessage("error.register.nullValue", null, LocaleContextHolder.getLocale()));
+            errors.add(messageSource.getMessage("error.register.nullValue", null, LocaleContextHolder.getLocale()));
 
         if (!emailValidator.isValid(userDTO.getEmail())) {
-            return messageHandler.error(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
+            errors.add(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
         }
         if (userRepository.findUserByEmail(userDTO.getEmail()) != null) {
-            return messageHandler.error(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
+            errors.add(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
         }
         if (isValidNickname(userDTO.getNickname())) {
-            return messageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
+            errors.add(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
         }
 
         LocalDate currentDate = LocalDate.now();
@@ -156,11 +161,22 @@ public class UserService {
         LocalDate userBirthDate = userDTO.getDateOfBirth();
 
         if (userBirthDate.isAfter(eighteenYearsAgo)) {
-            return messageHandler.error(messageSource.getMessage("error.register.ageTooYoung", null, LocaleContextHolder.getLocale()));
+            errors.add(messageSource.getMessage("error.register.ageTooYoung", null, LocaleContextHolder.getLocale()));
         }
 
         if (userDTO.getPassword().length() < 8)
-            return messageHandler.error(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
+            errors.add(messageSource.getMessage("error.register.invalidPassword", null, LocaleContextHolder.getLocale()));
+
+        if (userDTO.getWeight() > 150 || userDTO.getWeight() < 40)
+            errors.add(messageSource.getMessage("error.register.weight", null, LocaleContextHolder.getLocale()));
+
+        if (userDTO.getHeight() > 220 || userDTO.getHeight() < 140)
+            errors.add(messageSource.getMessage("error.register.height", null, LocaleContextHolder.getLocale()));
+
+        if (!errors.isEmpty()) {
+            return messageHandler.error(errors.toString());
+        }
+
 
         String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
         User user = new User(userDTO.getEmail(), userDTO.getNickname(), encryptedPassword, userDTO.getDateOfBirth(), userDTO.getSex(), userDTO.getWeight(), userDTO.getHeight(), userDTO.getBodyType());
@@ -229,9 +245,9 @@ public class UserService {
             double basalMetabolicRate;
             int userAge = Period.between(user.getDateOfBirth(), LocalDate.now()).getYears();
 
-            if (user.getSex().toString().equals("MALE")){
-                basalMetabolicRate = 10* user.getWeight()+6.25*user.getHeight()-5*userAge + 5;
-            }else basalMetabolicRate = 10* user.getWeight()+6.25*user.getHeight()-5*userAge - 161;
+            if (user.getSex().toString().equals("MALE")) {
+                basalMetabolicRate = 10 * user.getWeight() + 6.25 * user.getHeight() - 5 * userAge + 5;
+            } else basalMetabolicRate = 10 * user.getWeight() + 6.25 * user.getHeight() - 5 * userAge - 161;
 
             if (userStats != null) {
                 userStats.setBmr(basalMetabolicRate);
@@ -241,7 +257,7 @@ public class UserService {
                 userStatsRepository.save(userStats);
                 return messageHandler.success("values updated into database");
             } else {
-                UserStats userStats2 = new UserStats(bmi,waterIntake,basalMetabolicRate,0,0.,user);
+                UserStats userStats2 = new UserStats(bmi, waterIntake, basalMetabolicRate, 0, 0., user);
                 userStatsRepository.save(userStats2);
                 return messageHandler.success("values inserted into database");
             }
@@ -256,20 +272,37 @@ public class UserService {
      */
     public ResponseEntity<?> updateData(User user) {
         if (user != null) {
-
+            List<String> errors = new ArrayList<>();
             if (isValidNickname(user.getNickname())) {
-                return messageHandler.error(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
+                errors.add(messageSource.getMessage("error.register.invalidNick", null, LocaleContextHolder.getLocale()));
             }
-
             if (!emailValidator.isValid(user.getEmail())) {
-                return messageHandler.error(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
+                errors.add(messageSource.getMessage("error.email.invalid", null, LocaleContextHolder.getLocale()));
             }
             if (userRepository.findUserByEmail(user.getEmail()) != null && userRepository.findUserByEmail(user.getEmail()).getId() != user.getId()) {
-                return messageHandler.error(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
+                errors.add(messageSource.getMessage("error.email.duplicate", null, LocaleContextHolder.getLocale()));
+            }
+            if (user.getWeight() > 150 || user.getWeight() < 40)
+                errors.add(messageSource.getMessage("error.register.weight", null, LocaleContextHolder.getLocale()));
+
+            if (user.getHeight() > 220 || user.getHeight() < 140)
+                errors.add(messageSource.getMessage("error.register.height", null, LocaleContextHolder.getLocale()));
+
+            LocalDate currentDate = LocalDate.now();
+            LocalDate eighteenYearsAgo = currentDate.minusYears(18);
+            LocalDate userBirthDate = user.getDateOfBirth();
+
+            if (userBirthDate.isAfter(eighteenYearsAgo)) {
+                errors.add(messageSource.getMessage("error.register.ageTooYoung", null, LocaleContextHolder.getLocale()));
+            }
+
+            if (!errors.isEmpty()) {
+                return messageHandler.error(errors.toString());
             }
 
             User user2 = userRepository.findUserById(user.getId());
             user.setId(user2.getId());
+            user.setPassword(user2.getPassword());
             userRepository.save(user);
 
             generateUserStats(user);
@@ -280,7 +313,7 @@ public class UserService {
     }
 
     /**
-     * Adds average values for the user. Average run lenght and pace are used to determine, if the training would be achievable.
+     * Adds average values for the user. Average run length and pace are used to determine, if the training would be achievable.
      *
      * @param token               The authentication token.
      * @param addAverageValuesDTO DTO containing the average values to add.
@@ -289,8 +322,6 @@ public class UserService {
     public ResponseEntity<?> addAverageValues(String token, AddAverageValuesDTO addAverageValuesDTO) {
         User user = userRepository.findUserByToken(token);
         UserStats userStats = userStatsRepository.findUserStatsByUser(user);
-        log.info(userStats);
-        log.info(addAverageValuesDTO);
         userStats.setAverageRunLength(addAverageValuesDTO.getAverageRunLength());
         userStats.setAverageRunPace(addAverageValuesDTO.getAverageRunPace());
         updateData(user);
@@ -305,7 +336,7 @@ public class UserService {
      */
     public ResponseEntity<?> deleteUser(String token) {
         User user = userRepository.findUserByToken(token);
-        if (user == null){
+        if (user == null) {
             return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
         }
         userRepository.deleteUserWithData(user);
@@ -321,9 +352,9 @@ public class UserService {
      * @return ResponseEntity indicating the success or failure of the user deletion process.
      */
 
-    public ResponseEntity<?> logout(String token){
+    public ResponseEntity<?> logout(String token) {
         User user = userRepository.findUserByToken(token);
-        if (user == null){
+        if (user == null) {
             return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
         }
         user.setToken("");

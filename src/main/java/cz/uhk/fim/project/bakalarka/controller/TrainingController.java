@@ -36,8 +36,8 @@ public class TrainingController {
     @PostMapping(value = "training/generateTraining", consumes = {"application/json"})
     public ResponseEntity<?> generateTraining(@RequestBody CreateTrainingDTO createTrainingRequest, HttpServletRequest request) throws Exception {
         if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
-        //trainingService.trainModel();
-        return trainingService.generateTraining(createTrainingRequest, request);
+        String token = request.getHeader("Authorization");
+        return trainingService.generateTraining(createTrainingRequest, token);
     }
 
     /**
