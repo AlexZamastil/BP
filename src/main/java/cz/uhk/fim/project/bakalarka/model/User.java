@@ -76,7 +76,7 @@ public class User {
         this.password = password;
         this.dateOfBirth = dateOfBirth;
         this.sex = sex;
-        this.role = Role.USER;
+        this.role = Role.ROLE_USER;
     }
     public User(String email, String nickname, String password, LocalDate dateOfBirth, Sex sex, double weight, double height, BodyType bodyType){
         this.email = email;
@@ -84,7 +84,7 @@ public class User {
         this.password = password;
         this.dateOfBirth = dateOfBirth;
         this.sex = sex;
-        this.role = Role.USER;
+        this.role = Role.ROLE_USER;
         this.weight = weight;
         this.height = height;
         this.bodyType = bodyType;

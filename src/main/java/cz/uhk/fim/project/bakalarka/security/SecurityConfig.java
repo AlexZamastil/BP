@@ -62,67 +62,57 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .headers(headers ->
                         headers.xssProtection(xXssConfig -> xXssConfig.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
                                 .contentSecurityPolicy(contentSecurityPolicyConfig -> contentSecurityPolicyConfig.policyDirectives("script-src 'self'")))
 
-
-               .cors().configurationSource(corsConfigurationSource())
+                .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .csrf().csrfTokenRepository(csrfTokenRepository())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 .and()
-                .csrf().disable()
-
-
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers(HttpMethod.POST, "/user/passwordReset").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST, "api/user/updateData").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/user/getUserData").hasAnyRole("USER","ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/generateTraining").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/getTrainings").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/training/getActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/trainJ48").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/getExerciseTags").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/getFoodTags").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/getTimingTags").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/getExercise/{id}").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/exercise/addExercise").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.POST, "api/user/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "api/user/logout").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/initConnection").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/user/deleteUser").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/user/addAverageValues").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/training/deleteTraining/{id}").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/training/getTrainings").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/food/addFood").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/food/getFood/{id}").hasAnyRole("USER","ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/food/getFood/picture/{id}").hasAnyRole("USER","ADMIN")
-                                .requestMatchers(HttpMethod.POST,"api/initConnection").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/user/passwordReset").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/user/updateData").hasAnyRole("USER","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/user/getUserData").hasAnyRole("USER","ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/generateTraining").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/getTrainings").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/hasActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/training/getActiveTraining/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/trainJ48").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/getExerciseTags").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/getFoodTags").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/getTimingTags").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/getExercise/{id}").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/exercise/addExercise").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/user/logout").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/user/register").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/initConnection").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/api/user/deleteUser").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/user/addAverageValues").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/training/deleteTraining/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/training/getTrainings").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/food/addFood").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/food/getFood/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/food/getFood/picture/{id}").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "api/initConnection").permitAll()
 
 
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(authFilter, BasicAuthenticationFilter.class);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Auth check:" + authentication);
-        if (authentication != null) {
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-            // Now you can iterate over authorities to check user's roles
-            for (GrantedAuthority authority : authorities) {
-                String role = authority.getAuthority();
-                // Do something with the role
-                log.info("User role: " + role);
-            }
-        }
+
+
+
 
         return http.build();
     }
+
     /**
      * Provides a CorsConfigurationSource bean for configuring Cross-Origin Resource Sharing (CORS) settings.
      * This method sets up CORS configuration with allowed origins, methods, headers, and credentials.
@@ -143,8 +133,6 @@ public class SecurityConfig {
 
         return urlCORFConfig;
     }
-
-
 
 
     /**

@@ -10,17 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -92,6 +85,11 @@ public class AuthFilter extends OncePerRequestFilter {
             Claim userIDClaim = jwtUtils.getID(token);
             log.info(userIDClaim + " = User ID from jwtToken");
             User user = userRepository.findUserById(userIDClaim.asLong());
+            CustomUserDetails securityUser = new CustomUserDetails(user);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(securityUser,securityUser.getPassword(),securityUser.getAuthorities());
+            log.info(authentication);
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             if (user == null) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("User from token not found");
@@ -100,6 +98,7 @@ public class AuthFilter extends OncePerRequestFilter {
             }
             if (Objects.equals(user.getToken(), token)) {
                 filterChain.doFilter(request, response);
+                return;
             } else {
                 log.error("Token does not match current value in database");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
