@@ -18,7 +18,7 @@ export function callAPI(method, requestName, data, xsrfToken){
                          "Accept": "application/json",
                          "Authorization": localStorage.getItem("token"),
                          "X-XSRF-TOKEN": xsrfToken,
-                         "Localization": localStorage.getItem("Localization") 
+                         "Accept-Language": localStorage.getItem("Localization") 
                    }
       })
 }
@@ -34,7 +34,7 @@ export function callAPINoAuth(method, requestName, data, xsrfToken){
                  "Content-Type": "application/json; charset=utf-8",
                          "Accept": "application/json",
                          "X-XSRF-TOKEN": xsrfToken,
-                         "Localization": localStorage.getItem("Localization")
+                         "Accept-Language": localStorage.getItem("Localization")
                    }
       })
 }
@@ -51,7 +51,7 @@ export function callAPIMultipartFile(method, requestName, data, xsrfToken){
                          "Accept": "application/json",
                          "Authorization": localStorage.getItem("token"),
                          "X-XSRF-TOKEN": xsrfToken,
-                         "Localization": localStorage.getItem("Localization")
+                         "Accept-Language": localStorage.getItem("Localization")
                    }
       })
 }

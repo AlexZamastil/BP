@@ -62,6 +62,7 @@ public class ExerciseService {
                 StringUtils.isBlank(exerciseRequest.getName_eng()) ||
                 StringUtils.isBlank(exerciseRequest.getDescription()) ||
                 StringUtils.isBlank(exerciseRequest.getDescription_eng()) ||
+                exerciseRequest.getCalories() == 0 ||
                 multipartFile.isEmpty()
         )  return stringMessageHandler.error(messageSource.getMessage("error.exercise/food.null", null, LocaleContextHolder.getLocale()));
 
@@ -74,6 +75,7 @@ public class ExerciseService {
                         exerciseRequest.getDescription_eng(),
                         exerciseRequest.getCategory(),
                         exerciseRequest.getLength(),
+                        exerciseRequest.getCalories(),
                         exerciseRequest.getTags(),
                         multipartFile);
             }
@@ -85,6 +87,7 @@ public class ExerciseService {
                         exerciseRequest.getDescription_eng(),
                         exerciseRequest.getRepetitions(),
                         exerciseRequest.getSeries(),
+                        exerciseRequest.getCalories(),
                         exerciseRequest.getTags(),
                         multipartFile);
             }
@@ -96,6 +99,7 @@ public class ExerciseService {
                         exerciseRequest.getDescription_eng(),
                         exerciseRequest.getStyle(),
                         exerciseRequest.getLength(),
+                        exerciseRequest.getCalories(),
                         exerciseRequest.getTags(),
                         multipartFile);
             }
@@ -141,6 +145,7 @@ public class ExerciseService {
                         "GYM",
                         gymWorkout.getRepetitions(),
                         gymWorkout.getSeries(),
+                        exercise.getCaloriesBurned(),
                         jsonList
                 );
                 return exerciseMessageHandler.success(exerciseRequest);
@@ -154,6 +159,7 @@ public class ExerciseService {
                         "RUN",
                         run.getRuncategory().toString(),
                         run.getLenglhinmeters(),
+                        exercise.getCaloriesBurned(),
                         jsonList
                 );
                 return exerciseMessageHandler.success(exerciseRequest);
@@ -167,6 +173,7 @@ public class ExerciseService {
                         "SWIMMING",
                         swimming.getSwimmingstyle().toString(),
                         swimming.getLenglhinmeters(),
+                        exercise.getCaloriesBurned(),
                         jsonList);
                 return exerciseMessageHandler.success(exerciseRequest);
             }
@@ -203,12 +210,13 @@ public class ExerciseService {
      * @param description_eng The English description of the exercise.
      * @param category       The category of the running exercise.
      * @param lengthInMeters The length of the running exercise in meters.
+     * @param calories       The number of calories that are burned while performing exercise
      * @param tags           The tags associated with the exercise.
      * @param multipartFile  The multipart file containing the exercise picture.
      * @return ResponseEntity containing the ID of the newly created exercise or an error message.
      */
-    public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
-        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
+    public ResponseEntity<?> addNewRunExercise(String name, String description, String name_eng, String description_eng, String category, int lengthInMeters, int calories, List<String> tags, MultipartFile multipartFile) {
+        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng,calories, tags);
         Run run = new Run(lengthInMeters, RunCategory.valueOf(category), exercise);
         runRepository.save(run);
         return longMessageHandler.success(exercise.getId());
@@ -224,12 +232,13 @@ public class ExerciseService {
      * @param description_eng The English description of the exercise.
      * @param repetitions    The number of repetitions for the gym exercise.
      * @param series         The number of series for the gym exercise.
+     * @param calories       The number of calories that are burned while performing exercise
      * @param tags           The tags associated with the exercise.
      * @param multipartFile  The multipart file containing the exercise picture.
      * @return ResponseEntity containing the ID of the newly created exercise or an error message.
      */
-    public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series, List<String> tags, MultipartFile multipartFile) {
-        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
+    public ResponseEntity<?> addNewGymExercise(String name, String description, String name_eng, String description_eng, int repetitions, int series,int calories, List<String> tags, MultipartFile multipartFile) {
+        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng,calories, tags);
         GymWorkout gymWorkout = new GymWorkout(series, repetitions, exercise);
         gymWorkoutRepository.save(gymWorkout);
         return longMessageHandler.success(exercise.getId());
@@ -245,12 +254,13 @@ public class ExerciseService {
      * @param description_eng The English description of the exercise.
      * @param style          The swimming style for the exercise.
      * @param lengthInMeters The length of the swimming exercise in meters.
+     * @param calories       The number of calories that are burned while performing exercise
      * @param tags           The tags associated with the exercise.
      * @param multipartFile  The multipart file containing the exercise picture.
      * @return ResponseEntity containing the ID of the newly created exercise or an error message.
      */
-    public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, List<String> tags, MultipartFile multipartFile) {
-        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng, tags);
+    public ResponseEntity<?> addNewSwimmingExercise(String name, String description, String name_eng, String description_eng, String style, int lengthInMeters, int calories, List<String> tags, MultipartFile multipartFile) {
+        Exercise exercise = createExercise(multipartFile, name, description, name_eng, description_eng,calories, tags);
         Swimming swimming = new Swimming(lengthInMeters, SwimmingStyle.valueOf(style), exercise);
         swimmingRepository.save(swimming);
         return longMessageHandler.success(exercise.getId());
@@ -316,11 +326,11 @@ public class ExerciseService {
      * @param tags           The tags associated with the exercise.
      * @return The newly created Exercise entity.
      */
-    public Exercise createExercise(MultipartFile multipartFile, String name, String description, String name_eng, String description_eng, List<String> tags) {
+    public Exercise createExercise(MultipartFile multipartFile, String name, String description, String name_eng, String description_eng,int calories, List<String> tags) {
         byte[] pictureData = handlePicture(multipartFile);
         Picture picture = new Picture(pictureData);
         pictureRepository.save(picture);
-        Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng);
+        Exercise exercise = new Exercise(name, name_eng, picture, description, description_eng,calories);
         exerciseRepository.save(exercise);
         handleTags(tags, exercise);
         return exercise;

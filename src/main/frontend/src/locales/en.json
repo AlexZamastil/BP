@@ -158,6 +158,7 @@
     "repetitions_e" : "Repetitions: ",
     "admin_tools" : "Administrator tools",
     "calories_gain" : "Caloric gain (kcal)",
-    "calories_gain_f" : "Kcal "
+    "calories_gain_f" : "Kcal ",
+    "calories_burned" : "Caloric output"
     
 }

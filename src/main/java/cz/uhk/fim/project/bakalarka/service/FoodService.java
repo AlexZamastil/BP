@@ -59,6 +59,7 @@ public class FoodService {
                 StringUtils.isBlank(foodRequest.getName_eng()) ||
                 StringUtils.isBlank(foodRequest.getDescription()) ||
                 StringUtils.isBlank(foodRequest.getDescription_eng()) ||
+                foodRequest.getCalories() == 0 ||
                 multipartFile.isEmpty()
         )  return stringMessageHandler.error(messageSource.getMessage("error.exercise/food.null", null, LocaleContextHolder.getLocale()));
 

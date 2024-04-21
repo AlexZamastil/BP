@@ -1,5 +1,6 @@
 package cz.uhk.fim.project.bakalarka.security;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,6 +24,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,11 +35,12 @@ import java.util.List;
  * @author Alex Zamastil
  */
 @Configuration
+@Log4j2
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final List<String> allowedMethods = Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT");
-    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization", "XSRF-TOKEN", "Accept", "Localization");
+    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "X-XSRF-TOKEN", "Authorization", "XSRF-TOKEN", "Accept", "Accept-Language");
     @Value("${security.cors.origins}")
     private final List<String> allowedOrigins = Collections.emptyList();
     AuthFilter authFilter;
@@ -43,6 +49,7 @@ public class SecurityConfig {
     public SecurityConfig(AuthFilter authFilter) {
         this.authFilter = authFilter;
     }
+
 
     /**
      * Configures the security filter chain for HTTP requests.
@@ -59,15 +66,20 @@ public class SecurityConfig {
                 .headers(headers ->
                         headers.xssProtection(xXssConfig -> xXssConfig.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
                                 .contentSecurityPolicy(contentSecurityPolicyConfig -> contentSecurityPolicyConfig.policyDirectives("script-src 'self'")))
-                .cors().configurationSource(corsConfigurationSource())
+
+
+               .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .csrf().csrfTokenRepository(csrfTokenRepository())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 .and()
+                .csrf().disable()
+
+
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers(HttpMethod.POST, "/user/passwordReset").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/user/updateData").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "api/user/updateData").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/user/getUserData").hasAnyRole("USER","ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/generateTraining").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/getTrainings").hasAnyRole("USER", "ADMIN")
@@ -80,7 +92,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/getExercise/{id}").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/exercise/addExercise").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.POST, "api/user/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/user/logout").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "api/user/logout").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/initConnection").permitAll()
                                 .requestMatchers(HttpMethod.DELETE, "/user/deleteUser").hasAnyRole("USER", "ADMIN")
@@ -90,11 +102,24 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/food/addFood").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/food/getFood/{id}").hasAnyRole("USER","ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/food/getFood/picture/{id}").hasAnyRole("USER","ADMIN")
+                                .requestMatchers(HttpMethod.POST,"api/initConnection").permitAll()
 
 
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(authFilter, BasicAuthenticationFilter.class);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Auth check:" + authentication);
+        if (authentication != null) {
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            // Now you can iterate over authorities to check user's roles
+            for (GrantedAuthority authority : authorities) {
+                String role = authority.getAuthority();
+                // Do something with the role
+                log.info("User role: " + role);
+            }
+        }
 
         return http.build();
     }
@@ -104,6 +129,7 @@ public class SecurityConfig {
      *
      * @return CorsConfigurationSource instance with configured CORS settings.
      */
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -118,12 +144,16 @@ public class SecurityConfig {
         return urlCORFConfig;
     }
 
+
+
+
     /**
      * Provides a CookieCsrfTokenRepository bean for managing Cross-Site Request Forgery (CSRF) tokens.
      * This method configures the repository with the cookie name, security flag and cookie path.
      *
      * @return CookieCsrfTokenRepository instance with configured settings.
      */
+
     @Bean
     public CookieCsrfTokenRepository csrfTokenRepository() {
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
@@ -133,6 +163,7 @@ public class SecurityConfig {
 
         return repository;
     }
+
 
     /**
      * Provides a PasswordEncoder bean for encoding passwords securely.

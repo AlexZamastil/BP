@@ -32,6 +32,8 @@ public class Exercise {
     private String description;
     @Column(name = "description_eng")
     private String description_eng;
+    @Column(name = "caloriesburned")
+    private int caloriesBurned;
     @OneToOne
     @JoinColumn(name = "fk_pictureid", referencedColumnName = "pk_pictureid")
     private Picture picture;
@@ -48,51 +50,26 @@ public class Exercise {
 
     }
 
-    public Exercise(long id, String name, String name_eng, String description, String description_eng, Picture picture) {
-        this.id = id;
+    public Exercise(String name, String name_eng, Picture picture, String description, String description_eng, int caloriesBurned) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
         this.description_eng = description_eng;
+        this.caloriesBurned = caloriesBurned;
         this.picture = picture;
     }
 
-    public Exercise(long id, String name, String description) {
-
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
-
-    public Exercise(String name, String name_eng, Picture picture, String description, String description_eng) {
+    public Exercise(String name, String name_eng, String description, String description_eng, int caloriesBurned) {
         this.name = name;
         this.name_eng = name_eng;
         this.description = description;
         this.description_eng = description_eng;
-        this.picture = picture;
-    }
-
-    public Exercise(String name, String name_eng, String description, String description_eng) {
-        this.name = name;
-        this.name_eng = name_eng;
-        this.description = description;
-        this.description_eng = description_eng;
+        this.caloriesBurned = caloriesBurned;
     }
 
     public void addTagExercise(Tag t) {
         this.tagexercise.add(t);
     }
-
-   /* @Override
-    public String toString() {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }*/
 
     @Override
     public String toString() {

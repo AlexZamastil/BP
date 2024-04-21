@@ -100,10 +100,10 @@ export default function Food() {
                         :
                         <img src={`data:image/png;base64,${picture}`}
                             style={{
-                                borderRadius: '30px',
+                                borderRadius: '10px',
                                 maxWidth: '100%',
                                 height: 'auto',
-                                border: '2px solid black',
+                                border: '1px solid black',
                                 objectFit: 'cover',
                                 margin: "20px"
                             }}

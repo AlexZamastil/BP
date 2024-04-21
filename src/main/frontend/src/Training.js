@@ -15,6 +15,7 @@ export default function Training() {
     const [trainingID, setTrainingID] = useState(null);
     const [day, setDay] = useState(null);
     const [trainingInfo, setTrainingInfo] = useState(null);
+    const [waterIntake, setWaterIntake] = useState(null);
     const paperRun = {
         backgroundColor: `rgb(${125}, ${175}, ${255})`,
         padding: '10px',
@@ -37,6 +38,8 @@ export default function Training() {
         callAPI("GET", "user/getUserData", null, null)
             .then(response => {
                 let id = response.data.user.id;
+                setWaterIntake(response.data.waterintake);
+
                 callAPINoAuth("GET", "training/hasActiveTraining/" + id, null, null)
                     .then(response => {
                         if (response.data !== "no") {
@@ -141,8 +144,8 @@ export default function Training() {
         let progress = null;
         let localization = localStorage.getItem("Localization")
         console.log(dayData);
-        //TODO
-    
+        console.log(waterIntake);
+        progress = Math.floor(dayData.daysSoFar/dayData.daysTotal*100);
 
         for (let i = 0; i < dayData.trainingDays.length; i++) {
             let trainingDate = new Date(dayData.trainingDays[i].date);
@@ -151,8 +154,6 @@ export default function Training() {
                 setDay(i);
                 todayTraining = dayData.trainingDays[i];
                 tomorrowTraining = dayData.trainingDays[i + 1];
-               // progress = Math.floor((dayNumber / numberOfTrainingDays) * 100);
-                console.log(progress);
                 break;
             }
         }
@@ -163,7 +164,7 @@ export default function Training() {
             <div className="displayTraining">
 
                 <Paper className="displayTodayTraining">
-                    {/* <h2>{t("today_traning")}</h2> <br />*/}
+                    <h2>{t("today_traning")}</h2> <br />
 
                     {t("date")}{todayTraining.date}<br />
                     {t("calories")}{todayTraining.caloriesburned}<br />

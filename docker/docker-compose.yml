@@ -26,6 +26,7 @@ services:
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       HIBERNATE_DDL: ${HIBERNATE_DDL}
+      FILE_PATH : ${FILE_PATH}
 
     volumes:
       - ../src/main/resources/files:/app/src/main/resources/files

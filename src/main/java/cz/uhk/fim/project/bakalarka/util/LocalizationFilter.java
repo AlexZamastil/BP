@@ -7,8 +7,11 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.i18n.LocaleContextHolder;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -21,6 +24,7 @@ import java.util.Locale;
  * @author Alex Zamastil
  */
 @Component
+@Log4j2
 public class LocalizationFilter implements Filter {
 
 
@@ -40,10 +44,11 @@ public class LocalizationFilter implements Filter {
    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String localizationCookie = httpRequest.getHeader("Localization");
+        String localizationString = httpRequest.getHeader("Accept-Language");
         Locale czech = new Locale.Builder().setLanguage("cs").setRegion("CZ").build();
 
-       if (localizationCookie.equals("en")) {
+
+       if (localizationString.equals("en")) {
            LocaleContextHolder.setLocale(Locale.US);
            localeResolver.setLocale((HttpServletRequest) request, (HttpServletResponse) response, Locale.US);
        } else {

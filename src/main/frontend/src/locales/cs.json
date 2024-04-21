@@ -158,5 +158,6 @@
     "repetitions_e" : "Opakování: ",
     "admin_tools" : "Administrátorské nástroje",
     "calories_gain" : "Kalorický příjem (kcal)",
-    "calories_gain_f" : "Kcal "
+    "calories_gain_f" : "Kcal ",
+    "calories_burned" : "Kalorický výdej"
 }

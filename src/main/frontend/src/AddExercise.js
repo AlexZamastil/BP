@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 
 
 export default function AddExercise() {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate()
   const [name, setName] = useState(null);
   const [name_eng, setName_eng] = useState(null);
@@ -32,7 +32,7 @@ export default function AddExercise() {
   const [tags, setTags] = useState([]);
   const [picture, setPicture] = useState(null);
   const [exerciseType, setExerciseType] = useState('');
-
+  const [calories, setCalories] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
   const [isAdmin, setIsAdmin] = useState(false);
@@ -49,20 +49,20 @@ export default function AddExercise() {
 
   //getting user data from server
   useEffect(() => {
-  callAPI("GET", "user/getUserData", null, null)
-    .then(async response => {
-      const userData = response.data;
-      setIsAdmin((userData.user.role === "ADMIN"));
-    }
-    )
-    .catch(error => {
-      console.log(error);
-      if(error.response && error.response.data === "Token expired"){
-        navigate("/tokenExpired")
-   }
-    })
-  },[]);
-//getting exercise tags from server
+    callAPI("GET", "user/getUserData", null, null)
+      .then(async response => {
+        const userData = response.data;
+        setIsAdmin((userData.user.role === "ADMIN"));
+      }
+      )
+      .catch(error => {
+        console.log(error);
+        if (error.response && error.response.data === "Token expired") {
+          navigate("/tokenExpired")
+        }
+      })
+  }, []);
+  //getting exercise tags from server
   useEffect(() => {
     callAPINoAuth("GET", "tag/getExerciseTags", null, null)
       .then(async (response) => {
@@ -76,11 +76,18 @@ export default function AddExercise() {
       .catch(async (error) => {
         console.error("Failed to fetch exercise tags");
         console.error(error);
-        if(error.response && error.response.data === "Token expired"){
+        if (error.response && error.response.data === "Token expired") {
           navigate("/tokenExpired")
-     }
+        }
       })
   }, [])
+ //handler that allows input only numbers, used in textfields
+  const onlyNumbers = (e) => {
+    const inputValue = e.target.value.replace(/[^0-9.]/g, '');
+    e.target.value = inputValue;
+};
+
+
   // method for trying to send an exercise to server
   const addExercise = async (e) => {
     e.preventDefault();
@@ -93,6 +100,7 @@ export default function AddExercise() {
         name_eng: name_eng,
         description: description,
         description_eng: description_eng,
+        calories : calories,
         type: exerciseType,
         length: length,
         category: category,
@@ -106,6 +114,7 @@ export default function AddExercise() {
         name_eng: name_eng,
         description: description,
         description_eng: description_eng,
+        calories : calories,
         type: exerciseType,
         series: series,
         repetitions: repetitions,
@@ -119,6 +128,7 @@ export default function AddExercise() {
         name_eng: name_eng,
         description: description,
         description_eng: description_eng,
+        calories : calories,
         type: exerciseType,
         length: length,
         style: style,
@@ -127,18 +137,18 @@ export default function AddExercise() {
     } else {
       setErrorMessage(t("null_type"));
       return;
-    } 
+    }
 
-    if(selectedFile == null) {
+    if (selectedFile == null) {
       setErrorMessage(t("null_image"));
       return;
-    } 
-    try{
-      formData.append('imageData', selectedFile, {type: 'multipart/form-data'});
+    }
+    try {
+      formData.append('imageData', selectedFile, { type: 'multipart/form-data' });
       callAPIMultipartFile("POST", "exercise/addExercise", formData, xsrfToken)
         .then((response) => {
           const responseBody = response.data;
-          navigate("/exercise/"+responseBody)
+          navigate("/exercise/" + responseBody)
         })
         .catch((error) => {
           if (error.response && error.response.data === "Token expired") {
@@ -162,14 +172,14 @@ export default function AddExercise() {
   //method for uploading a picture
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-  
+
     if (file) {
       const reader = new FileReader();
-  
+
       reader.onload = (event) => {
         setPicture(event.target.result);
       };
-  
+
       reader.readAsDataURL(file);
       setSelectedFile(file);
     }
@@ -260,7 +270,7 @@ export default function AddExercise() {
               <MenuItem value={"BREASTSSTROKE"}>{t("breasts_stroke")}</MenuItem>
               <MenuItem value={"BUTTERFLYSTROKE"}>{t("butterfly_stroke")}</MenuItem>
               <MenuItem value={"BACKSTROKE"}>{t("back_stroke")}</MenuItem>
-              <MenuItem value={"FRONTCRAWLSTROKE"}>{t("front_crawl_stroke")}</MenuItem>
+              <MenuItem value={"CRAWL"}>{t("front_crawl_stroke")}</MenuItem>
             </Select>
 
 
@@ -277,7 +287,7 @@ export default function AddExercise() {
     <div>
       {isAdmin !== undefined ? (
         isAdmin ? (
-          <Container style={{padding : "20px"}}>
+          <Container style={{ padding: "20px" }}>
             <Paper elevation={3} className='paper'>
               <form noValidate autoComplete="off">
                 <h1>{t("add_exercise")}</h1>
@@ -326,6 +336,18 @@ export default function AddExercise() {
                   onChange={(e) => setDescription_eng(e.target.value)}
                 />
 
+                <TextField
+                  style={{ margin: '10px auto' }}
+                  sx={{ m: 1, width: isSmallScreen ? '20ch' : '25ch' }}
+                  id="outlined-basic"
+                  label={t("calories_burned")}
+                  variant="outlined"
+                  fullWidth
+                  onInput={onlyNumbers}
+                  value={calories}
+                  onChange={(e) => setCalories(e.target.value)}
+                />
+
 
                 <FormHelperText>{t("exercise_type")}</FormHelperText>
                 <Select
@@ -362,17 +384,17 @@ export default function AddExercise() {
                   </div>
                 )}
 
-              
-                <Button style={{margin:"10px"}} variant="contained" onClick={addExercise}>{t("submit")} </Button>
+
+                <Button style={{ margin: "10px" }} variant="contained" onClick={addExercise}>{t("submit")} </Button>
                 {errorMessage && (
-            <div style={{ color: 'red', marginTop: '10px' }}>
-              {errorMessage}
-            </div>
-          )}
+                  <div style={{ color: 'red', marginTop: '10px' }}>
+                    {errorMessage}
+                  </div>
+                )}
               </form>
             </Paper>
           </Container>
-         
+
         ) : (
           <p>Admin only</p>
         )

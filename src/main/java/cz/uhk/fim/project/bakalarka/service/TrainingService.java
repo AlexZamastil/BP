@@ -6,9 +6,9 @@ import cz.uhk.fim.project.bakalarka.model.*;
 import cz.uhk.fim.project.bakalarka.DTO.CreateTrainingDTO;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import io.micrometer.common.util.StringUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatusCode;
@@ -23,6 +23,7 @@ import weka.core.converters.ConverterUtils;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.util.*;
 
 /**
@@ -33,11 +34,11 @@ import java.util.*;
 @Service
 @Log4j2
 public class TrainingService {
+    @Value("${filepath.gladiator:src/main/resources/files}")
+    public String filePath;
 
-    public String dataset = "src/main/resources/files/dataset_1.arff";
-    public String gladiatorData = "src/main/resources/files/gladiator_data.arff";
-    public String runData = "src/main/resources/files/run_data.arff";
-    public String longRunData = "src/main/resources/files/long_run_data.arff";
+    public String runDataPath = filePath + "/run_data.arff";
+    public String longRunDataPath = filePath + "/long_run_data.arff";
     SimpleDateFormat sdf = new SimpleDateFormat("EEEE", Locale.US);
     private Classifier classifier;
     private Instances data;
@@ -77,10 +78,10 @@ public class TrainingService {
      * @throws Exception If an error occurs during model training.
      */
     public void trainModel() throws Exception {
-        ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(gladiatorData);
+        String gladiatorRaceDatasetPath = filePath + "/gladiator_data.arff";
+        ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(gladiatorRaceDatasetPath);
         Instances data = dataSource.getDataSet();
         data.setClassIndex(data.numAttributes() - 1);
-
         this.data = data;
         J48 j48 = new J48();
         j48.buildClassifier(data);
@@ -142,11 +143,15 @@ public class TrainingService {
         if (trainingData.getType().toString().equals("OCR")) {
             //for OCR the training consists of all 3 types of exercise to ensure versatility
             ConverterUtils.DataSource gladiator;
+            String gladiatorRaceDatasetPath = filePath + "/gladiator_data.arff";
+
             try {
-                gladiator = new ConverterUtils.DataSource(gladiatorData);
+                gladiator = new ConverterUtils.DataSource(gladiatorRaceDatasetPath);
+                log.info(gladiatorRaceDatasetPath);
                 Instances data = gladiator.getDataSet();
                 data.setClassIndex(data.numAttributes() - 1);
 
+                log.info(data);
                 J48 j48 = new J48();
                 //j48.setUnpruned(false);
                 //j48.setUseLaplace(true);
@@ -204,7 +209,7 @@ public class TrainingService {
             day.setDate(calendar.getTime());
             day.setTraining(training);
             day.setUser(user);
-            day.setCaloriesGained(userStats.getBmr());
+            day.setCaloriesBurned(userStats.getBmr());
             if(isTrainingDay(calendar.get(Calendar.DAY_OF_WEEK),trainingData)){
                 generateExercises(userStats, day, exercises,trainingData);
             }
@@ -230,7 +235,7 @@ public class TrainingService {
             int randomIndex = random.nextInt(exercises.size());
             Exercise randomExercise = exercises.get(randomIndex).getExercise();
             exerciseList.add(randomExercise);
-            day.setCaloriesBurned(day.getCaloriesBurned());
+            day.setCaloriesBurned(day.getCaloriesBurned()+randomExercise.getCaloriesBurned());
             exercises.remove(randomIndex);
         }
         day.setExercises(exerciseList);
@@ -238,7 +243,7 @@ public class TrainingService {
 
     public void generateFood(UserStats userStats, Day day, List<Food> foodPool) {
         log.info("food pool: " + foodPool.size());
-        if (foodPool.size() < 3) {
+        if (foodPool.size() < 5) {
             log.info("Insufficient food available.");
 
             return;
@@ -246,13 +251,14 @@ public class TrainingService {
 
         Random random = new Random();
         Set<Food> foodList = new HashSet<>();
-        while (foodList.size() < 3) {
+        while (foodList.size() < 5) {
             int randomIndex = random.nextInt(foodPool.size());
             Food randomFood = foodPool.get(randomIndex);
             foodList.add(randomFood);
             day.setCaloriesGained(day.getCaloriesGained()+randomFood.getCaloriesGained());
             foodPool.remove(randomIndex);
         }
+        // implement 80/20 reward
         day.setMenu(foodList);
     }
 
@@ -418,9 +424,14 @@ public class TrainingService {
         createTrainingDTO.setType(activeTraining.getType());
         createTrainingDTO.setStartDay(activeTraining.getStartday());
         createTrainingDTO.setRaceDay(activeTraining.getRaceday());
+
+        int days = (int) ChronoUnit.DAYS.between(activeTraining.getStartday(), activeTraining.getRaceday());
+        int daysProgress = (int) ChronoUnit.DAYS.between(activeTraining.getStartday(), LocalDate.now());
         Map<String, Object> response = new HashMap<>();
         response.put("trainingDays", daysDTO);
         response.put("trainingInfo", createTrainingDTO);
+        response.put("daysTotal", days);
+        response.put("daysSoFar", daysProgress);
         return ResponseEntity.ok(response);
     }
 
@@ -447,6 +458,7 @@ public class TrainingService {
      * @return ResponseEntity containing the list of trainings or an error message if the user is not found.
      */
     public ResponseEntity<?> getTrainings(String token) {
+        //TODO return brief info about past trainings
         User user = userRepository.findUserByToken(token);
         if (user == null)
             return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
