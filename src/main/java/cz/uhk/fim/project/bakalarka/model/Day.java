@@ -65,6 +65,15 @@ public class Day {
     }
     public void addFood(Food food) {
         menu.add(food);
-
+    }
+    public int getDayCalories(){
+        int calories = 0;
+    for (Exercise e : exercises){
+        calories -= e.getCaloriesBurned();
+    }
+    for (Food f : menu){
+        calories+= f.getCaloriesGained();
+    }
+    return calories;
     }
 }

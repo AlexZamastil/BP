@@ -3,7 +3,7 @@ package cz.uhk.fim.project.bakalarka.service;
 import cz.uhk.fim.project.bakalarka.DAO.*;
 import cz.uhk.fim.project.bakalarka.DTO.DayDTO;
 import cz.uhk.fim.project.bakalarka.model.*;
-import cz.uhk.fim.project.bakalarka.DTO.CreateTrainingDTO;
+import cz.uhk.fim.project.bakalarka.DTO.trainingDTO;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
@@ -23,7 +23,6 @@ import weka.core.converters.ConverterUtils;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
 import java.util.*;
 
 /**
@@ -36,9 +35,6 @@ import java.util.*;
 public class TrainingService {
     @Value("${filepath.gladiator:src/main/resources/files}")
     public String filePath;
-
-    public String runDataPath = filePath + "/run_data.arff";
-    public String longRunDataPath = filePath + "/long_run_data.arff";
     SimpleDateFormat sdf = new SimpleDateFormat("EEEE", Locale.US);
     private Classifier classifier;
     private Instances data;
@@ -46,7 +42,6 @@ public class TrainingService {
     private final UserRepository userRepository;
     private final TrainingRepository trainingRepository;
     private final DayRepository dayRepository;
-
     private final FoodRepository foodRepository;
     private final GymWorkoutRepository gymWorkoutRepository;
     private final RunRepository runRepository;
@@ -54,13 +49,13 @@ public class TrainingService {
     private final MessageSource messageSource;
     private final UserStatsRepository userStatsRepository;
     MessageHandler<String> messageHandler = new MessageHandler<>();
-    MessageHandler<List<Training>> trainingListMessageHandler = new MessageHandler<>();
     public final double MAX_PERCENTAGE_INCREASE_LENGTH_PER_TRAINING_DAY = 1.3;
-    public final double MAX_PERCENTAGE_INCREASE_PACE_PER_TRAINING_DAY = 0.8;
+    public final double MAX_PERCENTAGE_INCREASE_PACE_PER_TRAINING_DAY = 1;
     public final double LONG_RUN_THRESHOLD = 12000;
+    public static int MAX_CALORIC_DEVIATION = 200;
 
 
-    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, DayRepository dayRepository, ExerciseRepository exerciseRepository, FoodRepository foodRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, UserStatsRepository userStatsRepository, MessageSource messageSource) {
+    public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, DayRepository dayRepository, FoodRepository foodRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, UserStatsRepository userStatsRepository, MessageSource messageSource) {
         this.userRepository = userRepository;
         this.trainingRepository = trainingRepository;
         this.dayRepository = dayRepository;
@@ -73,36 +68,16 @@ public class TrainingService {
     }
 
     /**
-     * Trains the model using a dataset.
-     *
-     * @throws Exception If an error occurs during model training.
-     */
-    public void trainModel() throws Exception {
-        String gladiatorRaceDatasetPath = filePath + "/gladiator_data.arff";
-        ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(gladiatorRaceDatasetPath);
-        Instances data = dataSource.getDataSet();
-        data.setClassIndex(data.numAttributes() - 1);
-        this.data = data;
-        J48 j48 = new J48();
-        j48.buildClassifier(data);
-
-        Evaluation eval = new Evaluation(data);
-        eval.crossValidateModel(j48, data, 10, new java.util.Random(1));
-        log.info(eval.toSummaryString());
-        classifier = j48;
-    }
-
-    /**
      * Generates a training play based on provided parameters.
      * Validates provided data to determine if the training makes sense.
      * Create instances of Training and Day object, while utilizing J48 algorithm.
      *
      * @param trainingData DTO containing all the necessary data to create a training plan.
      * @param token        Users JWToken.
-     * @returnResponseEntity indicating the success or failure of the training plan generation process.
+     * @return indicating the success or failure of the training plan generation process.
      */
     @Transactional
-    public ResponseEntity<?> generateTraining(CreateTrainingDTO trainingData, String token) {
+    public ResponseEntity<?> generateTraining(trainingDTO trainingData, String token) {
         if (StringUtils.isBlank(trainingData.getElevationProfile().toString()) ||
                 trainingData.getLengthOfRaceInMeters() == null ||
                 StringUtils.isBlank(trainingData.getLengthOfRaceInMeters().toString()) ||
@@ -139,46 +114,84 @@ public class TrainingService {
 
         List<ExerciseType> exercisePool = new ArrayList<>();
         List<Food> foodPool = foodRepository.findAll();
+        String predictedCaloryProgram = "";
 
-        if (trainingData.getType().toString().equals("OCR")) {
-            //for OCR the training consists of all 3 types of exercise to ensure versatility
-            ConverterUtils.DataSource gladiator;
-            String gladiatorRaceDatasetPath = filePath + "/gladiator_data.arff";
+        //for OCR the training consists of all 3 types of exercise to ensure versatility
+        ConverterUtils.DataSource gladiator;
+        String finalDatasetPath = filePath + "/final_dataset.arff";
 
-            try {
-                gladiator = new ConverterUtils.DataSource(gladiatorRaceDatasetPath);
-                log.info(gladiatorRaceDatasetPath);
-                Instances data = gladiator.getDataSet();
-                data.setClassIndex(data.numAttributes() - 1);
-
-                log.info(data);
-                J48 j48 = new J48();
-                //j48.setUnpruned(false);
-                //j48.setUseLaplace(true);
-                //String[] options = {"-U"};
-                //j48.setOptions(options);
-                j48.buildClassifier(data);
-                //dataset evaluation
-                Evaluation eval = new Evaluation(data);
-                eval.crossValidateModel(j48, data, 3, new java.util.Random(1));
-                log.info(eval.toSummaryString());
-                classifier = j48;
-            } catch (Exception e) {
-                log.error(e);
-                return messageHandler.error(messageSource.getMessage("error.training.read", null, LocaleContextHolder.getLocale()));
-            }
-
-
-            List<GymWorkout> gymWorkouts = gymWorkoutRepository.findAll();
-            List<Run> runs = runRepository.findAll();
-            List<Swimming> swimming = swimmingRepository.findAll();
-            exercisePool.addAll(runs);
-            exercisePool.addAll(gymWorkouts);
-            exercisePool.addAll(swimming);
-
+        try {
+            gladiator = new ConverterUtils.DataSource(finalDatasetPath);
+            Instances data = gladiator.getDataSet();
+            data.setClassIndex(data.numAttributes() - 1);
+            this.data = data;
+            J48 j48 = new J48();
+            j48.setUnpruned(false);
+            //j48.setUseLaplace(true);// does not make a difference
+            //String[] options = {"-C", "0.25"}; does not make a difference
+            //j48.setOptions(options);
+            j48.buildClassifier(data);
+            //dataset evaluation
+            Evaluation eval = new Evaluation(data);
+            eval.crossValidateModel(j48, data, 2, new java.util.Random(1));
+            log.info(eval.toSummaryString());
+            classifier = j48;
+        } catch (Exception e) {
+            log.error(e);
+            return messageHandler.error(messageSource.getMessage("error.training.read", null, LocaleContextHolder.getLocale()));
         }
 
-        if (trainingData.getType().toString().equals("RUN") && trainingData.getLengthOfRaceInMeters() < LONG_RUN_THRESHOLD && trainingDays > 90) {
+        //Data initialization
+        String BMI;
+        if (userStats.getBmi() < 18.5) {
+            BMI = "UNDERWEIGHT";
+        } else if (userStats.getBmi() < 25) {
+            BMI = "NORMAL";
+        } else if (userStats.getBmi() < 30) {
+            BMI = "OVERWEIGHT";
+        } else BMI = "OBESE";
+
+        double increase = roundNumber(trainingData.getWantedPace());
+
+        //inserting values as input for the algorithm
+        try {
+            Instance instance = new DenseInstance(4);
+            instance.setDataset(data);
+            instance.setValue(0, data.attribute("bodyType").indexOfValue(userStats.getUser().getBodyType().toString()));
+            instance.setValue(1, data.attribute("BMI").indexOfValue(BMI));
+            instance.setValue(2, data.attribute("percentageIncrease").indexOfValue(String.valueOf(increase)));
+
+            data.setClassIndex(3);
+            //Calculating probabilities of each possibility and returning the highest
+            double[] predictions = classifier.distributionForInstance(instance);
+            double maxProbability = -1;
+            int predictedClass = -1;
+            for (int i = 0; i < predictions.length; i++) {
+                if (predictions[i] > maxProbability) {
+                    maxProbability = predictions[i];
+                    predictedClass = i;
+                }
+            }
+            //final value of J48 decision tree:
+            predictedCaloryProgram = data.classAttribute().value(predictedClass);
+
+            log.info("BodyType: " + userStats.getUser().getBodyType().toString());
+            log.info("BMI: " + BMI);
+            log.info("Percentage Increase: " + increase);
+            log.info("Predicted Training Algorithm: " + predictedCaloryProgram);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (trainingData.getType().toString().equals("OCR")) {
+            List<GymWorkout> gymWorkouts = gymWorkoutRepository.findAll();
+            List<Run> runs = runRepository.findAll();
+            exercisePool.addAll(runs);
+            exercisePool.addAll(gymWorkouts);
+        }
+
+        if (trainingData.getType().toString().equals("RUN") && trainingData.getLengthOfRaceInMeters() > LONG_RUN_THRESHOLD && trainingDays > 90) {
             //for long run the training prioritize only running and swimming for endurance and VO2MAX
             List<Run> runs = runRepository.findAll();
             List<Swimming> swimming = swimmingRepository.findAll();
@@ -200,6 +213,33 @@ public class TrainingService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
 
+        //basal metabolic rate of user
+        double BMR = userStats.getBmr();
+        double caloricGain = 0;
+        double activeCaloricBurn = 0;
+        switch (predictedCaloryProgram) {
+            case "HIGH_GAIN_HIGH_BURN" -> {
+                //maintaining weight with hard training
+                caloricGain = BMR * 1.8;
+                activeCaloricBurn = caloricGain - BMR;
+            }
+            case "LOW_GAIN_HIGH_BURN" -> {
+                // deficit
+                caloricGain = BMR * 1.22;
+                activeCaloricBurn = caloricGain + 500 - BMR;
+            }
+            case "HIGH_GAIN_LOW_BURN" -> {
+                //surplus
+                caloricGain = BMR * 1.8;
+                activeCaloricBurn = caloricGain - 500 - BMR;
+            }
+            case "LOW_GAIN_LOW_BURN" -> {
+                //maintaining weight on diet a light training
+                caloricGain = BMR * 1.22;
+                activeCaloricBurn = caloricGain - BMR;
+            }
+        }
+        String lastExercise = null;
         for (int x = 0; x < trainingDays; x++) {
             List<ExerciseType> exercises = new ArrayList<>(exercisePool);
             List<Food> food = new ArrayList<>(foodPool);
@@ -209,11 +249,16 @@ public class TrainingService {
             day.setDate(calendar.getTime());
             day.setTraining(training);
             day.setUser(user);
-            day.setCaloriesBurned(userStats.getBmr());
-            if(isTrainingDay(calendar.get(Calendar.DAY_OF_WEEK),trainingData)){
-                generateExercises(userStats, day, exercises,trainingData);
+            //day.setCaloriesBurned(userStats.getBmr());
+
+            if (isTrainingDay(calendar.get(Calendar.DAY_OF_WEEK), trainingData)) {
+                lastExercise = generateExercises(day, exercises, activeCaloricBurn, lastExercise);
             }
-            generateFood(userStats, day, food);
+            //can't switch exercises when only 1 type is available
+            if (trainingData.getType().toString().equals("RUN") && trainingData.getLengthOfRaceInMeters() < LONG_RUN_THRESHOLD && trainingDays < 90)
+                lastExercise = null;
+
+            generateFood(day, food, caloricGain);
             dayRepository.save(day);
             calendar.add(Calendar.DATE, 1);
         }
@@ -222,43 +267,45 @@ public class TrainingService {
         return messageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
     }
 
-    public void generateExercises(UserStats userStats, Day day, List<ExerciseType> exercises, CreateTrainingDTO trainingData) {
-        log.info("exercise pool: " + exercises.size());
-        if (exercises.size() < 3) {
+    public String generateExercises(Day day, List<ExerciseType> exercisePool, double caloricBurn, String lastExercise) {
+        exercisePool.removeIf(e -> e.getType().equals(lastExercise));
+        log.info("exercise pool: " + exercisePool.size());
+        if (exercisePool.size() < 3) {
             log.info("Insufficient exercises available.");
 
-            return;
+            return null;
         }
-        Random random = new Random();
         Set<Exercise> exerciseList = new HashSet<>();
-        while (exerciseList.size() < 3) {
-            int randomIndex = random.nextInt(exercises.size());
-            Exercise randomExercise = exercises.get(randomIndex).getExercise();
-            exerciseList.add(randomExercise);
-            day.setCaloriesBurned(day.getCaloriesBurned()+randomExercise.getCaloriesBurned());
-            exercises.remove(randomIndex);
+        double calories = 0;
+        Collections.shuffle(exercisePool);
+        int i = 0;
+        while (calories < (caloricBurn + MAX_CALORIC_DEVIATION) && i < exercisePool.size() - 1) {
+            exerciseList.add(exercisePool.get(i).getExercise());
+            day.setCaloriesBurned(day.getCaloriesBurned() + exercisePool.get(i).getExercise().getCaloriesBurned());
+            calories += exercisePool.get(i).getExercise().getCaloriesBurned();
+            i++;
         }
         day.setExercises(exerciseList);
+        log.info(exercisePool.get(0).getType());
+        return exercisePool.get(0).getType();
     }
 
-    public void generateFood(UserStats userStats, Day day, List<Food> foodPool) {
+    public void generateFood(Day day, List<Food> foodPool, double caloricGain) {
         log.info("food pool: " + foodPool.size());
         if (foodPool.size() < 5) {
             log.info("Insufficient food available.");
-
             return;
         }
-
-        Random random = new Random();
         Set<Food> foodList = new HashSet<>();
-        while (foodList.size() < 5) {
-            int randomIndex = random.nextInt(foodPool.size());
-            Food randomFood = foodPool.get(randomIndex);
-            foodList.add(randomFood);
-            day.setCaloriesGained(day.getCaloriesGained()+randomFood.getCaloriesGained());
-            foodPool.remove(randomIndex);
+        double calories = 0;
+        Collections.shuffle(foodPool);
+        int i = 0;
+        while (calories < (caloricGain + MAX_CALORIC_DEVIATION) && i < foodPool.size()) {
+                foodList.add(foodPool.get(i));
+                day.setCaloriesGained(day.getCaloriesGained() + foodPool.get(i).getCaloriesGained());
+                calories += foodPool.get(i).getCaloriesGained();
+            i++;
         }
-        // implement 80/20 reward
         day.setMenu(foodList);
     }
 
@@ -266,42 +313,37 @@ public class TrainingService {
      * Determines if the day of the week is a training day
      *
      * @param dayOfWeek Day of the week
-     * @param c DTO containing the training day
+     * @param c         DTO containing the training day
      * @return true if the day is training day, otherwise false
      */
 
-    public boolean isTrainingDay(int dayOfWeek, CreateTrainingDTO c) {
-        switch (dayOfWeek) {
-            case Calendar.MONDAY:
-                return c.isMonday();
-            case Calendar.TUESDAY:
-                return c.isTuesday();
-            case Calendar.WEDNESDAY:
-                return c.isWednesday();
-            case Calendar.THURSDAY:
-                return c.isThursday();
-            case Calendar.FRIDAY:
-                return c.isFriday();
-            case Calendar.SATURDAY:
-                return c.isSaturday();
-            case Calendar.SUNDAY:
-                return c.isSunday();
-            default:
-                return false;
-        }
+    public boolean isTrainingDay(int dayOfWeek, trainingDTO c) {
+        return switch (dayOfWeek) {
+            case Calendar.MONDAY -> c.isMonday();
+            case Calendar.TUESDAY -> c.isTuesday();
+            case Calendar.WEDNESDAY -> c.isWednesday();
+            case Calendar.THURSDAY -> c.isThursday();
+            case Calendar.FRIDAY -> c.isFriday();
+            case Calendar.SATURDAY -> c.isSaturday();
+            case Calendar.SUNDAY -> c.isSunday();
+            default -> false;
+        };
+    }
 
-
+    public double roundNumber(double number) {
+        if (number > 5.5) return 5.5;
+        return Math.round(number * 2) / 2.0;
     }
 
     /**
      * Tests the possibility of a training plan based on the provided parameters.
      *
-     * @param numberOfDays       The number of days available for training.
-     * @param raceLength         The length of the race.
-     * @param wantedPace         The desired pace for the race.
-     * @param averageRunLength   The average length of the user's runs.
-     * @param averagePace        The average pace of the user's runs.
-     * @param user               The user for whom the training plan is being tested.
+     * @param numberOfDays     The number of days available for training.
+     * @param raceLength       The length of the race.
+     * @param wantedPace       The desired pace for the race.
+     * @param averageRunLength The average length of the user's runs.
+     * @param averagePace      The average pace of the user's runs.
+     * @param user             The user for whom the training plan is being tested.
      * @return ResponseEntity indicating whether the training plan is feasible or not.
      */
 
@@ -326,18 +368,18 @@ public class TrainingService {
             // for long runs we cannot compare average training length, because it is not usual to run the race length as a training
             double x = weeklyPercentageIncreaseInLength(numberOfWeeks, averageRunLength, raceLength);
             log.info("Weekly percentage increase in length: " + x);
-            if (x > (MAX_PERCENTAGE_INCREASE_LENGTH_PER_TRAINING_DAY)*trainingDaysPerWeek)
+            if (x > (MAX_PERCENTAGE_INCREASE_LENGTH_PER_TRAINING_DAY) * trainingDaysPerWeek)
                 return messageHandler.error(messageSource.getMessage("error.training.badLength", null, LocaleContextHolder.getLocale()));
         }
         log.info("Average pace: " + averagePace);
         log.info("Wanted pace: " + wantedPace);
 
-        if (wantedPace != null && averagePace > wantedPace ) {
+        if (wantedPace != null && averagePace > wantedPace) {
 
             double x = weeklyPercentageIncreaseInPace(numberOfWeeks, averagePace, wantedPace);
             log.info("Weeks: " + numberOfWeeks);
             log.info("Weekly percentage increase in pace: " + x);
-            if (x > (MAX_PERCENTAGE_INCREASE_PACE_PER_TRAINING_DAY)*trainingDaysPerWeek)
+            if (x > (MAX_PERCENTAGE_INCREASE_PACE_PER_TRAINING_DAY) * trainingDaysPerWeek)
                 return messageHandler.error(messageSource.getMessage("error.training.badPace", null, LocaleContextHolder.getLocale()));
         }
 
@@ -349,12 +391,13 @@ public class TrainingService {
         }
         return ResponseEntity.ok("ok");
     }
+
     /**
      * Calculates the weekly percentage increase in run length based on the provided parameters.
      *
-     * @param numberOfWeeks     The number of weeks in the training period.
-     * @param averageRunLength  The average length of the user's runs.
-     * @param raceLength        The length of the race.
+     * @param numberOfWeeks    The number of weeks in the training period.
+     * @param averageRunLength The average length of the user's runs.
+     * @param raceLength       The length of the race.
      * @return The weekly percentage increase in run length.
      */
     public double weeklyPercentageIncreaseInLength(double numberOfWeeks, int averageRunLength, int raceLength) {
@@ -362,12 +405,13 @@ public class TrainingService {
         double weeklyIncrease = metersIncrease / numberOfWeeks;
         return weeklyIncrease / averageRunLength * 100;
     }
+
     /**
      * Calculates the weekly percentage increase in run pace based on the provided parameters.
      *
      * @param numberOfWeeks The number of weeks in the training period.
-     * @param averagePace    The average pace of the user's runs.
-     * @param wantedPace     The desired pace for the race.
+     * @param averagePace   The average pace of the user's runs.
+     * @param wantedPace    The desired pace for the race.
      * @return The weekly percentage increase in run pace.
      */
     public double weeklyPercentageIncreaseInPace(double numberOfWeeks, double averagePace, double wantedPace) {
@@ -375,6 +419,7 @@ public class TrainingService {
         double weeklyIncrease = paceIncrease / numberOfWeeks;
         return weeklyIncrease / averagePace * 100;
     }
+
     /**
      * Determines if the specified race length is suitable for training.
      *
@@ -384,6 +429,7 @@ public class TrainingService {
     public Boolean isGoalSuitable(Integer lengthOfRaceInMeters) {
         return lengthOfRaceInMeters >= 1000 && lengthOfRaceInMeters <= 42195;
     }
+
     /**
      * Checks if the user with the specified ID has an active training session.
      *
@@ -400,6 +446,7 @@ public class TrainingService {
         }
         return ResponseEntity.ok("no");
     }
+
     /**
      * Retrieves the active training for the user with the specified ID.
      * The training consists of a list of Day entity.
@@ -419,17 +466,17 @@ public class TrainingService {
             DayDTO dayDTO = new DayDTO(d.getDate(), d.getCaloriesGained(), d.getCaloriesBurned(), d.getExercises(), d.getMenu());
             daysDTO.add(dayDTO);
         }
-        CreateTrainingDTO createTrainingDTO = new CreateTrainingDTO();
-        createTrainingDTO.setLengthOfRaceInMeters(activeTraining.getLengthinmeters());
-        createTrainingDTO.setType(activeTraining.getType());
-        createTrainingDTO.setStartDay(activeTraining.getStartday());
-        createTrainingDTO.setRaceDay(activeTraining.getRaceday());
+        trainingDTO trainingDTO = new trainingDTO();
+        trainingDTO.setLengthOfRaceInMeters(activeTraining.getLengthinmeters());
+        trainingDTO.setType(activeTraining.getType());
+        trainingDTO.setStartDay(activeTraining.getStartday());
+        trainingDTO.setRaceDay(activeTraining.getRaceday());
 
         int days = (int) ChronoUnit.DAYS.between(activeTraining.getStartday(), activeTraining.getRaceday());
         int daysProgress = (int) ChronoUnit.DAYS.between(activeTraining.getStartday(), LocalDate.now());
         Map<String, Object> response = new HashMap<>();
         response.put("trainingDays", daysDTO);
-        response.put("trainingInfo", createTrainingDTO);
+        response.put("trainingInfo", trainingDTO);
         response.put("daysTotal", days);
         response.put("daysSoFar", daysProgress);
         return ResponseEntity.ok(response);
@@ -451,6 +498,7 @@ public class TrainingService {
             return messageHandler.error(messageSource.getMessage("error.dbs.onDelete", null, LocaleContextHolder.getLocale()));
         }
     }
+
     /**
      * Retrieves the list of trainings associated with the user obtained by the token.
      *
@@ -458,82 +506,25 @@ public class TrainingService {
      * @return ResponseEntity containing the list of trainings or an error message if the user is not found.
      */
     public ResponseEntity<?> getTrainings(String token) {
-        //TODO return brief info about past trainings
         User user = userRepository.findUserByToken(token);
         if (user == null)
             return messageHandler.error(messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
         List<Training> trainings = trainingRepository.findTrainingsContainingUser(user.getId());
-        return trainingListMessageHandler.success(trainings);
-    }
+        if (trainings.isEmpty())
+            return messageHandler.error(messageSource.getMessage("error.training.nullFound", null, LocaleContextHolder.getLocale()));
 
+        Map<String, Object> response = new HashMap<>();
 
-    public ResponseEntity<?> generateTrainingPlan(User user,
-                                                  int availableTrainingDays,
-                                                  int trainingLengthInDays,
-                                                  int averageRunLength,
-                                                  double trainingPace,
-                                                  int raceLength,
-                                                  double racePaceToAchieve,
-                                                  String raceType,
-                                                  String raceElevation
-    ) {
+        for (Training t : trainings) {
 
-    /*    try {
-            int[] attributeIndices = {13, 14};
-            for (int attributeIndex : attributeIndices) {
+            trainingDTO trainingDTO = new trainingDTO();
+            trainingDTO.setStartDay(t.getStartday());
+            trainingDTO.setRaceDay(t.getRaceday());
+            trainingDTO.setType(t.getType());
+            trainingDTO.setLengthOfRaceInMeters(t.getLengthinmeters());
 
-                Instance instance = new DenseInstance(16);
-
-                instance.setDataset(data);
-
-                instance.setValue(0, weight);
-                instance.setValue(1, height);
-                instance.setValue(2, bmi);
-                instance.setValue(3, sex);
-                instance.setValue(4, bodyType);
-                instance.setValue(5, availableTrainingDays);
-                instance.setValue(6, trainingLengthInDays);
-                instance.setValue(7, trainingLengthInMeters);
-                instance.setValue(8, trainingPace);
-                instance.setValue(9, raceLength);
-                instance.setValue(10, racePaceToAchieve);
-                instance.setValue(11, raceType);
-                instance.setValue(12, raceElevation);
-
-                data.setClassIndex(attributeIndex);
-
-                double[] predictions = classifier.distributionForInstance(instance);
-
-                int type = data.attribute(attributeIndex).type();
-                log.info("attribute type is " + type);
-
-                if (type == Attribute.NUMERIC) {
-                    // get numeric data
-                    double predictedNumericValue = classifier.classifyInstance(instance);
-                    log.info("Predicted Numeric Value for Attribute " + attributeIndex + ": " + predictedNumericValue);
-
-                } else if (type == Attribute.NOMINAL) {
-                    // get nominal data
-
-                    int predictedClassIndex = -1;
-                    double maxProbability = Double.NEGATIVE_INFINITY;
-
-                    for (int i = 0; i < predictions.length; i++) {
-                        if (predictions[i] > maxProbability) {
-                            maxProbability = predictions[i];
-                            predictedClassIndex = i;
-                        }
-                    }
-
-                    String predictedClass = data.attribute(attributeIndex).value(predictedClassIndex);
-                    log.info("Predicted Nominal Value for Attribute " + attributeIndex + ": " + predictedClass);
-                }
-            }
-            return ResponseEntity.ok(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.ok(messageSource.getMessage("error.training.failed", null, LocaleContextHolder.getLocale()));
-        }*/
-        return ResponseEntity.ok("ok");
+            response.put(String.valueOf(t.getId()), trainingDTO);
+        }
+        return ResponseEntity.ok(response);
     }
 }

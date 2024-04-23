@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateTrainingDTO {
+public class trainingDTO {
     LocalDate startDay;
     LocalDate raceDay;
     Type type;

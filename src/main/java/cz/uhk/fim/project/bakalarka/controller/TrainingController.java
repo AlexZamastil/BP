@@ -1,6 +1,6 @@
 package cz.uhk.fim.project.bakalarka.controller;
 
-import cz.uhk.fim.project.bakalarka.DTO.CreateTrainingDTO;
+import cz.uhk.fim.project.bakalarka.DTO.trainingDTO;
 import cz.uhk.fim.project.bakalarka.service.TrainingService;
 import cz.uhk.fim.project.bakalarka.util.AuthorizationCheck;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
@@ -31,10 +31,9 @@ public class TrainingController {
      * @param createTrainingRequest The CreateTrainingDTO containing training details.
      * @param request               The HttpServletRequest for authorization check.
      * @return ResponseEntity with the result of the operation.
-     * @throws Exception if an error occurs during reading, evaluating or cross-validating data
      */
     @PostMapping(value = "training/generateTraining", consumes = {"application/json"})
-    public ResponseEntity<?> generateTraining(@RequestBody CreateTrainingDTO createTrainingRequest, HttpServletRequest request) throws Exception {
+    public ResponseEntity<?> generateTraining(@RequestBody trainingDTO createTrainingRequest, HttpServletRequest request) {
         if (!AuthorizationCheck.hasAuthorization(request)) return messageHandler.error("Missing authorization");
         String token = request.getHeader("Authorization");
         return trainingService.generateTraining(createTrainingRequest, token);

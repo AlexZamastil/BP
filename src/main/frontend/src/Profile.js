@@ -5,6 +5,7 @@ import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { callAPI } from './CallAPI';
 import getXSRFtoken from './XSRF_token';
+import { isDisabled } from '@testing-library/user-event/dist/utils';
 
 /**
  * Author: Alex Zamastil
@@ -14,35 +15,69 @@ import getXSRFtoken from './XSRF_token';
 export default function Profile() {
   const [userStats, setUserStats] = useState([]);
   const [bmiColor, setBmiColor] = useState(null);
-  const [trainings, setTrainings] = useState([]);
+  const [trainings, setTrainings] = useState(null);
   const xsrfToken = getXSRFtoken();
-  const [age,setAge] = useState(null);
+  const [age, setAge] = useState(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
-//function that logs out the user
+  //function that logs out the user
   const handleLogout = () => {
-    callAPI("post", "user/logout", null,xsrfToken)
+    callAPI("post", "user/logout", null, xsrfToken)
     localStorage.removeItem("token");
     navigate("/WelcomePage");
     window.location.reload(false);
   }
-//function that navigates to update data form
+  //function that navigates to update data form
   const handleChange = () => {
     navigate("/UpdateData");
     window.location.reload(false);
   }
-//function that navigates to administrator tools (only for administrator)
+  //function that navigates to administrator tools (only for administrator)
   const handleAdminTools = () => {
     navigate("/AdminTools");
     window.location.reload(false);
   }
-//function that computes user's age
+  //function that computes user's age
   const handleAge = (date) => {
     const today = new Date();
     const day = new Date(date);
     const difference = (today - day);
-    const ageInYears = Math.floor(difference/1000/60/60/24/365.25);
+    const ageInYears = Math.floor(difference / 1000 / 60 / 60 / 24 / 365.25);
     setAge(ageInYears);
+  }
+  //function for displaying all trainings of the user
+  function displayTrainings(trainings) {
+   
+    if (trainings != null) {
+      const trainingArray = [];
+      for (const id in trainings) {
+        if (trainings.hasOwnProperty(id)) {
+          trainingArray.push(trainings[id]);
+        }
+      }
+       
+      return (
+        <div>
+          {trainingArray.map((training, id) => {
+            const raceDay = new Date(training.raceDay);
+            const isFutureRace = raceDay > new Date();
+        
+          return(
+            <div key={id}>
+              {training.type} <br />
+              {isFutureRace ? <p style={{color :"lightgreen"}}>{t("current_training")}</p> :<p style={{color :"red"}}>{t("past_training")}</p>}
+              {t("startDate")}<br />{training.startDay}<br />
+              {t("raceDate")} <br />{training.raceDay}<br />
+              {t("length_e")} {training.lengthOfRaceInMeters}
+              <br/>
+              <br/>
+            </div>
+         ) })}
+        </div>
+      );
+    }
+
+
   }
 
   const [adminTools, setAdminTools] = useState(null);
@@ -68,9 +103,10 @@ export default function Profile() {
             setBmiColor('#FFFF66');
           } else if (bmiValue > 18.5 && bmiValue < 25) {
             setBmiColor('#66FF66');
-          } else if (bmiValue <= 18.5 ) {
+          } else if (bmiValue <= 18.5) {
             setBmiColor('#99CCFF');
-          }}
+          }
+        }
       })
       .catch((error) => {
         console.log(error)
@@ -81,9 +117,10 @@ export default function Profile() {
         }
       });
 
-      callAPI("GET", "training/getTrainings", null, null)
+    callAPI("GET", "training/getTrainings", null, null)
       .then(response => {
-        setTrainings(response)
+        console.log(response.data)
+        setTrainings(response.data)
       })
       .catch((error) => {
         console.log(error)
@@ -136,7 +173,22 @@ export default function Profile() {
               <br />
             </div>
           </Paper></div>
+
+          <div className='profile_stats'> <Paper elevation={3} className='paperProfile'>
+            <div>
+              <h2 className='header'>{t('past_trainings')}</h2>
+              <div style={{ margin: "5px", padding: "5px" }}>
+
+              {(trainings === null) ?  t('null_training'):  displayTrainings(trainings) }
+           
+              
+              </div>
+
+            </div>
+          </Paper></div>
         </div>
+
+
 
 
         <div className='Logout'>

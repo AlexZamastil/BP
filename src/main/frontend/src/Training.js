@@ -112,22 +112,22 @@ export default function Training() {
 
     }
     //function for rendering menu items as links to food detail
-    function displayMenu(food, localization) {
+    function displayMenu(menu, localization) {
         if (localization === "en") {
             return (
                 <div>
-                    {food.map((food, id) => (
-                        <div key={id} onClick={() => handleFoodClick(food.id)} style={{ cursor: 'pointer', color: "#61e248" }}>
-                            {food.name_eng}
+                    {menu.map((food, id) => (
+                        <div key={id} onClick={() => handleFoodClick(food.id)} style={{ cursor: 'pointer', color: "#61e248", padding: "10px" }}>
+                            {food.name_eng} 
                         </div>
                     ))}
                 </div>
             );
         } else return (
             <div>
-                {food.map((food, id) => (
-                    <div key={id} onClick={() => handleFoodClick(food.id)} style={{ cursor: 'pointer', color: "#61e248" }}>
-                        {food.name}
+                {menu.map((food, id) => (
+                    <div key={id} onClick={() => handleFoodClick(food.id)} style={{ cursor: 'pointer', color: "#61e248", padding: "10px" }}>
+                        {food.name} 
                     </div>
                 ))}
             </div>
@@ -196,6 +196,9 @@ export default function Training() {
                         backgroundColor: '#e0e0e0',
                         height: '10px',
                     }} />
+                    <br/>
+                    {t("raceDate")}   <br/>
+                    {dayData.trainingInfo.raceDay}
                 </Paper>
 
             </div>

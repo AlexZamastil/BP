@@ -1,6 +1,0 @@
-@relation LongRun
-
-@attribute previous3 {Intervals, Endurance run, Uphill run, Crawl, Breaststroke}
-@attribute previous2 {Intervals, Endurance run, Uphill run, Crawl, Breaststroke}
-@attribute previous1 {Intervals, Endurance run, Uphill run, Crawl, Breaststroke}
-@attribute next {Intervals, Endurance run, Uphill run, Crawl, Breaststroke}

@@ -3,9 +3,7 @@ package cz.uhk.fim.project.bakalarka.service;
 
 import cz.uhk.fim.project.bakalarka.BakalarkaJavaApplication;
 import cz.uhk.fim.project.bakalarka.DAO.TrainingRepository;
-import cz.uhk.fim.project.bakalarka.DTO.CreateTrainingDTO;
 import cz.uhk.fim.project.bakalarka.enumerations.Type;
-import cz.uhk.fim.project.bakalarka.model.Training;
 import cz.uhk.fim.project.bakalarka.model.User;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -18,7 +16,6 @@ import java.time.LocalDate;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 @Log4j2

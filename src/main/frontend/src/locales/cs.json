@@ -142,7 +142,7 @@
     "today_traning": "Dnes",
     "tomorrow_training": "Zítra",
     "date": "Datum: ",
-    "calories": "Spáleno kalorií: ",
+    "calories": "Aktivní spálené kalorie: ",
     "exercises": "Cvičení: ",
     "menu": "Jídelníček: ",
     "progress": "Pokrok",
@@ -159,5 +159,11 @@
     "admin_tools" : "Administrátorské nástroje",
     "calories_gain" : "Kalorický příjem (kcal)",
     "calories_gain_f" : "Kcal ",
-    "calories_burned" : "Kalorický výdej"
+    "calories_burned" : "Kalorický výdej",
+    "raceDate" : "Datum závodu: ",
+    "startDate" : "Datum zahájení přípravy: ",
+    "past_trainings" : "Přehled tréninků",
+    "current_training" : "Aktuální trénink",
+    "past_training" : "Skončený trénink",
+    "null_training":"Uživatel nemá aktivní ani dokončený trénink"
 }

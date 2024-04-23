@@ -34,11 +34,12 @@ export default function GenerateTraining() {
     const [age, setAge] = useState(null);
     const [selectPace, setSelectPace] = useState(true);
     const theme = useTheme();
+    const [raceDate,setRaceDay] = useState(null);
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const [length, setLength] = useState(null);
     const [pace, setPace] = useState(null);
     const [time, setTime] = useState(null);
-    const [raceDate, setRaceDate] = useState(new Date());
+    const [formattedRaceDate, setFormattedRaceDate] = useState(new Date());
     const [raceLength, setRaceLength] = useState(0);
     const [wantedPace, setWantedPace] = useState(0);
     const [elevation, setElevation] = useState("FLAT_ROAD");
@@ -71,6 +72,8 @@ export default function GenerateTraining() {
             setErrorMessage(t('invalid_day_count'));
             return;
         }
+       //
+        setRaceDay(formatDay(raceDate));
 
         const data = {
             startDay: dayjs().toISOString().split("T")[0],
@@ -105,9 +108,9 @@ export default function GenerateTraining() {
             })
     }
     //function for maintaining expected time format
-    function setRaceDay(date) {
+    function formatDay(date) {
         const formattedDate = date ? date.toISOString().split("T")[0] : null;
-        setRaceDate(formattedDate);
+        return(formattedDate);
     }
     //handler that allows input only numbers, used in textfields
     const onlyNumbers = (e) => {

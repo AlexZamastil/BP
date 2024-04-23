@@ -142,7 +142,7 @@
     "today_traning" : "Today",
     "tomorrow_training" : "Tomorrow",
     "date" : "Date: ",
-    "calories" : "Calories burned: ",
+    "calories" : "Active Calories burned: ",
     "exercises" : "Exercises: ",
     "menu" : "Menu: ",
     "progress" : "Progress",
@@ -159,6 +159,12 @@
     "admin_tools" : "Administrator tools",
     "calories_gain" : "Caloric gain (kcal)",
     "calories_gain_f" : "Kcal ",
-    "calories_burned" : "Caloric output"
+    "calories_burned" : "Caloric output",
+    "raceDate" : "Race date: ",
+    "startDate" : "Preparation started: ",
+    "past_trainings" : "Trainings overview",
+    "current_training" : "Current training",
+    "past_training" : "Past training",
+    "null_training":"User don't have any current or finished training"
     
 }

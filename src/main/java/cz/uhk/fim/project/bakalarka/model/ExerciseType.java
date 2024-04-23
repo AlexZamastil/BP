@@ -6,4 +6,6 @@ package cz.uhk.fim.project.bakalarka.model;
  */
 public interface ExerciseType {
     Exercise getExercise();
+
+    String getType();
 }

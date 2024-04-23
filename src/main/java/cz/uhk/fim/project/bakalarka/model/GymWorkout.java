@@ -33,6 +33,11 @@ public class GymWorkout implements ExerciseType{
 
     }
 
+    @Override
+    public String getType() {
+        return "GYM";
+    }
+
     public GymWorkout(Integer series, Integer repetitions, Exercise exercise) {
         this.series = series;
         this.repetitions = repetitions;

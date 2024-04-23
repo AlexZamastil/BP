@@ -33,6 +33,10 @@ public class Run implements ExerciseType{
     public Run() {
 
     }
+    @Override
+    public String getType() {
+        return "RUN";
+    }
 
     public Run(Integer lenglhinmeters, RunCategory runcategory, Exercise exercise) {
         this.lenglhinmeters = lenglhinmeters;

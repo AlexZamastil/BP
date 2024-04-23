@@ -32,6 +32,10 @@ public class Swimming implements ExerciseType{
 
     public Swimming() {
     }
+    @Override
+    public String getType() {
+        return "SWIMMING";
+    }
 
     public Swimming(Integer lenglhinmeters, SwimmingStyle swimmingstyle, Exercise exercise) {
         this.lenglhinmeters = lenglhinmeters;
