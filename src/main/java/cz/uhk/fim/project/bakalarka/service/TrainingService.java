@@ -220,23 +220,23 @@ public class TrainingService {
         switch (predictedCaloryProgram) {
             case "HIGH_GAIN_HIGH_BURN" -> {
                 //maintaining weight with hard training
-                caloricGain = BMR * 1.8;
-                activeCaloricBurn = caloricGain - BMR;
+                caloricGain = BMR * 1.5;
+                activeCaloricBurn = caloricGain  - BMR;
             }
             case "LOW_GAIN_HIGH_BURN" -> {
                 // deficit
-                caloricGain = BMR * 1.22;
-                activeCaloricBurn = caloricGain + 500 - BMR;
+                caloricGain = BMR * 1.2;
+                activeCaloricBurn = caloricGain  - BMR;
             }
             case "HIGH_GAIN_LOW_BURN" -> {
                 //surplus
-                caloricGain = BMR * 1.8;
-                activeCaloricBurn = caloricGain - 500 - BMR;
+                caloricGain = BMR * 1.5;
+                activeCaloricBurn = caloricGain - 250 - BMR;
             }
             case "LOW_GAIN_LOW_BURN" -> {
                 //maintaining weight on diet a light training
-                caloricGain = BMR * 1.22;
-                activeCaloricBurn = caloricGain - BMR;
+                caloricGain = BMR * 1.2;
+                activeCaloricBurn = caloricGain - 250 - BMR;
             }
         }
         String lastExercise = null;
@@ -300,10 +300,12 @@ public class TrainingService {
         double calories = 0;
         Collections.shuffle(foodPool);
         int i = 0;
-        while (calories < (caloricGain + MAX_CALORIC_DEVIATION) && i < foodPool.size()) {
-                foodList.add(foodPool.get(i));
-                day.setCaloriesGained(day.getCaloriesGained() + foodPool.get(i).getCaloriesGained());
-                calories += foodPool.get(i).getCaloriesGained();
+        log.info(caloricGain);
+        while (calories < (caloricGain - MAX_CALORIC_DEVIATION) && i < foodPool.size()) {
+            foodList.add(foodPool.get(i));
+            day.setCaloriesGained(day.getCaloriesGained() + foodPool.get(i).getCaloriesGained());
+            calories += foodPool.get(i).getCaloriesGained();
+            log.info(calories);
             i++;
         }
         day.setMenu(foodList);

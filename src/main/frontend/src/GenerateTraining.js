@@ -52,6 +52,7 @@ export default function GenerateTraining() {
     const [sunday, setSunday] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
     const xsrfToken = getXSRFtoken();
+    const [formatBoolean,setFormatBoolean] = useState(false);
     function displayHeartBeatInfo() {
         if (age != null) {
             const maxHB = Math.floor(211 - 0.8 * age);
@@ -73,10 +74,13 @@ export default function GenerateTraining() {
             return;
         }
        //
+       if(formatBoolean){
         setRaceDay(formatDay(raceDate));
-
+       }
+       const startDay = dayjs().tz('Europe/Prague').format('YYYY-MM-DD');
         const data = {
-            startDay: dayjs().toISOString().split("T")[0],
+            startDay: startDay,
+           // startDay: dayjs().toISOString().split("T")[0],
             type: trainingType,
             lengthOfRaceInMeters: raceLength,
             wantedPace: wantedPace,
@@ -110,6 +114,7 @@ export default function GenerateTraining() {
     //function for maintaining expected time format
     function formatDay(date) {
         const formattedDate = date ? date.toISOString().split("T")[0] : null;
+        setFormatBoolean(false);
         return(formattedDate);
     }
     //handler that allows input only numbers, used in textfields
@@ -171,6 +176,7 @@ export default function GenerateTraining() {
                                 format="DD-MM-YYYY"
                                 label={t('race_date')}
                                 onChange={(e) => {
+                                    setFormatBoolean(true)
                                     setRaceDay(e)
                                 }}
                             />
