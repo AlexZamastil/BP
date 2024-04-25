@@ -102,8 +102,6 @@ export default function Food() {
                             style={{
                                 borderRadius: '10px',
                                 maxWidth: '100%',
-                                height: 'auto',
-                                border: '1px solid black',
                                 objectFit: 'cover',
                                 margin: "20px"
                             }}

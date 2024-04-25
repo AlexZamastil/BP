@@ -1,8 +1,6 @@
 package cz.uhk.fim.project.bakalarka.controller;
 
-import cz.uhk.fim.project.bakalarka.DTO.ExerciseDTO;
 import cz.uhk.fim.project.bakalarka.DTO.FoodDTO;
-import cz.uhk.fim.project.bakalarka.service.ExerciseService;
 import cz.uhk.fim.project.bakalarka.service.FoodService;
 import cz.uhk.fim.project.bakalarka.util.AuthorizationCheck;
 import cz.uhk.fim.project.bakalarka.util.MessageHandler;
@@ -11,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 /**
  * Controller class for handling food-related endpoints.
@@ -35,8 +31,8 @@ public class FoodController {
      * Endpoint for adding a new food
      *
      * @param foodRequest = the DTO containing the food data
-     * @param imageData       = data of the food image
-     * @param request         = HttpServletRequest that contains headers, authorization header is needed for this request
+     * @param imageData   = data of the food image
+     * @param request     = HttpServletRequest that contains headers, authorization header is needed for this request
      * @return ResponseEntity with the result of the operation.
      */
 
@@ -64,8 +60,8 @@ public class FoodController {
     /**
      * Endpoint for retrieving the picture of the food by ID.
      *
-     * @param id The ID of the exercise to retrieve the picture for.
-     * @return ResponseEntity with the exercise picture.
+     * @param id The ID of the food to retrieve the picture for.
+     * @return ResponseEntity with the food picture.
      */
     @GetMapping(value = "food/getFood/picture/{id}")
     public ResponseEntity<?> getFoodPicture(@PathVariable Long id) {

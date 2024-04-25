@@ -22,8 +22,8 @@ body {
   height: 100%;
 }
 
-.container {
-  
+.AppContainer {
+  min-height: 80vh;
   position: relative;
 }
 
@@ -855,7 +855,7 @@ footer a{font-size: small;}
   padding-bottom:  250px;
   background-image: url(/src/sources/img_legs.jpg);
   background-size: cover;
-  
+  background-position: center;
   justify-content:center;
 }
 

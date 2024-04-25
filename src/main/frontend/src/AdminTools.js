@@ -18,11 +18,16 @@ export default function AdminTools() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  useEffect(()=>{
+    console.log(isAdmin);
+  },[isAdmin])
+
   //getting user data from server
   useEffect(() => {
     callAPI("GET", "user/getUserData", null, null)
       .then(response => {
-        setIsAdmin((response.data.user.role = "ADMIN"));
+        console.log(response.data)
+        setIsAdmin((response.data.user.role === "ROLE_ADMIN"));
       })
       .catch(error => {
         console.error('Error fetching data:', error);

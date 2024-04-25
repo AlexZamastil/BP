@@ -145,7 +145,7 @@ export default function Training() {
         let localization = localStorage.getItem("Localization")
         console.log(dayData);
         console.log(waterIntake);
-        progress = Math.floor(dayData.daysSoFar/dayData.daysTotal*100);
+        progress = Math.floor(dayData.daysSoFar+10/dayData.daysTotal*100);
 
         for (let i = 0; i < dayData.trainingDays.length; i++) {
             let trainingDate = new Date(dayData.trainingDays[i].date);

@@ -31,4 +31,14 @@ Pro spuštění containerizované verze otevřít podadresář:
 
             Pro spuštění aplikace v dockeru je nutné mít běžící program Docker desktop
 
+DB
+Pro správný chod databáze je potřeba mít v databází data.
+
+soubor db_backup.sql umožňuje nahrát celou strukturu databáze včetně dat.
+
+Na zařízení je potřeba vytvořit postgreSQL databázi, nahrát do ni db_backup.sql (funkce restore) a přizpůsobit
+soubor application.properties názvu a portu databáze. Konkrétně údaj spring.datasource.url
+Lze spustit i bez testovacích dat, ale např. generování tréninku bez těchto dat není možné.
+V testovacích datech je vytvořený uživatel s rolí administrátora. email je : a@admin.cz a heslo 12345678
+
 

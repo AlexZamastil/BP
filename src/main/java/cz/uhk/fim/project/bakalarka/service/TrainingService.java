@@ -52,7 +52,9 @@ public class TrainingService {
     public final double MAX_PERCENTAGE_INCREASE_LENGTH_PER_TRAINING_DAY = 1.3;
     public final double MAX_PERCENTAGE_INCREASE_PACE_PER_TRAINING_DAY = 1;
     public final double LONG_RUN_THRESHOLD = 12000;
-    public static int MAX_CALORIC_DEVIATION = 200;
+    public static int MAX_CALORIC_DEVIATION = 400;
+    public static int MIN_RUN_LENGTH = 2000;
+    public static int MAX_RUN_LENGTH = 21000;
 
 
     public TrainingService(UserRepository userRepository, TrainingRepository trainingRepository, DayRepository dayRepository, FoodRepository foodRepository, GymWorkoutRepository gymWorkoutRepository, RunRepository runRepository, SwimmingRepository swimmingRepository, UserStatsRepository userStatsRepository, MessageSource messageSource) {
@@ -221,12 +223,12 @@ public class TrainingService {
             case "HIGH_GAIN_HIGH_BURN" -> {
                 //maintaining weight with hard training
                 caloricGain = BMR * 1.5;
-                activeCaloricBurn = caloricGain  - BMR;
+                activeCaloricBurn = caloricGain - BMR;
             }
             case "LOW_GAIN_HIGH_BURN" -> {
                 // deficit
                 caloricGain = BMR * 1.2;
-                activeCaloricBurn = caloricGain  - BMR;
+                activeCaloricBurn = caloricGain - BMR;
             }
             case "HIGH_GAIN_LOW_BURN" -> {
                 //surplus
@@ -239,7 +241,7 @@ public class TrainingService {
                 activeCaloricBurn = caloricGain - 250 - BMR;
             }
         }
-        String lastExercise = null;
+        String lastExercise = "RUN";
         for (int x = 0; x < trainingDays; x++) {
             List<ExerciseType> exercises = new ArrayList<>(exercisePool);
             List<Food> food = new ArrayList<>(foodPool);
@@ -252,11 +254,8 @@ public class TrainingService {
             //day.setCaloriesBurned(userStats.getBmr());
 
             if (isTrainingDay(calendar.get(Calendar.DAY_OF_WEEK), trainingData)) {
-                lastExercise = generateExercises(day, exercises, activeCaloricBurn, lastExercise);
+                lastExercise = generateExercises(day, exercises, activeCaloricBurn, lastExercise, trainingData);
             }
-            //can't switch exercises when only 1 type is available
-            if (trainingData.getType().toString().equals("RUN") && trainingData.getLengthOfRaceInMeters() < LONG_RUN_THRESHOLD && trainingDays < 90)
-                lastExercise = null;
 
             generateFood(day, food, caloricGain);
             dayRepository.save(day);
@@ -267,26 +266,46 @@ public class TrainingService {
         return messageHandler.success(messageSource.getMessage("success.training.generated", null, LocaleContextHolder.getLocale()));
     }
 
-    public String generateExercises(Day day, List<ExerciseType> exercisePool, double caloricBurn, String lastExercise) {
-        exercisePool.removeIf(e -> e.getType().equals(lastExercise));
+    public String generateExercises(Day day, List<ExerciseType> exercisePool, double caloricBurn, String lastExercise, trainingDTO trainingData) {
+        if(!trainingData.getType().toString().equals("RUN")){
+            exercisePool.removeIf(e -> e.getType().equals(lastExercise));
+        }
+
         log.info("exercise pool: " + exercisePool.size());
         if (exercisePool.size() < 3) {
             log.info("Insufficient exercises available.");
 
             return null;
         }
+
+
         Set<Exercise> exerciseList = new HashSet<>();
         double calories = 0;
         Collections.shuffle(exercisePool);
+        log.info("Exercise pool: ");
+        for (ExerciseType e : exercisePool ){
+            log.info(e.getExercise().getName());
+        }
         int i = 0;
         while (calories < (caloricBurn + MAX_CALORIC_DEVIATION) && i < exercisePool.size() - 1) {
             exerciseList.add(exercisePool.get(i).getExercise());
             day.setCaloriesBurned(day.getCaloriesBurned() + exercisePool.get(i).getExercise().getCaloriesBurned());
-            calories += exercisePool.get(i).getExercise().getCaloriesBurned();
+            if (exercisePool.get(i).getType().equals("GYM")){
+                //gym workout is usually hard and burns way less calories that run or swimming,
+                // the caloric output of this exercise is lower, usually between 300 and 800 calories burned, big portion of the burned calories are from cardio
+                calories += 2*(exercisePool.get(i).getExercise().getCaloriesBurned());
+            } else {
+                calories += exercisePool.get(i).getExercise().getCaloriesBurned();
+            }
+
             i++;
         }
+        log.info("Exercises being added: ");
+        log.info(exerciseList);
+        for (Exercise e : exerciseList ){
+            log.info(e.getName());
+        }
         day.setExercises(exerciseList);
-        log.info(exercisePool.get(0).getType());
         return exercisePool.get(0).getType();
     }
 
@@ -366,7 +385,7 @@ public class TrainingService {
         log.info("Weeks: " + numberOfWeeks);
         log.info("Average length: " + averageRunLength);
         log.info("Race length: " + raceLength);
-        if (averageRunLength < raceLength && raceLength < 20000) {
+        if (averageRunLength < raceLength && raceLength < MAX_RUN_LENGTH) {
             // for long runs we cannot compare average training length, because it is not usual to run the race length as a training
             double x = weeklyPercentageIncreaseInLength(numberOfWeeks, averageRunLength, raceLength);
             log.info("Weekly percentage increase in length: " + x);
@@ -385,12 +404,6 @@ public class TrainingService {
                 return messageHandler.error(messageSource.getMessage("error.training.badPace", null, LocaleContextHolder.getLocale()));
         }
 
-        if (raceLength > 20000 && (
-                (user.getBodyType().toString().equals("OBESE") && numberOfWeeks < 20) ||
-                        (user.getBodyType().toString().equals("AVERAGE") && numberOfWeeks < 16) ||
-                        (user.getBodyType().toString().equals("ATHLETIC") && numberOfWeeks < 12))) {
-            return messageHandler.error(messageSource.getMessage("error.training.longRace", null, LocaleContextHolder.getLocale()));
-        }
         return ResponseEntity.ok("ok");
     }
 
@@ -429,7 +442,7 @@ public class TrainingService {
      * @return true if the race length is between 1000 and 42195 meters, false otherwise.
      */
     public Boolean isGoalSuitable(Integer lengthOfRaceInMeters) {
-        return lengthOfRaceInMeters >= 1000 && lengthOfRaceInMeters <= 42195;
+        return lengthOfRaceInMeters >= MIN_RUN_LENGTH && lengthOfRaceInMeters <= MAX_RUN_LENGTH;
     }
 
     /**

@@ -50,7 +50,7 @@ export default function AddFood() {
         callAPI("GET", "user/getUserData", null, null)
             .then(async response => {
                 const userData = response.data;
-                setIsAdmin((userData.user.role === "ADMIN"));
+                setIsAdmin((userData.user.role === "ROLE_ADMIN"));
             }
             )
             .catch(error => {

@@ -154,7 +154,6 @@ export default function Exercise() {
                                 borderRadius: '30px',
                                 maxWidth: '100%',
                                 height: 'auto',
-                                border: '2px solid black',
                                 objectFit: 'cover',
                                 margin: "20px"
                             }}

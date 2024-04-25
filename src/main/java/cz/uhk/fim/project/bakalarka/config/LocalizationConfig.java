@@ -12,7 +12,7 @@ import java.util.Locale;
 
 /**
  * Configuration class for setting up LocaleResolver.
- * This class defines beans for managing locale resolution and message sources.
+ * This class defines beans for managing language of the project and message sources for the actual texts.
  *
  * @author Alex Zamastil
  */
@@ -32,7 +32,7 @@ public class LocalizationConfig {
     }
 
     /**
-     * Definition of source of the localization messages, that are being sent to frontend part of project
+     * Definition of source of the localized messages, that are being sent to frontend part of project
      *
      * @return messageSource
      */

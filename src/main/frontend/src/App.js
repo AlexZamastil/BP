@@ -68,7 +68,7 @@ function App() {
   return (
     <>
       <Navbar />
-      <div className='container'>
+      <div className='AppContainer'>
         <Routes>
           <Route path="/aboutproject" element={<AboutProject />} />
           <Route path="/profile" element={<Profile />} />

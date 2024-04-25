@@ -88,7 +88,7 @@ export default function Profile() {
       .then((userStats) => {
         setUserStats(userStats);
         handleAge(userStats.user.dateOfBirth)
-        if (userStats.user && userStats.user.role === "ADMIN") {
+        if (userStats.user && userStats.user.role === "ROLE_ADMIN") {
           setAdminTools(
             <Button color="dark" style={{ margin: '10px' }} variant="contained" onClick={handleAdminTools}>
               {t('admin_button')}
